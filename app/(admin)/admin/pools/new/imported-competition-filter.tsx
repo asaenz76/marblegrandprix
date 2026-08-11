@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Label } from "@/components/ui/label";
 import { SELECT_CLASS, type CompetitionOption } from "./template-cards";
 import { COMPETITION_GROUP_LABEL } from "@/lib/sports-data/supported-competitions";
@@ -20,12 +19,7 @@ export function ImportedCompetitionFilter({
 }) {
   return (
     <div className="space-y-1.5">
-      <div className="flex items-center justify-between">
-        <Label htmlFor="competitionFilter">Competition</Label>
-        <Link href="/admin/competitions" className="text-xs font-medium text-accent-primary hover:underline">
-          + Import another competition
-        </Link>
-      </div>
+      <Label htmlFor="competitionFilter">Competition</Label>
       <select
         id="competitionFilter"
         className={SELECT_CLASS}

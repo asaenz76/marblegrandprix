@@ -44,8 +44,8 @@ const PROTECTED_RPCS: Array<{
   { name: "apply_wallet_transaction", args: { p_account_type: "user", p_user_id: "00000000-0000-0000-0000-000000000000", p_type: "manual_deposit", p_direction: "credit", p_amount: 1, p_admin_id: "00000000-0000-0000-0000-000000000000", p_reason: "test", p_idempotency_key: "test", p_pool_id: "00000000-0000-0000-0000-000000000000", p_entry_id: "00000000-0000-0000-0000-000000000000", p_settlement_id: "00000000-0000-0000-0000-000000000000", p_destination: "test" }, allowAnon: false, allowAuthenticated: false },
   { name: "can_view_pool_distribution", args: { p_pool_id: "00000000-0000-0000-0000-000000000000" }, allowAnon: false, allowAuthenticated: true },
   { name: "check_and_increment_rate_limit", args: { p_identifier: "test", p_window_seconds: 1, p_max_attempts: 1 }, allowAnon: true, allowAuthenticated: true },
-  { name: "claim_import_job_chunks", args: { p_limit: 1, p_max_attempts: 1 }, allowAnon: false, allowAuthenticated: false },
-  { name: "cleanup_import_job_chunk_payloads", args: { p_recovery_window: "1 hour" }, allowAnon: false, allowAuthenticated: false },
+  // claim_import_job_chunks / cleanup_import_job_chunk_payloads / recalculate_import_job_progress
+  // dropped in Racing Phase 1 (migration 20260101000108) — football import infrastructure removed.
   { name: "close_own_account", args: { p_user_id: "00000000-0000-0000-0000-000000000000" }, allowAnon: false, allowAuthenticated: false },
   { name: "confirm_combo_refund_fee_retained", args: { p_pool_id: "00000000-0000-0000-0000-000000000000", p_admin_id: "00000000-0000-0000-0000-000000000000", p_grading_version: 1, p_idempotency_key: "test", p_winning_option_id: "00000000-0000-0000-0000-000000000000" }, allowAnon: false, allowAuthenticated: false },
   { name: "confirm_pool_refund", args: { p_pool_id: "00000000-0000-0000-0000-000000000000", p_void_reason: "ADMIN_MANUAL_CANCEL", p_idempotency_key: "test", p_admin_id: "00000000-0000-0000-0000-000000000000", p_grading_version: 1 }, allowAnon: false, allowAuthenticated: false },
@@ -84,7 +84,6 @@ const PROTECTED_RPCS: Array<{
   { name: "is_super_admin", args: { uid: "00000000-0000-0000-0000-000000000000" }, allowAnon: false, allowAuthenticated: true },
   { name: "prepare_pool_settlement", args: { p_pool_id: "00000000-0000-0000-0000-000000000000" }, allowAnon: false, allowAuthenticated: false },
   { name: "prepare_pool_settlement_manual", args: { p_pool_id: "00000000-0000-0000-0000-000000000000" }, allowAnon: false, allowAuthenticated: false },
-  { name: "recalculate_import_job_progress", args: { p_job_id: "00000000-0000-0000-0000-000000000000", p_max_attempts: 1 }, allowAnon: false, allowAuthenticated: false },
   { name: "reverse_pool_settlement", args: { p_pool_id: "00000000-0000-0000-0000-000000000000", p_admin_id: "00000000-0000-0000-0000-000000000000", p_reason: "test", p_idempotency_key: "test" }, allowAnon: false, allowAuthenticated: false },
   { name: "toggle_pool_like", args: { p_pool_id: "00000000-0000-0000-0000-000000000000", p_user_id: "00000000-0000-0000-0000-000000000000" }, allowAnon: false, allowAuthenticated: false },
   { name: "undo_pool_grading", args: { p_pool_id: "00000000-0000-0000-0000-000000000000", p_admin_id: "00000000-0000-0000-0000-000000000000" }, allowAnon: false, allowAuthenticated: false },

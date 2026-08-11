@@ -7,8 +7,6 @@ import { cn } from "@/lib/utils";
 const TABS: Array<{ href: string; label: string; superAdminOnly?: boolean }> = [
   { href: "/admin/users", label: "Users" },
   { href: "/admin/invitations", label: "Invitations" },
-  { href: "/admin/competitions", label: "Competitions" },
-  { href: "/admin/fixtures", label: "Fixtures" },
   { href: "/admin/pools", label: "Pools" },
   { href: "/admin/wallet-requests", label: "Ledger Requests", superAdminOnly: true },
   { href: "/admin/reports", label: "Reports", superAdminOnly: true },

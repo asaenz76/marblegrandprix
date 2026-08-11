@@ -116,8 +116,9 @@ local dev and CI both work today with no Sentry account at all.
 
 ## 5. Cron jobs (cron-job.org, not Vercel Cron)
 
-The app needs three routes hit once a minute — `/api/cron/sync-fixtures`,
-`/api/cron/lock-pools`, `/api/cron/process-results`. Vercel's Hobby plan
+The app needs two routes hit once a minute — `/api/cron/lock-pools` and
+`/api/cron/process-results`. (The football `sync-fixtures` cron was removed
+in Racing Phase 1.) Vercel's Hobby plan
 only allows daily cron invocations (Pro is required for per-minute native
 Vercel Cron), so instead this project uses
 [cron-job.org](https://cron-job.org) — a free external scheduler that calls
@@ -128,11 +129,10 @@ Each route checks `Authorization: Bearer $CRON_SECRET` and returns `401` on
 a mismatch — the same header Vercel's native cron would have sent, so
 cron-job.org just needs to be told to send it too. Set `CRON_SECRET` to a
 long random value in the Vercel project's env vars first, then on
-cron-job.org create three jobs:
+cron-job.org create two jobs:
 
 | Job | URL | Schedule | Header |
 | --- | --- | --- | --- |
-| Sync fixtures | `https://brohda.com/api/cron/sync-fixtures` | Every 1 minute | `Authorization: Bearer <CRON_SECRET>` |
 | Lock pools | `https://brohda.com/api/cron/lock-pools` | Every 1 minute | `Authorization: Bearer <CRON_SECRET>` |
 | Process results | `https://brohda.com/api/cron/process-results` | Every 1 minute | `Authorization: Bearer <CRON_SECRET>` |
 
