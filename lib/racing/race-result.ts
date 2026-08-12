@@ -5,6 +5,7 @@ import { isSuperAdmin } from "@/lib/auth/guards";
 import { isOrganizerOrAbove, userCanManageDescendant } from "@/lib/auth/racing";
 import { settleRacePool, settleRacingPoolsForRace, type SettleRacePoolOutcome } from "@/lib/racing/settle-race-pool";
 import type { RacingPoolRow } from "@/lib/racing/grade-race-pool";
+import { processProgressionForRace, assessDownstreamSafety, type ProgressionResult } from "@/lib/racing/progression";
 
 /**
  * Racing result entry / confirmation core (Phase 6). The organizer records a
@@ -23,6 +24,7 @@ export type ConfirmResultResult = {
   error: string | null;
   confirmed?: boolean;
   outcomes?: Record<string, SettleRacePoolOutcome>;
+  progression?: ProgressionResult;
 };
 
 export interface RaceResultPositionInput {
@@ -108,39 +110,36 @@ export async function confirmRaceResultForActor(
     if (confErr) return { error: "Could not confirm — another confirmed result already exists for this race." };
   }
 
+  // 1) Settle this race's OWN pools (Phase 6, existing money path).
   const outcomes = await settleRacingPoolsForRace(client, input.raceId);
-  return { error: null, confirmed: true, outcomes };
+  // 2) Advance the bracket/elimination structure (Phase 8). Forward-only: it
+  //    fills downstream placeholder slots and, if this is the final race,
+  //    publishes the competition winner + settles via the existing adapter. It
+  //    never overwrites an already-filled slot on the normal path.
+  const progression = await processProgressionForRace(client, input.raceId, { actorId: actor.id });
+  return { error: null, confirmed: true, outcomes, progression };
 }
 
-/**
- * Is there a downstream race that consumes this race's result as a progression
- * source AND is already finalized (started / confirmed result / settled pool)?
- * If so, an automatic correction cascade is unsafe here — Phase 8 owns that.
- * For a Single Race with no downstream, this is always false.
- */
-async function hasBlockingDownstream(client: Client, raceId: string): Promise<boolean> {
-  const { data: slots } = await client.from("race_competitors").select("race_id").eq("source_race_id", raceId);
-  const downstreamRaceIds = [...new Set((slots ?? []).map((s) => s.race_id as string))];
-  for (const rid of downstreamRaceIds) {
-    const { data: race } = await client.from("races").select("status").eq("id", rid).maybeSingle();
-    if (race && race.status !== "SCHEDULED") return true;
-    const { data: confirmed } = await client.from("race_results").select("id").eq("race_id", rid).eq("status", "CONFIRMED").maybeSingle();
-    if (confirmed) return true;
-    const { data: settled } = await client.from("pools").select("id").eq("race_id", rid).eq("status", "SETTLED").limit(1).maybeSingle();
-    if (settled) return true;
-  }
-  return false;
-}
-
-export type CorrectResultResult = { error: string | null; outcomes?: Record<string, SettleRacePoolOutcome> };
+export type CorrectResultResult = {
+  error: string | null;
+  outcomes?: Record<string, SettleRacePoolOutcome>;
+  progression?: ProgressionResult;
+  blockedBy?: Array<{ raceId: string; reasons: string[] }>;
+};
 
 /**
  * SUPER-ADMIN-ONLY correction after a result was confirmed/settled. Reuses the
  * proven reversal machinery — no reversal/settlement semantics are changed.
  * History is preserved: the prior CONFIRMED revision is SUPERSEDED (not
  * overwritten), a new CONFIRMED revision is added, and prior grading evidence
- * stays. Blocked (routed to Super-Admin review, not auto-cascaded) if any
- * downstream race is already finalized (§12; Phase 8 owns full cascade).
+ * stays.
+ *
+ * Phase 8 correction boundary (§3): the correction auto-rebuilds downstream
+ * progression ONLY while every affected downstream object is still safely mutable
+ * (assessDownstreamSafety). If any downstream race has started, holds a confirmed
+ * result, or carries a pool that has moved toward money, the ENTIRE correction is
+ * blocked and routed to Super-Admin review — it never reverses/replays a settled
+ * downstream tree, and never triggers an automatic financial cascade.
  */
 export async function correctRaceResultForActor(
   client: Client,
@@ -151,8 +150,12 @@ export async function correctRaceResultForActor(
   // must NOT independently trigger settlement reversal.
   if (!isSuperAdmin(actor)) return { error: "Only a Super Admin can correct a confirmed result." };
 
-  if (await hasBlockingDownstream(client, input.raceId)) {
-    return { error: "This race has finalized downstream state — route to Super-Admin review (Phase 8 cascade)." };
+  const safety = await assessDownstreamSafety(client, input.raceId);
+  if (!safety.safe) {
+    return {
+      error: "This race has downstream progression that is no longer safely mutable — route to Super-Admin review. No automatic cascade is performed.",
+      blockedBy: safety.blockedBy,
+    };
   }
 
   // 1) Reverse any SETTLED racing pools on this race (restores wallets atomically).
@@ -201,5 +204,11 @@ export async function correctRaceResultForActor(
     }
     outcomes[pool.id] = await settleRacePool(client, pool as RacingPoolRow);
   }
-  return { error: null, outcomes };
+
+  // 5) Safe downstream rebuild (§3). Every affected downstream race was verified
+  //    still-mutable above, so we may deterministically REPLACE the slots it fed
+  //    with the corrected advancement. This does not cascade further: a mutable
+  //    downstream race has no confirmed result, so nothing advanced beyond it.
+  const progression = await processProgressionForRace(client, input.raceId, { allowReplace: true, actorId: actor.id });
+  return { error: null, outcomes, progression };
 }

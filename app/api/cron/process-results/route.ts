@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { processAwaitingResults } from "@/lib/pools/settle";
-import { reconcileRacingSettlements } from "@/lib/racing/reconcile";
+import { reconcileRacingSettlements, reconcileRacingProgression } from "@/lib/racing/reconcile";
 import { recordJobRun } from "@/lib/jobs/record";
 
 export async function GET(request: Request) {
@@ -16,5 +16,8 @@ export async function GET(request: Request) {
   // missed (transient error / restart). Normal racing settlement is event-driven
   // on result confirmation — this never double-pays (settleRacePool is idempotent).
   const racing = await reconcileRacingSettlements();
-  return NextResponse.json({ ...result, racingReconciled: Object.keys(racing).length });
+  // Idempotent progression safety net (Phase 8): fill any downstream slot a
+  // transient error left empty and publish a champion once a final is confirmed.
+  const progression = await reconcileRacingProgression();
+  return NextResponse.json({ ...result, racingReconciled: Object.keys(racing).length, racingProgression: progression });
 }

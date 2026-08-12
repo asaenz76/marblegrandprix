@@ -9,29 +9,36 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 
-type CompetitionOption = { id: string; name: string };
+type CompetitionOption = { id: string; name: string; format: string };
 type LibraryCompetitor = { id: string; name: string | null; number: string | null; colors: string[] | null };
+type SourceRace = { id: string; title: string | null };
 
 type Row = {
-  mode: "new" | "existing";
+  mode: "new" | "existing" | "slot"; // "slot" = Phase 8 progression placeholder
   existingCompetitorId: string;
   name: string;
   number: string;
   colorsText: string; // comma-separated, up to 4
   imageUrl: string;
   persistent: boolean;
+  // Placeholder-slot fields:
+  sourceRaceId: string;
+  sourceRule: "WINNER" | "POSITION";
+  sourcePosition: string;
 };
 
-const emptyRow = (): Row => ({ mode: "new", existingCompetitorId: "", name: "", number: "", colorsText: "", imageUrl: "", persistent: false });
+const emptyRow = (): Row => ({ mode: "new", existingCompetitorId: "", name: "", number: "", colorsText: "", imageUrl: "", persistent: false, sourceRaceId: "", sourceRule: "WINNER", sourcePosition: "" });
 
 export function RaceCreateForm({
   competitions,
   canCreateCompetition,
   library,
+  racesByCompetition = {},
 }: {
   competitions: CompetitionOption[];
   canCreateCompetition: boolean;
   library: LibraryCompetitor[];
+  racesByCompetition?: Record<string, SourceRace[]>;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -40,7 +47,11 @@ export function RaceCreateForm({
   const [useNewCompetition, setUseNewCompetition] = useState(canCreateCompetition && competitions.length === 0);
   const [competitionId, setCompetitionId] = useState(competitions[0]?.id ?? "");
   const [newCompetitionName, setNewCompetitionName] = useState("");
-  const [newCompetitionFormat, setNewCompetitionFormat] = useState<"SINGLE_RACE" | "CHAMPIONSHIP" | "LEAGUE">("SINGLE_RACE");
+  const [newCompetitionFormat, setNewCompetitionFormat] = useState<"SINGLE_RACE" | "CHAMPIONSHIP" | "LEAGUE" | "BRACKET" | "ELIMINATION">("SINGLE_RACE");
+
+  // Source races available for a progression slot (only when adding to an
+  // existing competition that already has races to advance from).
+  const sourceRaces = !useNewCompetition ? racesByCompetition[competitionId] ?? [] : [];
   const [title, setTitle] = useState("");
   const [scheduledStart, setScheduledStart] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
@@ -53,6 +64,15 @@ export function RaceCreateForm({
   function submit() {
     setError(null);
     const competitors = rows.map((r) => {
+      if (r.mode === "slot") {
+        return {
+          advancesFrom: {
+            sourceRaceId: r.sourceRaceId,
+            sourceRule: r.sourceRule,
+            ...(r.sourceRule === "POSITION" && r.sourcePosition ? { sourcePosition: Number(r.sourcePosition) } : {}),
+          },
+        };
+      }
       if (r.mode === "existing") return { existingCompetitorId: r.existingCompetitorId };
       const colors = r.colorsText.split(",").map((c) => c.trim()).filter(Boolean).slice(0, 4);
       return {
@@ -103,8 +123,10 @@ export function RaceCreateForm({
                   <option value="SINGLE_RACE">Single race</option>
                   <option value="CHAMPIONSHIP">Championship (points standings)</option>
                   <option value="LEAGUE">League (points standings)</option>
+                  <option value="BRACKET">Bracket (single elimination)</option>
+                  <option value="ELIMINATION">Elimination (position-based)</option>
                 </select>
-                <p className="text-xs text-text-secondary">Championship/League accumulate points across their races and are finalized from the standings.</p>
+                <p className="text-xs text-text-secondary">Championship/League finalize from standings; Bracket/Elimination advance winners (or qualifying positions) round-by-round to a final race.</p>
               </div>
             </div>
           ) : (
@@ -158,13 +180,29 @@ export function RaceCreateForm({
                   {library.length > 0 && (
                     <label className="flex items-center gap-1"><input type="radio" checked={r.mode === "existing"} onChange={() => update(i, { mode: "existing", existingCompetitorId: library[0].id })} /> From library</label>
                   )}
+                  {sourceRaces.length > 0 && (
+                    <label className="flex items-center gap-1"><input type="radio" checked={r.mode === "slot"} onChange={() => update(i, { mode: "slot", sourceRaceId: sourceRaces[0].id })} /> Advances from a race</label>
+                  )}
                 </div>
                 {rows.length > 2 && (
                   <Button type="button" variant="ghost" size="sm" onClick={() => setRows((rs) => rs.filter((_, idx) => idx !== i))}>Remove</Button>
                 )}
               </div>
 
-              {r.mode === "existing" ? (
+              {r.mode === "slot" ? (
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                  <select className="rounded-md border border-border-subtle bg-transparent px-3 py-2 text-sm" value={r.sourceRaceId} onChange={(e) => update(i, { sourceRaceId: e.target.value })}>
+                    {sourceRaces.map((sr) => (<option key={sr.id} value={sr.id}>{sr.title ?? "Untitled race"}</option>))}
+                  </select>
+                  <select className="rounded-md border border-border-subtle bg-transparent px-3 py-2 text-sm" value={r.sourceRule} onChange={(e) => update(i, { sourceRule: e.target.value as "WINNER" | "POSITION" })}>
+                    <option value="WINNER">Winner advances</option>
+                    <option value="POSITION">Finishing position advances</option>
+                  </select>
+                  {r.sourceRule === "POSITION" && (
+                    <Input type="number" min={1} placeholder="Position (e.g. 1)" value={r.sourcePosition} onChange={(e) => update(i, { sourcePosition: e.target.value })} />
+                  )}
+                </div>
+              ) : r.mode === "existing" ? (
                 <select className="w-full rounded-md border border-border-subtle bg-transparent px-3 py-2 text-sm" value={r.existingCompetitorId} onChange={(e) => update(i, { existingCompetitorId: e.target.value })}>
                   {library.map((c) => (
                     <option key={c.id} value={c.id}>{[c.number, c.name, (c.colors ?? []).join("/")].filter(Boolean).join(" · ") || "Competitor"}</option>

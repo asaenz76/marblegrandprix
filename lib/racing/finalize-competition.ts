@@ -63,7 +63,7 @@ const STANDINGS_FORMATS = new Set(["CHAMPIONSHIP", "LEAGUE"]);
  * MANUAL_REVIEW for a Super Admin to resolve. Money is never moved on a stale
  * decision; the common (first-time) path has no evidence and settles normally.
  */
-async function settleCompetitionPools(
+export async function settleCompetitionPools(
   client: Client,
   competitionId: string,
   publishedWinnerId: string,

@@ -11,16 +11,27 @@ export default async function NewRacePage() {
   const client = createAdminClient();
   const superAdmin = isSuperAdmin(profile);
 
-  let competitions: { id: string; name: string }[] = [];
+  let competitions: { id: string; name: string; format: string }[] = [];
   if (superAdmin) {
-    const { data } = await client.from("racing_competitions").select("id, name").order("created_at", { ascending: false });
+    const { data } = await client.from("racing_competitions").select("id, name, format").order("created_at", { ascending: false });
     competitions = data ?? [];
   } else {
     const { data: assignments } = await client.from("competition_organizers").select("competition_id").eq("organizer_id", profile.id);
     const ids = (assignments ?? []).map((a) => a.competition_id);
     if (ids.length) {
-      const { data } = await client.from("racing_competitions").select("id, name").in("id", ids).order("created_at", { ascending: false });
+      const { data } = await client.from("racing_competitions").select("id, name, format").in("id", ids).order("created_at", { ascending: false });
       competitions = data ?? [];
+    }
+  }
+
+  // Source races (per competition) that a placeholder slot can advance from —
+  // used to author BRACKET/ELIMINATION rounds referencing an earlier round.
+  const racesByCompetition: Record<string, { id: string; title: string | null }[]> = {};
+  const compIds = competitions.map((c) => c.id);
+  if (compIds.length) {
+    const { data: allRaces } = await client.from("races").select("id, title, competition_id").in("competition_id", compIds).order("created_at", { ascending: true });
+    for (const r of allRaces ?? []) {
+      (racesByCompetition[r.competition_id] ??= []).push({ id: r.id, title: r.title });
     }
   }
 
@@ -38,7 +49,7 @@ export default async function NewRacePage() {
         <h1 className="text-lg font-semibold">Create a race</h1>
         <p className="text-sm text-text-secondary">Add a field of competitors and schedule the race.</p>
       </div>
-      <RaceCreateForm competitions={competitions} canCreateCompetition={superAdmin} library={lib ?? []} />
+      <RaceCreateForm competitions={competitions} canCreateCompetition={superAdmin} library={lib ?? []} racesByCompetition={racesByCompetition} />
     </div>
   );
 }

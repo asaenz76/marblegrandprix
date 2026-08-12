@@ -82,6 +82,7 @@ export async function createRaceForActor(
       .from("races")
       .insert({
         competition_id: competitionId,
+        stage_id: data.stageId ?? null,
         title: data.title,
         race_number: data.raceNumber ?? null,
         scheduled_start_utc: data.scheduledStartUtc ?? null,
@@ -97,7 +98,24 @@ export async function createRaceForActor(
     raceId = rid;
 
     for (let i = 0; i < data.competitors.length; i++) {
-      const competitorId = await resolveCompetitor(client, data.competitors[i], rid, actor.id, raceOnlyCompetitorIds);
+      const c = data.competitors[i];
+      // Phase 8: a progression placeholder slot — occupant deferred to the engine.
+      if (c.advancesFrom) {
+        const { data: src } = await client.from("races").select("competition_id").eq("id", c.advancesFrom.sourceRaceId).maybeSingle();
+        if (!src || src.competition_id !== competitionId) throw new Error("slot-source"); // source must be in this competition
+        const { error: slotErr } = await client.from("race_competitors").insert({
+          race_id: raceId,
+          competitor_id: null,
+          is_placeholder: true,
+          sort_order: i,
+          source_race_id: c.advancesFrom.sourceRaceId,
+          source_rule: c.advancesFrom.sourceRule,
+          source_position: c.advancesFrom.sourcePosition ?? null,
+        });
+        if (slotErr) throw new Error("slot");
+        continue;
+      }
+      const competitorId = await resolveCompetitor(client, c, rid, actor.id, raceOnlyCompetitorIds);
       if (!competitorId) throw new Error("competitor");
       const { error: attachErr } = await client
         .from("race_competitors")

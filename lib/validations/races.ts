@@ -4,6 +4,23 @@ import { z } from "zod";
 // persistent competitor, or a new inline competitor. Mirrors the Phase-2
 // structural rules (>=1 identifier, 1..4 colors) so the frontend and database
 // never diverge — the DB constraints remain authoritative.
+// A progression placeholder slot (Phase 8): the occupant is not known at
+// authoring time; it advances from a source race by rule. WINNER = the confirmed
+// winner (bracket); POSITION = the competitor who finished in `sourcePosition`
+// (elimination). The engine fills it deterministically when the source confirms.
+export const progressionSourceSchema = z
+  .object({
+    sourceRaceId: z.string().uuid(),
+    sourceRule: z.enum(["WINNER", "POSITION"]),
+    sourcePosition: z.number().int().positive().max(1000).optional(),
+  })
+  .strict()
+  .superRefine((s, ctx) => {
+    if (s.sourceRule === "POSITION" && !s.sourcePosition) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "A POSITION slot needs the qualifying finishing position.", path: ["sourcePosition"] });
+    }
+  });
+
 export const raceCompetitorInputSchema = z
   .object({
     // Reuse path: pick an existing persistent competitor from the library.
@@ -18,9 +35,19 @@ export const raceCompetitorInputSchema = z
     // "Save this competitor for future races" — persistent when true, else
     // race-only (scoped to the race being created). Ignored on the reuse path.
     persistent: z.boolean().default(false),
+
+    // Phase 8: instead of a known competitor, this slot advances from a race.
+    advancesFrom: progressionSourceSchema.optional(),
   })
   .strict()
   .superRefine((c, ctx) => {
+    // Placeholder slot: identity is deferred to the progression engine.
+    if (c.advancesFrom) {
+      if (c.existingCompetitorId || c.name || c.number || c.colors || c.imageUrl) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "A progression slot cannot also name a competitor." });
+      }
+      return;
+    }
     if (c.existingCompetitorId) {
       // Reuse path: identity comes from the existing row; inline fields are not
       // used to mutate it here.
@@ -43,9 +70,12 @@ export const createRaceSchema = z
     newCompetitionName: z.string().trim().min(1).max(120).optional(),
     // Format for a newly-created competition (ignored when joining an existing
     // one). SINGLE_RACE is the Phase 4 default; CHAMPIONSHIP/LEAGUE opt into the
-    // Phase 7 standings + finalization path. BRACKET/ELIMINATION/MIXED are
-    // reserved for Phase 8 and not creatable here yet.
-    newCompetitionFormat: z.enum(["SINGLE_RACE", "CHAMPIONSHIP", "LEAGUE"]).default("SINGLE_RACE"),
+    // Phase 7 standings + finalization path; BRACKET/ELIMINATION opt into the
+    // Phase 8 single-elimination progression path. MIXED remains deferred.
+    newCompetitionFormat: z.enum(["SINGLE_RACE", "CHAMPIONSHIP", "LEAGUE", "BRACKET", "ELIMINATION"]).default("SINGLE_RACE"),
+
+    // Optional stage (round) this race belongs to (Phase 8 authoring).
+    stageId: z.string().uuid().optional(),
 
     title: z.string().trim().min(1).max(120),
     raceNumber: z.number().int().positive().max(100000).optional(),

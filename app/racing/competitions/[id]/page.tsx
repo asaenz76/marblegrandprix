@@ -3,11 +3,12 @@ import { notFound } from "next/navigation";
 import { requireCompetitionAccess } from "@/lib/auth/session";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isOrganizerOrAbove } from "@/lib/auth/guards";
-import { computeStandings } from "@/lib/racing/standings";
+import { computeStandings, type StandingsResult } from "@/lib/racing/standings";
 import { humanizeEnum } from "@/lib/utils/humanize";
 import type { CompetitorIdentityData } from "@/components/racing/CompetitorIdentity";
 import { StandingsTable } from "./standings-table";
 import { FinalizeForm } from "./finalize-form";
+import { BracketView } from "./bracket-view";
 
 // Competition detail + standings (Phase 7). Access re-checked server-side:
 // requireCompetitionAccess enforces the Phase 3 assignment boundary (super_admin
@@ -24,10 +25,13 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
 
   const profile = await requireCompetitionAccess(comp.id);
 
-  const [{ data: races }, standings] = await Promise.all([
-    admin.from("races").select("id, title, status, race_number").eq("competition_id", id).order("race_number", { ascending: true, nullsFirst: false }).order("created_at", { ascending: true }),
-    computeStandings(admin, id),
-  ]);
+  const isStandings = comp.format === "CHAMPIONSHIP" || comp.format === "LEAGUE";
+  const isBracket = comp.format === "BRACKET" || comp.format === "ELIMINATION";
+
+  const { data: races } = await admin.from("races").select("id, title, status, race_number").eq("competition_id", id).order("race_number", { ascending: true, nullsFirst: false }).order("created_at", { ascending: true });
+
+  // Standings are only meaningful for CHAMPIONSHIP/LEAGUE.
+  const standings: StandingsResult | null = isStandings ? await computeStandings(admin, id) : null;
 
   // Resolve confirmed-result state per race (for the "needs result" hint).
   const raceIds = (races ?? []).map((r) => r.id);
@@ -38,14 +42,15 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
   }
 
   // Competitor identities for the standings rows.
-  const competitorIds = standings.rows.map((r) => r.competitorId);
   const competitors = new Map<string, CompetitorIdentityData>();
+  const competitorIds = standings?.rows.map((r) => r.competitorId) ?? [];
   if (competitorIds.length) {
     const { data: rows } = await admin.from("competitors").select("id, name, number, colors, image_url").in("id", competitorIds);
     for (const c of rows ?? []) competitors.set(c.id, { name: c.name, number: c.number, colors: c.colors, imageUrl: c.image_url });
   }
 
-  const isStandings = comp.format === "CHAMPIONSHIP" || comp.format === "LEAGUE";
+  // Bracket/elimination competitions publish the winner automatically from the
+  // final race, so they expose no manual "Finalize" control.
   const canManage = isOrganizerOrAbove(profile);
   const eligibleToFinalize = isStandings && canManage && comp.status !== "COMPLETED" && comp.status !== "CANCELLED";
 
@@ -55,11 +60,11 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
         <h1 className="text-lg font-semibold">{comp.name}</h1>
         <p className="text-sm text-text-secondary">
           {humanizeEnum(comp.format)} · {humanizeEnum(comp.status)}
-          {comp.status === "ACTIVE" && standings.racesAwaitingResult > 0 && ` · ${standings.racesAwaitingResult} race(s) awaiting result`}
+          {isStandings && comp.status === "ACTIVE" && standings!.racesAwaitingResult > 0 && ` · ${standings!.racesAwaitingResult} race(s) awaiting result`}
         </p>
       </div>
 
-      {isStandings ? (
+      {isStandings && standings ? (
         <section className="space-y-2">
           <h2 className="text-sm font-semibold">Standings</h2>
           <StandingsTable standings={standings} competitors={competitors} winnerCompetitorId={comp.winner_competitor_id} />
@@ -70,11 +75,20 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
             <p className="text-sm text-text-secondary">The top of the standings is tied — there is no automatic champion.</p>
           )}
         </section>
+      ) : isBracket ? (
+        <section className="space-y-2">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold">Bracket</h2>
+            {canManage && comp.status !== "COMPLETED" && <Link href="/racing/races/new" className="text-sm text-accent-primary hover:underline">New race</Link>}
+          </div>
+          <BracketView competitionId={comp.id} />
+          {comp.status === "COMPLETED" && <p className="text-sm text-success">Champion decided by the final race.</p>}
+        </section>
       ) : (
-        <p className="text-sm text-text-secondary">This is a {humanizeEnum(comp.format)} competition — it has no championship standings.</p>
+        <p className="text-sm text-text-secondary">This is a {humanizeEnum(comp.format)} competition.</p>
       )}
 
-      <section className="space-y-2">
+      <section className={`space-y-2 ${isBracket ? "hidden" : ""}`}>
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold">Races ({(races ?? []).length})</h2>
           {canManage && <Link href="/racing/races/new" className="text-sm text-accent-primary hover:underline">New race</Link>}
