@@ -40,6 +40,7 @@ export function RaceCreateForm({
   const [useNewCompetition, setUseNewCompetition] = useState(canCreateCompetition && competitions.length === 0);
   const [competitionId, setCompetitionId] = useState(competitions[0]?.id ?? "");
   const [newCompetitionName, setNewCompetitionName] = useState("");
+  const [newCompetitionFormat, setNewCompetitionFormat] = useState<"SINGLE_RACE" | "CHAMPIONSHIP" | "LEAGUE">("SINGLE_RACE");
   const [title, setTitle] = useState("");
   const [scheduledStart, setScheduledStart] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
@@ -64,7 +65,7 @@ export function RaceCreateForm({
     });
 
     const input = {
-      ...(useNewCompetition ? { newCompetitionName: newCompetitionName.trim() } : { competitionId }),
+      ...(useNewCompetition ? { newCompetitionName: newCompetitionName.trim(), newCompetitionFormat } : { competitionId }),
       title: title.trim(),
       scheduledStartUtc: scheduledStart ? new Date(scheduledStart).toISOString() : undefined,
       videoUrl: videoUrl.trim() || undefined,
@@ -91,9 +92,20 @@ export function RaceCreateForm({
             </label>
           )}
           {useNewCompetition ? (
-            <div className="space-y-1.5">
-              <Label htmlFor="newComp">Competition name</Label>
-              <Input id="newComp" value={newCompetitionName} onChange={(e) => setNewCompetitionName(e.target.value)} placeholder="Marble Grand Prix" />
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="newComp">Competition name</Label>
+                <Input id="newComp" value={newCompetitionName} onChange={(e) => setNewCompetitionName(e.target.value)} placeholder="Marble Grand Prix" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="newFormat">Format</Label>
+                <select id="newFormat" className="w-full rounded-md border border-border-subtle bg-transparent px-3 py-2 text-sm" value={newCompetitionFormat} onChange={(e) => setNewCompetitionFormat(e.target.value as typeof newCompetitionFormat)}>
+                  <option value="SINGLE_RACE">Single race</option>
+                  <option value="CHAMPIONSHIP">Championship (points standings)</option>
+                  <option value="LEAGUE">League (points standings)</option>
+                </select>
+                <p className="text-xs text-text-secondary">Championship/League accumulate points across their races and are finalized from the standings.</p>
+              </div>
             </div>
           ) : (
             <div className="space-y-1.5">

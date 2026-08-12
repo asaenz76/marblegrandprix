@@ -53,9 +53,13 @@ export async function createRaceForActor(
 
   if (data.newCompetitionName) {
     if (!isSuperAdmin(actor)) return { error: "Only a Super Admin can create a new competition." };
+    // A standings-based competition (Championship/League) starts ACTIVE so it
+    // can run and be finalized (Phase 7); a SINGLE_RACE competition keeps the
+    // DRAFT default. The winner is published later by finalization, never here.
+    const format = data.newCompetitionFormat;
     const { data: comp, error } = await client
       .from("racing_competitions")
-      .insert({ name: data.newCompetitionName, format: "SINGLE_RACE", created_by: actor.id })
+      .insert({ name: data.newCompetitionName, format, status: format === "SINGLE_RACE" ? "DRAFT" : "ACTIVE", created_by: actor.id })
       .select("id")
       .single();
     if (error || !comp) return { error: "Could not create the competition." };

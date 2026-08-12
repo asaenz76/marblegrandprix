@@ -41,6 +41,11 @@ export const createRaceSchema = z
     // one by name (Super-Admin-only path, enforced in the action).
     competitionId: z.string().uuid().optional(),
     newCompetitionName: z.string().trim().min(1).max(120).optional(),
+    // Format for a newly-created competition (ignored when joining an existing
+    // one). SINGLE_RACE is the Phase 4 default; CHAMPIONSHIP/LEAGUE opt into the
+    // Phase 7 standings + finalization path. BRACKET/ELIMINATION/MIXED are
+    // reserved for Phase 8 and not creatable here yet.
+    newCompetitionFormat: z.enum(["SINGLE_RACE", "CHAMPIONSHIP", "LEAGUE"]).default("SINGLE_RACE"),
 
     title: z.string().trim().min(1).max(120),
     raceNumber: z.number().int().positive().max(100000).optional(),

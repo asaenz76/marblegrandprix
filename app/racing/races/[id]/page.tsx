@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireCompetitionAccess } from "@/lib/auth/session";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -32,7 +33,10 @@ export default async function RaceDetailPage({ params }: { params: Promise<{ id:
     <div className="mx-auto max-w-xl space-y-6">
       <div>
         <h1 className="text-lg font-semibold">{race.title ?? "Race"}</h1>
-        <p className="text-sm text-text-secondary">{comp?.name} · {humanizeEnum(race.status)}</p>
+        <p className="text-sm text-text-secondary">
+          <Link href={`/racing/competitions/${race.competition_id}`} className="text-accent-primary hover:underline">{comp?.name}</Link>
+          {" · "}{humanizeEnum(race.status)}
+        </p>
       </div>
 
       <section className="space-y-2">
