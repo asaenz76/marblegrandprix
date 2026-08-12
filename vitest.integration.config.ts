@@ -5,6 +5,8 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["tests/integration/**/*.test.ts"],
+    // Refuse to run integration tests against a non-local Supabase URL.
+    setupFiles: ["tests/integration/setup-local-guard.ts"],
     testTimeout: 20_000,
     // These tests share one real database and some rely on another file's
     // setup already having run (e.g. an admin account looked up but never

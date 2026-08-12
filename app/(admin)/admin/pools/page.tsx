@@ -117,13 +117,8 @@ export default async function AdminPoolsPage() {
   return (
     <div className="space-y-4">
       <h1 className="sr-only">Pools</h1>
-      {isSuperAdmin(viewer) && (
-        <div className="flex justify-end">
-          <Link href="/admin/pools/new">
-            <Button>Create pool</Button>
-          </Link>
-        </div>
-      )}
+      {/* Football pool-creation wizard retired in Phase 4; racing prediction
+          pool creation arrives in Phase 5. */}
       <PoolsTable pools={rows} isSuperAdmin={isSuperAdmin(viewer)} />
     </div>
   );

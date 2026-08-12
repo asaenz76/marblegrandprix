@@ -1,6 +1,6 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
-import { isSuperAdmin } from "@/lib/auth/guards";
+import { isSuperAdmin, isOrganizerOrAbove } from "@/lib/auth/guards";
 import { getUnreadCount } from "@/lib/notifications/fetch";
 import type { UserProfile } from "@/lib/auth/session";
 
@@ -27,11 +27,11 @@ export async function getAppShellProps(user: UserProfile) {
     getUnreadCount(user.id),
   ]);
 
-  // Bottom nav's centered Create button only means something for
-  // super_admin, the only role that can author a new pool. Everyone else
-  // (players and plain 'admin') gets no center button at all rather than
-  // one repurposed into an unrelated shortcut.
-  const createHref = isSuperAdmin(user) ? "/admin/pools/new" : null;
+  // Bottom nav's centered Create button routes to racing race creation for the
+  // roles that can author races — Super Admins and (assignment-scoped)
+  // Organizers. Players and legacy 'admin' get no center button. (The old
+  // football pool wizard at /admin/pools/new is retired in Phase 4.)
+  const createHref = isOrganizerOrAbove(user) ? "/racing/races/new" : null;
 
   return {
     balanceCents: wallet?.balance ?? 0,

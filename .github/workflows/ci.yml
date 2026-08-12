@@ -59,8 +59,7 @@ jobs:
       # machine running the Supabase CLI's default local stack), never
       # real secrets, so no GitHub Actions secret is needed for this part.
       # The remaining vars are non-Supabase and only need placeholder
-      # values here since API_FOOTBALL_ENABLED=false means the app never
-      # calls the real API-Football service during these tests.
+      # calls any external sports provider during these tests.
       - name: Write .env.local from the local Supabase stack
         run: |
           eval "$(pnpm supabase status -o env | grep -E '^(API_URL|ANON_KEY|SERVICE_ROLE_KEY)=')"
@@ -68,9 +67,6 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL=$API_URL
           NEXT_PUBLIC_SUPABASE_ANON_KEY=$ANON_KEY
           SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY
-          API_FOOTBALL_BASE_URL=https://v3.football.api-sports.io
-          API_FOOTBALL_KEY=ci-placeholder
-          API_FOOTBALL_ENABLED=false
           DEFAULT_TIMEZONE=America/Costa_Rica
           APP_URL=http://localhost:3000
           CRON_SECRET=ci-placeholder
@@ -123,9 +119,6 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL=$API_URL
           NEXT_PUBLIC_SUPABASE_ANON_KEY=$ANON_KEY
           SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY
-          API_FOOTBALL_BASE_URL=https://v3.football.api-sports.io
-          API_FOOTBALL_KEY=ci-placeholder
-          API_FOOTBALL_ENABLED=false
           DEFAULT_TIMEZONE=America/Costa_Rica
           APP_URL=http://localhost:3000
           CRON_SECRET=ci-placeholder

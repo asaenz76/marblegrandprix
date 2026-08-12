@@ -18,10 +18,12 @@
  */
 import { randomUUID } from "node:crypto";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import { assertLocalSupabase } from "../lib/dev/assert-local-supabase";
 import { lockDuePools } from "../lib/pools/lock";
 import { processAwaitingResults } from "../lib/pools/settle";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "http://127.0.0.1:54321";
+assertLocalSupabase("verify-custom-pool-cron");
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
 
 const admin = createSupabaseClient(SUPABASE_URL, SERVICE_ROLE_KEY, {

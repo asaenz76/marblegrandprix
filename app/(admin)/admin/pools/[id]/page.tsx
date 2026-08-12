@@ -166,19 +166,8 @@ export default async function AdminPoolDetailPage({
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {/* Pre-fills the creation wizard from this pool's template/
-              financial config for a new fixture — not a data mutation, so
-              no super-admin-only comment needed the way the buttons below
-              have; gated on isSuperAdmin only because /admin/pools/new
-              itself is (a plain admin would otherwise hit a dead-end
-              redirect). CUSTOM pools have no wizard equivalent to land on. */}
-          {isSuperAdmin && pool.pool_type !== "CUSTOM" && (
-            <Link href={`/admin/pools/new?duplicateFrom=${pool.id}`}>
-              <Button variant="outline" size="sm">
-                Duplicate
-              </Button>
-            </Link>
-          )}
+          {/* Duplicate-to-wizard removed in Phase 4 (football pool wizard
+              retired; racing pool creation is Phase 5). */}
           {pool.status === "DRAFT" && <PublishButton poolId={pool.id} />}
           {pool.status === "OPEN" && <ForceLockButton poolId={pool.id} />}
           {/* Can auto-refund below minimum entries — money movement, super_admin only. */}

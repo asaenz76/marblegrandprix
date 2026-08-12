@@ -16,7 +16,6 @@ import {
   toSerializableRecommendation,
   type PublishWarning,
 } from "@/lib/pools/templates/recommendations";
-import { getFixtureMarketsAction } from "@/lib/actions/odds";
 import { getPoolLiveStats, type PoolLiveStats } from "@/lib/pools/fetch";
 import { notifyFollowedPoolPublished } from "@/lib/email/notify-followed-pool-published";
 import { getPoolPublishFollowRecipients } from "@/lib/pools/follow-recipients";
@@ -84,15 +83,12 @@ async function notifyFollowersOfPublish(pool: { id: string; question: string; fi
 export async function getFixtureQuestionContextAction(fixtureId: string, externalFixtureId: string | null = null) {
   await requireAdminOrAbove();
   const adminClient = createAdminClient();
-  const [activePools, markets] = await Promise.all([
-    getActivePoolSummariesForFixture(adminClient, fixtureId),
-    // Real odds are optional, best-effort — a fixture with the provider
-    // disabled, no odds posted yet, or a fetch failure still gets a full
-    // recommendation list, just on the static prior (rankRecommendations
-    // treats null exactly like "no markets fetched").
-    externalFixtureId ? getFixtureMarketsAction(externalFixtureId) : Promise.resolve(null),
-  ]);
-  const recommendations = rankRecommendations(activePools, markets);
+  // Provider odds removed in Phase 4 (API-Football creation path retired):
+  // recommendations run on the static prior only. rankRecommendations treats
+  // null markets exactly like "no markets fetched".
+  void externalFixtureId;
+  const activePools = await getActivePoolSummariesForFixture(adminClient, fixtureId);
+  const recommendations = rankRecommendations(activePools, null);
   return {
     activePools,
     recommendations: {
@@ -236,10 +232,8 @@ async function createPoolForFixture(
   // the pool at insert time, so the two always agree with each other.
   // Never fetched for non-TEMPLATE_GRADED pools (WHO_WILL_ADVANCE/
   // REGULATION_RESULT/COMBO have no single well-defined YES probability).
-  const markets =
-    input.poolType === "TEMPLATE_GRADED" && fixture.external_fixture_id
-      ? await getFixtureMarketsAction(fixture.external_fixture_id)
-      : null;
+  // Provider odds removed in Phase 4: no market-derived probability/evidence.
+  const markets = null;
 
   // Publishing guidance (Question Family/mirror/duplicate detection) — never
   // a hard block. COMBO is exempt: its identity is its legs (pool_combo_legs),
@@ -349,7 +343,8 @@ async function createPoolForFixture(
             bookmakerIds: probabilityEstimate.bookmakerIds,
             marketKey: probabilityEstimate.marketKey,
             oddsLine: probabilityEstimate.oddsLine,
-            oddsUpdatedAt: probabilityEstimate.source === "STATIC_PRIOR" ? null : (markets?.providerUpdatedAt ?? null),
+            // Provider odds removed in Phase 4 — always static prior, no odds timestamp.
+            oddsUpdatedAt: null,
           }
         : null,
       analytics_category: resolvePoolAnalyticsCategory(

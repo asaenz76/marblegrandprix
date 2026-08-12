@@ -22,8 +22,10 @@
  * NEVER run against production — enforced below, not just documented.
  */
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import { assertLocalSupabase } from "../lib/dev/assert-local-supabase";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+assertLocalSupabase("seed-dev-grading");
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
 
 // Hard guard: this script moves wallet balances and creates auth users, so

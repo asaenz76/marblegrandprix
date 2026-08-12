@@ -7,6 +7,9 @@
  *   pnpm create-super-admin --email you@example.com --password 'xxxx' --name "Admin Name"
  */
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import { assertLocalSupabase } from "../lib/dev/assert-local-supabase";
+
+assertLocalSupabase("create-super-admin");
 
 // Not importing lib/supabase/admin.ts here: it's guarded by the `server-only`
 // package, which throws unconditionally when required outside Next's

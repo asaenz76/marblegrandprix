@@ -1,0 +1,193 @@
+"use client";
+
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { createRaceAction } from "@/lib/actions/races";
+import { CompetitorIdentity } from "@/components/racing/CompetitorIdentity";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
+
+type CompetitionOption = { id: string; name: string };
+type LibraryCompetitor = { id: string; name: string | null; number: string | null; colors: string[] | null };
+
+type Row = {
+  mode: "new" | "existing";
+  existingCompetitorId: string;
+  name: string;
+  number: string;
+  colorsText: string; // comma-separated, up to 4
+  imageUrl: string;
+  persistent: boolean;
+};
+
+const emptyRow = (): Row => ({ mode: "new", existingCompetitorId: "", name: "", number: "", colorsText: "", imageUrl: "", persistent: false });
+
+export function RaceCreateForm({
+  competitions,
+  canCreateCompetition,
+  library,
+}: {
+  competitions: CompetitionOption[];
+  canCreateCompetition: boolean;
+  library: LibraryCompetitor[];
+}) {
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+
+  const [useNewCompetition, setUseNewCompetition] = useState(canCreateCompetition && competitions.length === 0);
+  const [competitionId, setCompetitionId] = useState(competitions[0]?.id ?? "");
+  const [newCompetitionName, setNewCompetitionName] = useState("");
+  const [title, setTitle] = useState("");
+  const [scheduledStart, setScheduledStart] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
+  const [rows, setRows] = useState<Row[]>([emptyRow(), emptyRow()]);
+
+  function update(i: number, patch: Partial<Row>) {
+    setRows((rs) => rs.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
+  }
+
+  function submit() {
+    setError(null);
+    const competitors = rows.map((r) => {
+      if (r.mode === "existing") return { existingCompetitorId: r.existingCompetitorId };
+      const colors = r.colorsText.split(",").map((c) => c.trim()).filter(Boolean).slice(0, 4);
+      return {
+        name: r.name.trim() || undefined,
+        number: r.number.trim() || undefined,
+        colors: colors.length ? colors : undefined,
+        imageUrl: r.imageUrl.trim() || undefined,
+        persistent: r.persistent,
+      };
+    });
+
+    const input = {
+      ...(useNewCompetition ? { newCompetitionName: newCompetitionName.trim() } : { competitionId }),
+      title: title.trim(),
+      scheduledStartUtc: scheduledStart ? new Date(scheduledStart).toISOString() : undefined,
+      videoUrl: videoUrl.trim() || undefined,
+      competitors,
+    };
+
+    startTransition(async () => {
+      const res = await createRaceAction(input as Parameters<typeof createRaceAction>[0]);
+      if (res.error) setError(res.error);
+      else router.push("/racing/races");
+    });
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Competition context */}
+      <Card>
+        <CardContent className="space-y-3 pt-6">
+          <h2 className="text-sm font-semibold">Competition</h2>
+          {canCreateCompetition && (
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" checked={useNewCompetition} onChange={(e) => setUseNewCompetition(e.target.checked)} />
+              Create a new standalone competition
+            </label>
+          )}
+          {useNewCompetition ? (
+            <div className="space-y-1.5">
+              <Label htmlFor="newComp">Competition name</Label>
+              <Input id="newComp" value={newCompetitionName} onChange={(e) => setNewCompetitionName(e.target.value)} placeholder="Marble Grand Prix" />
+            </div>
+          ) : (
+            <div className="space-y-1.5">
+              <Label htmlFor="comp">Competition</Label>
+              <select id="comp" className="w-full rounded-md border border-border-subtle bg-transparent px-3 py-2 text-sm" value={competitionId} onChange={(e) => setCompetitionId(e.target.value)}>
+                {competitions.length === 0 && <option value="">No competitions you can manage</option>}
+                {competitions.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Race details */}
+      <Card>
+        <CardContent className="space-y-3 pt-6">
+          <h2 className="text-sm font-semibold">Race</h2>
+          <div className="space-y-1.5">
+            <Label htmlFor="title">Race name</Label>
+            <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Opening Race" />
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="start">Scheduled start</Label>
+              <Input id="start" type="datetime-local" value={scheduledStart} onChange={(e) => setScheduledStart(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="video">Video / stream URL (optional)</Label>
+              <Input id="video" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="https://…" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Competitors */}
+      <Card>
+        <CardContent className="space-y-4 pt-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold">Competitors ({rows.length})</h2>
+            <Button type="button" variant="outline" size="sm" onClick={() => setRows((rs) => [...rs, emptyRow()])}>+ Add competitor</Button>
+          </div>
+
+          {rows.map((r, i) => (
+            <div key={i} className="space-y-2 rounded-md border border-border-subtle p-3">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-3 text-xs">
+                  <label className="flex items-center gap-1"><input type="radio" checked={r.mode === "new"} onChange={() => update(i, { mode: "new" })} /> New</label>
+                  {library.length > 0 && (
+                    <label className="flex items-center gap-1"><input type="radio" checked={r.mode === "existing"} onChange={() => update(i, { mode: "existing", existingCompetitorId: library[0].id })} /> From library</label>
+                  )}
+                </div>
+                {rows.length > 2 && (
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setRows((rs) => rs.filter((_, idx) => idx !== i))}>Remove</Button>
+                )}
+              </div>
+
+              {r.mode === "existing" ? (
+                <select className="w-full rounded-md border border-border-subtle bg-transparent px-3 py-2 text-sm" value={r.existingCompetitorId} onChange={(e) => update(i, { existingCompetitorId: e.target.value })}>
+                  {library.map((c) => (
+                    <option key={c.id} value={c.id}>{[c.number, c.name, (c.colors ?? []).join("/")].filter(Boolean).join(" · ") || "Competitor"}</option>
+                  ))}
+                </select>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-4">
+                    <Input placeholder="Name" value={r.name} onChange={(e) => update(i, { name: e.target.value })} />
+                    <Input placeholder="Number (#7)" value={r.number} onChange={(e) => update(i, { number: e.target.value })} />
+                    <Input placeholder="Colors (Red, White)" value={r.colorsText} onChange={(e) => update(i, { colorsText: e.target.value })} />
+                    <Input placeholder="Image URL (optional)" value={r.imageUrl} onChange={(e) => update(i, { imageUrl: e.target.value })} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <label className="flex items-center gap-2 text-xs text-text-secondary">
+                      <input type="checkbox" checked={r.persistent} onChange={(e) => update(i, { persistent: e.target.checked })} />
+                      Save this competitor for future races
+                    </label>
+                    <CompetitorIdentity
+                      size="sm"
+                      competitor={{ name: r.name, number: r.number, colors: r.colorsText.split(",").map((c) => c.trim()).filter(Boolean).slice(0, 4), imageUrl: r.imageUrl || null }}
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      {error && <p className="text-sm text-danger">{error}</p>}
+      <div className="flex gap-2">
+        <Button type="button" onClick={submit} disabled={pending}>{pending ? "Creating…" : "Create race"}</Button>
+        <Button type="button" variant="outline" onClick={() => router.push("/racing/races")}>Cancel</Button>
+      </div>
+    </div>
+  );
+}

@@ -14,9 +14,12 @@
  * NEVER run against production — see docs/DEPLOYMENT.md.
  */
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import { assertLocalSupabase } from "../lib/dev/assert-local-supabase";
 import { generatePoolTemplate, type PoolType } from "../lib/pools/templates";
 import { buildNoticeCopy } from "../lib/pools/notices";
 import type { PoolVoidReason } from "../lib/pools/anomaly";
+
+assertLocalSupabase("seed");
 
 function createAdminClient() {
   return createSupabaseClient(
