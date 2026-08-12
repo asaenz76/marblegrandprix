@@ -50,7 +50,7 @@ export default async function RacesPage() {
                 const count = (r.race_competitors as unknown as { count: number }[] | null)?.[0]?.count ?? 0;
                 return (
                   <tr key={r.id} className="border-t border-border-subtle">
-                    <td className="px-3 py-2">{r.title ?? "Untitled race"}</td>
+                    <td className="px-3 py-2"><Link href={`/racing/races/${r.id}`} className="text-accent-primary hover:underline">{r.title ?? "Untitled race"}</Link></td>
                     <td className="px-3 py-2 text-text-secondary">{comp?.name ?? "—"}</td>
                     <td className="px-3 py-2 tabular-nums">{count}</td>
                     <td className="px-3 py-2 text-text-secondary">{humanizeEnum(r.status)}</td>

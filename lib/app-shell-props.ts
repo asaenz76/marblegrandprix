@@ -1,6 +1,6 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
-import { isSuperAdmin, isOrganizerOrAbove } from "@/lib/auth/guards";
+import { isOrganizerOrAbove } from "@/lib/auth/guards";
 import { getUnreadCount } from "@/lib/notifications/fetch";
 import type { UserProfile } from "@/lib/auth/session";
 

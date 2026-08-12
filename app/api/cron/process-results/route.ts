@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { processAwaitingResults } from "@/lib/pools/settle";
+import { reconcileRacingSettlements } from "@/lib/racing/reconcile";
 import { recordJobRun } from "@/lib/jobs/record";
 
 export async function GET(request: Request) {
@@ -11,5 +12,9 @@ export async function GET(request: Request) {
   }
 
   const result = await recordJobRun("process-results", () => processAwaitingResults());
-  return NextResponse.json(result);
+  // Idempotent safety net for racing pools whose event-driven settlement was
+  // missed (transient error / restart). Normal racing settlement is event-driven
+  // on result confirmation — this never double-pays (settleRacePool is idempotent).
+  const racing = await reconcileRacingSettlements();
+  return NextResponse.json({ ...result, racingReconciled: Object.keys(racing).length });
 }
