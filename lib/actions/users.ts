@@ -65,9 +65,10 @@ export async function setUserActiveAction(
 
 export type SetUserRoleState = { error: string | null };
 
-// Only ever sets 'player' or 'admin' (validated by setUserRoleSchema) —
+// Only ever sets 'player' or 'organizer' (validated by setUserRoleSchema) —
+// the legacy 'admin' value is no longer assignable (no new product use), and
 // minting/demoting a super_admin stays a manual/create-super-admin-script
-// action, never a UI dropdown one click away.
+// action, never a UI dropdown one click away. Gated by requireSuperAdmin().
 export async function setUserRoleAction(
   _prevState: SetUserRoleState,
   formData: FormData,

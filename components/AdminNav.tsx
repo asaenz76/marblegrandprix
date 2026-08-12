@@ -15,7 +15,7 @@ const TABS: Array<{ href: string; label: string; superAdminOnly?: boolean }> = [
   { href: "/admin/settings", label: "Settings", superAdminOnly: true },
 ];
 
-export function AdminNav({ role }: { role: "super_admin" | "admin" | "player" }) {
+export function AdminNav({ role }: { role: "super_admin" | "admin" | "organizer" | "player" }) {
   const pathname = usePathname();
   const tabs = TABS.filter((tab) => !tab.superAdminOnly || role === "super_admin");
 

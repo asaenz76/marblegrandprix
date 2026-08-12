@@ -184,7 +184,7 @@ export default async function AdminUsersPage({
                             <SetRoleForm
                               key={`${u.id}-${u.role}`}
                               userId={u.id}
-                              role={u.role as "player" | "admin"}
+                              role={u.role as "player" | "organizer" | "admin"}
                             />
                           )}
                         </>

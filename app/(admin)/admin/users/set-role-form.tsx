@@ -10,15 +10,20 @@ const initialState: SetUserRoleState = { error: null };
  * Same remount-on-success shape as ToggleActiveForm — key this on `role`
  * from the parent list so a successful change resets local `open` state.
  */
-export function SetRoleForm({ userId, role }: { userId: string; role: "player" | "admin" }) {
+export function SetRoleForm({ userId, role }: { userId: string; role: "player" | "organizer" | "admin" }) {
   const [state, formAction, pending] = useActionState(setUserRoleAction, initialState);
   const [open, setOpen] = useState(false);
-  const nextRole = role === "player" ? "admin" : "player";
+  // Promote player -> organizer; demote organizer/legacy-admin -> player.
+  // The legacy 'admin' role is never re-mintable (validation permits only
+  // player/organizer), so an admin row can only be demoted, never restored.
+  const nextRole = role === "player" ? "organizer" : "player";
+  const label =
+    role === "player" ? "Make organizer" : role === "admin" ? "Remove legacy admin" : "Remove organizer";
 
   if (!open) {
     return (
       <Button type="button" variant="outline" size="sm" onClick={() => setOpen(true)}>
-        {role === "player" ? "Make admin" : "Remove admin"}
+        {label}
       </Button>
     );
   }

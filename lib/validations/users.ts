@@ -1,12 +1,14 @@
 import { z } from "zod";
 
-// Deliberately excludes 'super_admin' — minting a new super admin stays a
-// manual/create-super-admin-script action, not a UI dropdown one accidental
-// click away.
+// Assignable roles are player <-> organizer only. Deliberately excludes
+// 'super_admin' (minting one stays a manual/create-super-admin-script action)
+// AND the legacy 'admin' value (LEGACY TECHNICAL ROLE — NO NEW PRODUCT USE):
+// no new user may be promoted to 'admin' through this path. Promoting to
+// 'organizer' is Super-Admin-only (setUserRoleAction calls requireSuperAdmin).
 export const setUserRoleSchema = z
   .object({
     userId: z.string().uuid(),
-    role: z.enum(["player", "admin"]),
+    role: z.enum(["player", "organizer"]),
   })
   .strict();
 
