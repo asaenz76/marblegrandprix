@@ -33,6 +33,9 @@ export interface NoticeInput {
   houseFeeBasisPoints?: number;
   /** Only present when poolStatus is MANUAL_REVIEW. */
   reviewReason?: string | null;
+  /** Phase 9: a racing pool has no football fixture — use the same neutral,
+   * result-oriented copy as CUSTOM pools (no "kickoff"/"Match"). */
+  isRacing?: boolean;
 }
 
 const REVIEW_REASON_LABELS: Record<string, string> = {
@@ -97,9 +100,12 @@ export function buildNoticeCopy(input: NoticeInput): Notice | null {
     poolType,
     houseFeeBasisPoints,
     reviewReason,
+    isRacing,
   } = input;
 
-  const isCustom = poolType === "CUSTOM" || poolType === "COMBO";
+  // Racing pools have no fixture, so they take the same neutral, result-oriented
+  // copy as CUSTOM/COMBO pools ("Waiting for the result", not "Waiting for kickoff").
+  const isCustom = poolType === "CUSTOM" || poolType === "COMBO" || isRacing === true;
 
   if (poolStatus === "MANUAL_REVIEW") {
     const detail = reviewReason ? REVIEW_REASON_LABELS[reviewReason] : null;

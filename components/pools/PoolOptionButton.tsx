@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { formatCents } from "@/lib/utils/money";
 
@@ -14,6 +15,12 @@ interface PoolOptionButtonProps {
   isCurrentUserChoice: boolean;
   disabled: boolean;
   onSelect: () => void;
+  /** Phase 9: when set, renders this in place of the logo + text label —
+   *  e.g. a racing <CompetitorIdentity> (colors/number/name/image). Keeps the
+   *  option button one shared, option-count-agnostic control across domains. */
+  leading?: ReactNode;
+  /** Optional winner marker shown after settlement/result (racing). */
+  isWinner?: boolean;
 }
 
 // X.5.6-X.5.10: large touch-friendly control; indigo glow + "Your Choice"
@@ -27,6 +34,8 @@ export function PoolOptionButton({
   isCurrentUserChoice,
   disabled,
   onSelect,
+  leading,
+  isWinner = false,
 }: PoolOptionButtonProps) {
   return (
     <button
@@ -38,16 +47,27 @@ export function PoolOptionButton({
         "flex min-h-11 w-full items-center gap-3 rounded-xl border-2 px-4 py-3 text-left transition-colors",
         isCurrentUserChoice
           ? "border-accent-primary bg-accent-primary/10"
-          : "border-border-subtle bg-surface-primary hover:border-accent-primary/50",
-        disabled && !isCurrentUserChoice && "cursor-not-allowed opacity-60",
+          : isWinner
+            ? "border-success/60 bg-success/10"
+            : "border-border-subtle bg-surface-primary hover:border-accent-primary/50",
+        disabled && !isCurrentUserChoice && !isWinner && "cursor-not-allowed opacity-60",
       )}
     >
-      {logoUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={logoUrl} alt="" className="size-8 rounded-full object-contain" />
-      ) : null}
-      <span className="flex-1 text-sm font-semibold text-text-primary">{label}</span>
+      {leading ? (
+        <span className="flex-1 text-sm font-semibold text-text-primary">{leading}</span>
+      ) : (
+        <>
+          {logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={logoUrl} alt="" className="size-8 rounded-full object-contain" />
+          ) : null}
+          <span className="flex-1 text-sm font-semibold text-text-primary">{label}</span>
+        </>
+      )}
       <div className="flex items-center gap-2">
+        {isWinner && (
+          <span className="rounded-full bg-success px-2 py-0.5 text-xs font-medium text-white">Winner</span>
+        )}
         {isCurrentUserChoice && (
           <span className="rounded-full bg-accent-primary px-2 py-0.5 text-xs font-medium text-white">
             Your Choice

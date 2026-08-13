@@ -8,7 +8,7 @@ import { CompetitorIdentity, type CompetitorIdentityData } from "@/components/ra
  * (a filled competitor, or its advancement source "Winner of …" / "Pn of …") →
  * the race's result status. No drag-and-drop, no tournament designer.
  */
-export async function BracketView({ competitionId }: { competitionId: string }) {
+export async function BracketView({ competitionId, raceBasePath = "/racing/races" }: { competitionId: string; raceBasePath?: string }) {
   const admin = createAdminClient();
 
   const [{ data: stages }, { data: races }] = await Promise.all([
@@ -55,7 +55,7 @@ export async function BracketView({ competitionId }: { competitionId: string }) 
     return (
       <div key={r.id} className="rounded-md border border-border-subtle p-3">
         <div className="flex items-center justify-between">
-          <Link href={`/racing/races/${r.id}`} className="text-sm font-medium text-accent-primary hover:underline">{r.title ?? "Untitled race"}</Link>
+          <Link href={`${raceBasePath}/${r.id}`} className="text-sm font-medium text-accent-primary hover:underline">{r.title ?? "Untitled race"}</Link>
           <span className="text-xs text-text-secondary">{winnerId ? "Result confirmed" : "Awaiting result"}</span>
         </div>
         <ul className="mt-2 space-y-1">

@@ -9,6 +9,7 @@ import { getRuleLabel, type PoolType } from "./templates";
 import { buildNoticeCopy, type Notice } from "./notices";
 import type { PoolVoidReason } from "./anomaly";
 import type { FixtureInternalStatus } from "@/lib/sports-data/types";
+import type { RacingPoolContext } from "@/lib/racing/pool-presentation";
 
 /** Per-viewer follow state for a single team or league, threaded through
  *  so a pool card can render correct follow-icon state without a separate
@@ -53,6 +54,11 @@ export interface SocialPoolCardViewModel {
    *  Semifinal France – England"), shown above `question` where
    *  MatchIdentity would otherwise render. Null for fixture-backed pools. */
   title: string | null;
+  /** Phase 9: racing presentation context (competition/race/competitors/result)
+   *  for RACE_WINNER/COMPETITION_WINNER pools. Null/absent for football/custom
+   *  pools — the card renders its racing header + competitor options only when
+   *  set. Optional so existing football view-model literals stay valid. */
+  racing?: RacingPoolContext | null;
   poolType: PoolType;
   ruleLabel: string;
   /** COMBO's N graded conditions (e.g. "Mbappé 1+ goals") — informational
@@ -152,6 +158,8 @@ export interface BuildViewModelInput {
   isLikedByCurrentUser: boolean;
   /** Only populated (and only meaningful) for COMBO pools. */
   comboLegs?: Array<{ id: string; label: string }>;
+  /** Phase 9: racing presentation context, when this is a racing pool. */
+  racing?: RacingPoolContext | null;
 }
 
 /**
@@ -197,7 +205,16 @@ export function buildPoolCardViewModel(input: BuildViewModelInput): SocialPoolCa
     finalPayout,
     isLikedByCurrentUser,
     comboLegs,
+    racing,
   } = input;
+
+  // Racing pools are auto-graded from the race/competition outcome, not a
+  // football fixture — keep the rule pill truthful and free of "fixture".
+  const ruleLabel = racing
+    ? racing.scope === "COMPETITION"
+      ? "Auto-graded from the competition result"
+      : "Auto-graded from the race result"
+    : getRuleLabel(pool.pool_type);
 
   const status = deriveCardState(
     { status: pool.status, locksAt: pool.locks_at },
@@ -247,6 +264,7 @@ export function buildPoolCardViewModel(input: BuildViewModelInput): SocialPoolCa
     poolType: pool.pool_type,
     houseFeeBasisPoints: pool.house_fee_bps,
     reviewReason: pool.review_reason,
+    isRacing: racing != null,
   });
 
   return {
@@ -274,8 +292,9 @@ export function buildPoolCardViewModel(input: BuildViewModelInput): SocialPoolCa
     },
     question: pool.question,
     title: pool.title,
+    racing: racing ?? null,
     poolType: pool.pool_type,
-    ruleLabel: getRuleLabel(pool.pool_type),
+    ruleLabel,
     comboLegs:
       pool.pool_type === "COMBO"
         ? (comboLegs ?? []).map((leg) => ({ id: leg.id, label: leg.label }))

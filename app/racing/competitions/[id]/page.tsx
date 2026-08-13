@@ -6,9 +6,9 @@ import { isOrganizerOrAbove } from "@/lib/auth/guards";
 import { computeStandings, type StandingsResult } from "@/lib/racing/standings";
 import { humanizeEnum } from "@/lib/utils/humanize";
 import type { CompetitorIdentityData } from "@/components/racing/CompetitorIdentity";
-import { StandingsTable } from "./standings-table";
+import { StandingsTable } from "@/components/racing/StandingsTable";
 import { FinalizeForm } from "./finalize-form";
-import { BracketView } from "./bracket-view";
+import { BracketView } from "@/components/racing/BracketView";
 
 // Competition detail + standings (Phase 7). Access re-checked server-side:
 // requireCompetitionAccess enforces the Phase 3 assignment boundary (super_admin

@@ -33,6 +33,9 @@ interface PoolLeagueHeaderProps {
   // per-option "Your Choice" badge only surfaces once you've scanned into
   // the option list. This gives the same fact away at a glance.
   hasEntered?: boolean;
+  // Phase 9: racing pools have no football competition to name here — pass a
+  // neutral label ("Race pool"/"Competition pool") instead of "Custom Poll".
+  overrideLabel?: string;
 }
 
 function relativeTime(iso: string): string {
@@ -88,6 +91,7 @@ export function PoolLeagueHeader({
   isResolved,
   hasEntered = false,
   leagueFollow = null,
+  overrideLabel,
 }: PoolLeagueHeaderProps) {
   // relativeTime()/countdown() below are pure reads of Date.now() — with
   // nothing else ticking this component's re-render (no interval anywhere
@@ -101,13 +105,15 @@ export function PoolLeagueHeader({
     return () => clearInterval(id);
   }, []);
 
-  const label = competitionName
-    ? competitionCountry
-      ? `${competitionCountry} | ${competitionName}`
-      : competitionName
-    : poolType === "COMBO"
-      ? "Combo"
-      : "Custom Poll";
+  const label = overrideLabel
+    ? overrideLabel
+    : competitionName
+      ? competitionCountry
+        ? `${competitionCountry} | ${competitionName}`
+        : competitionName
+      : poolType === "COMBO"
+        ? "Combo"
+        : "Custom Poll";
 
   return (
     <div className="flex items-start gap-3">

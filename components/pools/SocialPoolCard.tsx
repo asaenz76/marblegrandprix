@@ -13,6 +13,9 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { PoolLeagueHeader } from "./PoolLeagueHeader";
 import { MatchIdentity } from "./MatchIdentity";
+import { CompetitorIdentity } from "@/components/racing/CompetitorIdentity";
+import { RacingPoolHeader } from "@/components/racing/RacingPoolHeader";
+import { RaceResultSummary } from "@/components/racing/RaceResultSummary";
 import { RulePill } from "./RulePill";
 import { PoolOptionButton } from "./PoolOptionButton";
 import { PoolDistributionBar } from "./PoolDistributionBar";
@@ -142,6 +145,7 @@ export function SocialPoolCard({
             isResolved={!isPreVote && !isPostVote && !isLocked && !isLive}
             hasEntered={viewModel.currentUser.hasEntered}
             leagueFollow={viewModel.fixture.leagueFollow}
+            overrideLabel={viewModel.racing ? (viewModel.racing.scope === "COMPETITION" ? "Competition pool" : "Race pool") : undefined}
           />
         </div>
         {collapsible && (
@@ -166,9 +170,13 @@ export function SocialPoolCard({
           as WHO_WILL_ADVANCE/REGULATION_RESULT, not just its title. */}
       {viewModel.fixture.homeTeamName && <MatchIdentity fixture={viewModel.fixture} />}
 
+      {/* Racing pools show their competition/race context here, where a
+          football MatchIdentity would otherwise render. */}
+      {viewModel.racing && <RacingPoolHeader racing={viewModel.racing} />}
+
       {!collapsed && (
         <>
-          {viewModel.title && (
+          {viewModel.title && !viewModel.racing && (
             <p className="text-sm font-medium text-text-secondary">{viewModel.title}</p>
           )}
 
@@ -244,22 +252,38 @@ export function SocialPoolCard({
           )}
 
           <div className="space-y-2">
-            {mergedOptions.map((option) => (
-              <PoolOptionButton
-                key={option.optionId}
-                label={option.label}
-                logoUrl={option.teamLogoUrl}
-                percentage={option.percentage}
-                estimatedPayout={option.estimatedPayout}
-                isCurrentUserChoice={option.isCurrentUserChoice}
-                // Admins/super_admins coordinate pools, they don't play in
-                // them — create_pool_entry rejects this server-side too, but
-                // hiding the affordance here avoids a pointless round trip.
-                disabled={!isPreVote || viewer.isModerator}
-                onSelect={() => isPreVote && !viewer.isModerator && setSelectedOptionId(option.optionId)}
-              />
-            ))}
+            {mergedOptions.map((option) => {
+              const competitor = viewModel.racing?.optionCompetitors[option.optionId];
+              return (
+                <PoolOptionButton
+                  key={option.optionId}
+                  label={option.label}
+                  logoUrl={option.teamLogoUrl}
+                  // Racing options render the full competitor identity
+                  // (colors/number/name/image), N-agnostically.
+                  leading={competitor ? <CompetitorIdentity competitor={competitor} /> : undefined}
+                  isWinner={viewModel.racing?.winnerOptionId === option.optionId}
+                  percentage={option.percentage}
+                  estimatedPayout={option.estimatedPayout}
+                  isCurrentUserChoice={option.isCurrentUserChoice}
+                  // Admins/super_admins coordinate pools, they don't play in
+                  // them — create_pool_entry rejects this server-side too, but
+                  // hiding the affordance here avoids a pointless round trip.
+                  disabled={!isPreVote || viewer.isModerator}
+                  onSelect={() => isPreVote && !viewer.isModerator && setSelectedOptionId(option.optionId)}
+                />
+              );
+            })}
           </div>
+
+          {/* Truthful race result once available (RACE scope, past the pick
+              stage) — winner / finishing order / ambiguous, never fabricated. */}
+          {viewModel.racing?.scope === "RACE" && viewModel.racing.result && viewModel.racing.result.status !== "PENDING" && !isPreVote && !isPostVote && (
+            <div className="rounded-xl border border-border-subtle bg-surface-secondary px-3 py-2">
+              <p className="mb-1 text-xs font-medium text-text-secondary">Result</p>
+              <RaceResultSummary result={viewModel.racing.result} compact />
+            </div>
+          )}
 
           <PoolStatusNotice notice={viewModel.notice} />
 

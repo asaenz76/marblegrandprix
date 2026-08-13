@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { buildPoolCardViewModel, computeOptionStats, type FollowState, type SocialPoolCardViewModel } from "./view-model";
 import type { EntryStatusForCard } from "./card-state";
+import { getRacingPoolContexts } from "@/lib/racing/pool-presentation";
 
 export interface PoolTotalsBulkRow {
   pool_id: string;
@@ -132,6 +133,13 @@ export async function getPoolCardViewModels(
 
   const fixtureIds = [...new Set(pools.map((p) => p.fixture_id).filter((id) => id != null))];
   const creatorIds = [...new Set(pools.map((p) => p.created_by))];
+
+  // Phase 9: batched racing presentation context (competition/race/competitors/
+  // result) for RACE_WINNER/COMPETITION_WINNER pools — non-racing pools are
+  // simply absent from the map, so the football path is unchanged.
+  const racingByPoolId = await getRacingPoolContexts(
+    pools.map((p) => ({ id: p.id as string, template_id: p.template_id ?? null, race_id: p.race_id ?? null, template_config: p.template_config ?? null })),
+  );
 
   // public_profiles filters to is_active — a pool created by an account
   // that's since been deactivated (common for the many test/seed accounts
@@ -294,6 +302,7 @@ export async function getPoolCardViewModels(
         finalPayout: entry ? (payoutByEntryId.get(entry.id) ?? null) : null,
         isLikedByCurrentUser: likedPoolIds.has(pool.id),
         comboLegs: comboLegs.filter((leg) => leg.pool_id === pool.id),
+        racing: racingByPoolId.get(pool.id) ?? null,
       }),
     );
   }
