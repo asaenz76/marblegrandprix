@@ -5,7 +5,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { LogoutButton } from "@/components/LogoutButton";
 import { MobileBottomNavigation } from "@/components/MobileBottomNavigation";
 import { NotificationToast } from "@/components/NotificationToast";
-import { isAdminOrAbove } from "@/lib/auth/guards";
+import { isAdminOrAbove, isOrganizerOrAbove } from "@/lib/auth/guards";
 import { cn } from "@/lib/utils";
 import type { UserProfile } from "@/lib/auth/session";
 
@@ -48,6 +48,17 @@ export function AppShell({
           </Link>
           <div className="flex flex-wrap items-center justify-end gap-2">
             <BalancePill balanceCents={balanceCents} />
+            {/* Racing operators (Super Admin + assigned Organizers) get a
+                one-click entry to the racing management home. Legacy 'admin'
+                is intentionally excluded (no racing authority). */}
+            {isOrganizerOrAbove(user) && (
+              <Link
+                href="/racing"
+                className="text-sm font-medium text-text-secondary underline underline-offset-4 hover:text-text-primary"
+              >
+                Manage
+              </Link>
+            )}
             {isAdminOrAbove(user) && (
               <Link
                 href="/admin/users"

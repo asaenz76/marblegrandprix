@@ -42,6 +42,9 @@ const REVIEW_REASON_LABELS: Record<string, string> = {
   BINARY_OPTIONS_UNRESOLVABLE: "its Yes/No options couldn't be verified",
   TEMPLATE_VERSION_UNRESOLVABLE: "its question template couldn't be resolved",
   TEMPLATE_CONFIG_INVALID: "its stored configuration couldn't be validated",
+  // Racing review reasons (Phase 10) — plain language instead of the raw enum.
+  RACE_RESULT_UNRESOLVABLE: "the race result couldn't be matched to a single winner (for example a tie at the front)",
+  WINNER_NOT_IN_POOL_OPTIONS: "the confirmed winner isn't one of this pool's options",
 };
 
 const ANOMALY_LABEL: Partial<Record<FixtureInternalStatus, string>> = {

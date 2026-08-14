@@ -1,10 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireCompetitionAccess } from "@/lib/auth/session";
+import { isSuperAdmin } from "@/lib/auth/guards";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getRaceResultView } from "@/lib/racing/pool-presentation";
 import { CompetitorIdentity } from "@/components/racing/CompetitorIdentity";
+import { RaceResultSummary } from "@/components/racing/RaceResultSummary";
 import { humanizeEnum } from "@/lib/utils/humanize";
 import { ResultForm } from "./result-form";
+import { CorrectionForm } from "./correction-form";
 
 // Race detail + result entry (Phase 6). Access is re-checked server-side:
 // requireCompetitionAccess enforces the Phase 3 assignment boundary (super_admin
@@ -16,7 +20,7 @@ export default async function RaceDetailPage({ params }: { params: Promise<{ id:
   if (!race) notFound();
 
   // Enforce per-competition authorization (redirects if not permitted).
-  await requireCompetitionAccess(race.competition_id);
+  const profile = await requireCompetitionAccess(race.competition_id);
 
   const { data: rc } = await admin
     .from("race_competitors")
@@ -28,6 +32,8 @@ export default async function RaceDetailPage({ params }: { params: Promise<{ id:
 
   const { data: confirmed } = await admin.from("race_results").select("id, winner_competitor_id").eq("race_id", id).eq("status", "CONFIRMED").maybeSingle();
   const comp = race.racing_competitions as unknown as { name: string } | null;
+  const canCorrect = isSuperAdmin(profile);
+  const result = confirmed ? await getRaceResultView(id) : null;
 
   return (
     <div className="mx-auto max-w-xl space-y-6">
@@ -50,7 +56,18 @@ export default async function RaceDetailPage({ params }: { params: Promise<{ id:
 
       <section className="space-y-2">
         <h2 className="text-sm font-semibold">Result</h2>
-        <ResultForm raceId={id} competitors={competitors} alreadyConfirmed={!!confirmed} />
+        {result ? (
+          <>
+            <RaceResultSummary result={result} />
+            {canCorrect ? (
+              <div className="pt-1"><CorrectionForm raceId={id} competitors={competitors} /></div>
+            ) : (
+              <p className="text-xs text-text-muted">A confirmed result is authoritative. Corrections are Super-Admin-only.</p>
+            )}
+          </>
+        ) : (
+          <ResultForm raceId={id} competitors={competitors} alreadyConfirmed={false} />
+        )}
       </section>
     </div>
   );

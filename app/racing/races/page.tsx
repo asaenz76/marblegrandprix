@@ -23,6 +23,14 @@ export default async function RacesPage() {
     .limit(50);
   if (competitionIds !== null) query = query.in("competition_id", competitionIds.length ? competitionIds : ["00000000-0000-0000-0000-000000000000"]);
   const { data: races } = await query;
+  const list = races ?? [];
+
+  // Confirmed-result state, so the list can show "Awaiting result" vs "Result confirmed".
+  const confirmed = new Set<string>();
+  if (list.length) {
+    const { data: results } = await client.from("race_results").select("race_id").in("race_id", list.map((r) => r.id)).eq("status", "CONFIRMED");
+    for (const r of results ?? []) confirmed.add(r.race_id as string);
+  }
 
   return (
     <div className="space-y-6">
@@ -31,35 +39,30 @@ export default async function RacesPage() {
         <Link href="/racing/races/new"><Button size="sm">New race</Button></Link>
       </div>
 
-      {(races ?? []).length === 0 ? (
-        <p className="text-sm text-text-secondary">No races yet. Create your first one.</p>
-      ) : (
-        <div className="overflow-x-auto rounded-md border border-border-subtle">
-          <table className="w-full text-sm">
-            <thead className="text-left text-text-secondary">
-              <tr>
-                <th className="px-3 py-2">Race</th>
-                <th className="px-3 py-2">Competition</th>
-                <th className="px-3 py-2">Competitors</th>
-                <th className="px-3 py-2">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(races ?? []).map((r) => {
-                const comp = r.racing_competitions as unknown as { name: string } | null;
-                const count = (r.race_competitors as unknown as { count: number }[] | null)?.[0]?.count ?? 0;
-                return (
-                  <tr key={r.id} className="border-t border-border-subtle">
-                    <td className="px-3 py-2"><Link href={`/racing/races/${r.id}`} className="text-accent-primary hover:underline">{r.title ?? "Untitled race"}</Link></td>
-                    <td className="px-3 py-2 text-text-secondary">{comp?.name ?? "—"}</td>
-                    <td className="px-3 py-2 tabular-nums">{count}</td>
-                    <td className="px-3 py-2 text-text-secondary">{humanizeEnum(r.status)}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+      {list.length === 0 ? (
+        <div className="rounded-md border border-border-subtle p-4 text-center">
+          <p className="text-sm text-text-secondary">No races yet.</p>
+          <Link href="/racing/races/new" className="mt-2 inline-block text-sm font-medium text-accent-primary hover:underline">Create your first race →</Link>
         </div>
+      ) : (
+        <ul className="divide-y divide-border-subtle rounded-md border border-border-subtle">
+          {list.map((r) => {
+            const comp = r.racing_competitions as unknown as { name: string } | null;
+            const count = (r.race_competitors as unknown as { count: number }[] | null)?.[0]?.count ?? 0;
+            const awaiting = !confirmed.has(r.id) && (r.status === "SCHEDULED" || r.status === "IN_PROGRESS");
+            return (
+              <li key={r.id} className="flex items-center justify-between gap-2 px-3 py-2.5 text-sm">
+                <div className="min-w-0">
+                  <Link href={`/racing/races/${r.id}`} className="font-medium text-accent-primary hover:underline">{r.title ?? "Untitled race"}</Link>
+                  <div className="text-xs text-text-secondary">{comp?.name ?? "—"} · {count} competitor{count === 1 ? "" : "s"}</div>
+                </div>
+                <span className={`shrink-0 text-xs ${awaiting ? "font-medium text-accent-primary" : "text-text-secondary"}`}>
+                  {confirmed.has(r.id) ? "Result confirmed" : awaiting ? "Awaiting result" : humanizeEnum(r.status)}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
       )}
     </div>
   );

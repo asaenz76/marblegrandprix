@@ -8,6 +8,8 @@ import {
   refinalizeCompetitionForActor,
   type FinalizeResult,
 } from "@/lib/racing/finalize-competition";
+import { createCompetitionForActor, type CreateCompetitionInput, type CreateCompetitionResult } from "@/lib/racing/create-competition";
+import { writeAuditLog } from "@/lib/audit/log";
 
 /**
  * Thin trust-boundary wrappers (Phase 7). Competition finalization DERIVES the
@@ -20,6 +22,18 @@ import {
  * the finalization core (it records the standings snapshot that produced the
  * outcome).
  */
+
+export async function createCompetitionAction(input: CreateCompetitionInput): Promise<CreateCompetitionResult> {
+  // Creating a competition is global — Super-Admin-only (enforced here AND in the core).
+  const actor = await requireSuperAdmin();
+  const res = await createCompetitionForActor(createAdminClient(), actor, input);
+  if (!res.error && res.competitionId) {
+    await writeAuditLog({ actorId: actor.id, action: "racing_competition.created", entityType: "racing_competition", entityId: res.competitionId, after: { name: input.name, format: input.format } });
+    revalidatePath("/racing/competitions");
+    revalidatePath("/racing");
+  }
+  return res;
+}
 
 export async function finalizeCompetitionAction(input: { competitionId: string }): Promise<FinalizeResult> {
   const actor = await requireOrganizerOrAbove();

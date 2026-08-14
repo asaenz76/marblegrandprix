@@ -34,18 +34,23 @@ export function RaceCreateForm({
   canCreateCompetition,
   library,
   racesByCompetition = {},
+  lockedCompetitionId = null,
 }: {
   competitions: CompetitionOption[];
   canCreateCompetition: boolean;
   library: LibraryCompetitor[];
   racesByCompetition?: Record<string, SourceRace[]>;
+  // Phase 10: when adding a race from a competition page, the competition is
+  // fixed — lock it and hide the competition picker / "new competition" toggle.
+  lockedCompetitionId?: string | null;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  const [useNewCompetition, setUseNewCompetition] = useState(canCreateCompetition && competitions.length === 0);
-  const [competitionId, setCompetitionId] = useState(competitions[0]?.id ?? "");
+  const lockedCompetition = lockedCompetitionId ? competitions.find((c) => c.id === lockedCompetitionId) ?? null : null;
+  const [useNewCompetition, setUseNewCompetition] = useState(!lockedCompetition && canCreateCompetition && competitions.length === 0);
+  const [competitionId, setCompetitionId] = useState(lockedCompetition?.id ?? competitions[0]?.id ?? "");
   const [newCompetitionName, setNewCompetitionName] = useState("");
   const [newCompetitionFormat, setNewCompetitionFormat] = useState<"SINGLE_RACE" | "CHAMPIONSHIP" | "LEAGUE" | "BRACKET" | "ELIMINATION">("SINGLE_RACE");
 
@@ -101,7 +106,11 @@ export function RaceCreateForm({
 
   return (
     <div className="space-y-6">
-      {/* Competition context */}
+      {/* Competition context. When locked (adding from a competition page), we
+          show the fixed competition and skip the picker entirely. */}
+      {lockedCompetition ? (
+        <input type="hidden" value={lockedCompetition.id} readOnly />
+      ) : (
       <Card>
         <CardContent className="space-y-3 pt-6">
           <h2 className="text-sm font-semibold">Competition</h2>
@@ -142,6 +151,7 @@ export function RaceCreateForm({
           )}
         </CardContent>
       </Card>
+      )}
 
       {/* Race details */}
       <Card>

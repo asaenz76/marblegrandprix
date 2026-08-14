@@ -2,13 +2,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireCompetitionAccess } from "@/lib/auth/session";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { isOrganizerOrAbove } from "@/lib/auth/guards";
+import { isOrganizerOrAbove, isSuperAdmin } from "@/lib/auth/guards";
 import { computeStandings, type StandingsResult } from "@/lib/racing/standings";
 import { humanizeEnum } from "@/lib/utils/humanize";
 import type { CompetitorIdentityData } from "@/components/racing/CompetitorIdentity";
 import { StandingsTable } from "@/components/racing/StandingsTable";
 import { FinalizeForm } from "./finalize-form";
 import { BracketView } from "@/components/racing/BracketView";
+import { OrganizersSection } from "./organizers-section";
 
 // Competition detail + standings (Phase 7). Access re-checked server-side:
 // requireCompetitionAccess enforces the Phase 3 assignment boundary (super_admin
@@ -53,6 +54,22 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
   // final race, so they expose no manual "Finalize" control.
   const canManage = isOrganizerOrAbove(profile);
   const eligibleToFinalize = isStandings && canManage && comp.status !== "COMPLETED" && comp.status !== "CANCELLED";
+  const addRaceHref = `/racing/races/new?competition=${comp.id}`;
+
+  // Organizer assignment (Super-Admin only): assigned organizers + assignable ones.
+  const superAdmin = isSuperAdmin(profile);
+  const assignedOrganizers: { id: string; name: string }[] = [];
+  const assignableOrganizers: { id: string; name: string }[] = [];
+  if (superAdmin) {
+    const { data: assignedRows } = await admin.from("competition_organizers").select("organizer_id").eq("competition_id", comp.id);
+    const assignedIds = new Set((assignedRows ?? []).map((r) => r.organizer_id as string));
+    const { data: orgUsers } = await admin.from("user_profiles").select("id, display_name").eq("role", "organizer").eq("is_active", true).order("display_name");
+    for (const u of orgUsers ?? []) {
+      const person = { id: u.id, name: u.display_name };
+      if (assignedIds.has(u.id)) assignedOrganizers.push(person);
+      else assignableOrganizers.push(person);
+    }
+  }
 
   return (
     <div className="mx-auto max-w-xl space-y-6">
@@ -79,7 +96,7 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
         <section className="space-y-2">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold">Bracket</h2>
-            {canManage && comp.status !== "COMPLETED" && <Link href="/racing/races/new" className="text-sm text-accent-primary hover:underline">New race</Link>}
+            {canManage && comp.status !== "COMPLETED" && <Link href={addRaceHref} className="text-sm text-accent-primary hover:underline">Add race</Link>}
           </div>
           <BracketView competitionId={comp.id} />
           {comp.status === "COMPLETED" && <p className="text-sm text-success">Champion decided by the final race.</p>}
@@ -91,7 +108,7 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
       <section className={`space-y-2 ${isBracket ? "hidden" : ""}`}>
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold">Races ({(races ?? []).length})</h2>
-          {canManage && <Link href="/racing/races/new" className="text-sm text-accent-primary hover:underline">New race</Link>}
+          {canManage && <Link href={addRaceHref} className="text-sm text-accent-primary hover:underline">Add race</Link>}
         </div>
         {(races ?? []).length === 0 ? (
           <p className="text-sm text-text-secondary">No races yet.</p>
@@ -114,6 +131,10 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
           <h2 className="text-sm font-semibold">Finalize</h2>
           <FinalizeForm competitionId={comp.id} eligible={eligibleToFinalize} />
         </section>
+      )}
+
+      {superAdmin && (
+        <OrganizersSection competitionId={comp.id} assigned={assignedOrganizers} assignable={assignableOrganizers} />
       )}
     </div>
   );

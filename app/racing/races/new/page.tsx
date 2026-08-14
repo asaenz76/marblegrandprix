@@ -6,7 +6,8 @@ import { RaceCreateForm } from "./race-create-form";
 // Single Race creation (Phase 4). First-class racing-native flow — no fixtures,
 // no provider, no home/away. Eligibility is the coarse organizer gate here; the
 // per-competition assignment check is enforced server-side in createRaceAction.
-export default async function NewRacePage() {
+export default async function NewRacePage({ searchParams }: { searchParams: Promise<{ competition?: string }> }) {
+  const { competition: preselectedCompetitionId } = await searchParams;
   const profile = await requireOrganizerOrAbove();
   const client = createAdminClient();
   const superAdmin = isSuperAdmin(profile);
@@ -43,13 +44,27 @@ export default async function NewRacePage() {
     .order("created_at", { ascending: false })
     .limit(100);
 
+  // Preselect + lock the competition when arriving from a competition page
+  // ("Add race"), so the operator isn't asked to re-pick the same competition.
+  const preselected = preselectedCompetitionId && competitions.some((c) => c.id === preselectedCompetitionId)
+    ? competitions.find((c) => c.id === preselectedCompetitionId)!
+    : null;
+
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
         <h1 className="text-lg font-semibold">Create a race</h1>
-        <p className="text-sm text-text-secondary">Add a field of competitors and schedule the race.</p>
+        <p className="text-sm text-text-secondary">
+          {preselected ? <>Adding a race to <span className="font-medium text-text-primary">{preselected.name}</span>.</> : "Add a field of competitors and schedule the race."}
+        </p>
       </div>
-      <RaceCreateForm competitions={competitions} canCreateCompetition={superAdmin} library={lib ?? []} racesByCompetition={racesByCompetition} />
+      <RaceCreateForm
+        competitions={competitions}
+        canCreateCompetition={superAdmin}
+        library={lib ?? []}
+        racesByCompetition={racesByCompetition}
+        lockedCompetitionId={preselected?.id ?? null}
+      />
     </div>
   );
 }
