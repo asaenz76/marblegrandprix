@@ -109,9 +109,10 @@ export function getLatestTemplate(templateId: string): PoolTemplate<Record<strin
   return candidates.reduce((latest, t) => (t.version > latest.version ? t : latest));
 }
 
-// One Zod schema per (template id, version) pair — validated against the
-// client-submitted templateConfig once templateId is known (see
-// createPoolFromTemplate). Kept here rather than on PoolTemplate itself so
+// One Zod schema per (template id, version) pair — validated against a
+// pool's stored templateConfig at grade time once templateId is known (see
+// getTemplateConfigSchema, used by grade.ts). Kept here rather than on
+// PoolTemplate itself so
 // the interface's gradingRule/questionBuilder stay bivariantly checkable
 // (see types.ts's comment) without also needing a generic schema field.
 // Composite string key (not a nested map) so a duplicate (id, version) pair
