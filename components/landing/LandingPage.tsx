@@ -4,7 +4,7 @@ import { LandingHero } from "./LandingHero";
 import { ActivityStrip } from "./ActivityStrip";
 import { HowItWorks } from "./HowItWorks";
 import { ProductShowcase } from "./ProductShowcase";
-import { ComparisonSection } from "./ComparisonSection";
+import { FormatsSection } from "./FormatsSection";
 import { BetaStats } from "./BetaStats";
 import { FinalCta } from "./FinalCta";
 import { LandingFooter } from "./LandingFooter";
@@ -17,12 +17,8 @@ export function LandingPage({ data }: { data: LandingPageData }) {
         <LandingHero heroPool={data.heroPool} />
         <ActivityStrip items={data.activity} />
         <HowItWorks />
-        <ProductShowcase
-          feedPools={data.feedPools}
-          leaderboard={data.leaderboard}
-          sampleAnalytics={data.sampleAnalytics}
-        />
-        <ComparisonSection />
+        <ProductShowcase feedPools={data.feedPools} leaderboard={data.leaderboard} />
+        <FormatsSection />
         <BetaStats stats={data.stats} />
         <FinalCta />
       </main>

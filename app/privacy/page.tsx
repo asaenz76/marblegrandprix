@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { LegalPage } from "@/components/legal/LegalPage";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — brohda.",
+  title: "Privacy Policy — Marble Grand Prix",
   robots: { index: false, follow: false },
 };
 
@@ -13,8 +13,8 @@ export default function PrivacyPage() {
     <LegalPage title="Privacy Policy" effectiveDate={EFFECTIVE_DATE}>
       <section>
         <p>
-          This Privacy Policy describes how <strong>brohda</strong> (&quot;we&quot;,
-          &quot;us&quot;) handles information in connection with brohda. (the &quot;App&quot;, the
+          This Privacy Policy describes how <strong>Marble Grand Prix</strong> (&quot;we&quot;,
+          &quot;us&quot;) handles information in connection with Marble Grand Prix (the &quot;App&quot;, the
           &quot;Service&quot;), a private, invite-only platform. It applies only to information
           collected through the App itself — it does not cover the payment apps, banks, or other
           third-party services members use to move money between each other off-platform, which
@@ -70,7 +70,7 @@ export default function PrivacyPage() {
       <section>
         <h2>4. What other members can see</h2>
         <p>
-          brohda. is a social app for a private group: your username, display name, profile photo,
+          Marble Grand Prix is a social app for a private group: your username, display name, profile photo,
           public activity (entries, likes, comments), and leaderboard stats are visible to other
           members of your group by design. Group administrators additionally see wallet requests
           you submit (amount, payment method, and any transaction reference or note) in order to
@@ -82,8 +82,8 @@ export default function PrivacyPage() {
         <h2>5. Third-party services we use</h2>
         <p>
           We use infrastructure providers to run the Service, including a hosting/database/authentication
-          provider and a sports-data provider that supplies fixture and match information displayed
-          in the App. These providers process data on our behalf under their own security and
+          provider and, for historical records, a sports-data provider that supplied event
+          information displayed in the App. These providers process data on our behalf under their own security and
           privacy commitments. We do not sell your information to anyone, and we do not share it
           with advertisers.
         </p>
@@ -145,8 +145,8 @@ export default function PrivacyPage() {
         <h2>12. Contact</h2>
         <p>
           Questions about this Privacy Policy can be sent to{" "}
-          <a href="mailto:support@brohda.com" className="underline underline-offset-4">
-            support@brohda.com
+          <a href="mailto:support@marblegrandprix.com" className="underline underline-offset-4">
+            support@marblegrandprix.com
           </a>
           .
         </p>

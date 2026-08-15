@@ -45,10 +45,18 @@ export function CompetitorIdentity({
       ) : colors.length > 0 ? (
         <span className="inline-flex items-center gap-0.5" aria-hidden>
           {colors.map((c, i) => (
+            // The ring is a theme-contrasting hairline (dark on light surfaces,
+            // light on dark) so a swatch whose fill matches the theme — white
+            // on light, black/navy on dark — never visually disappears.
+            // Competitor colors are product data and are rendered exactly as
+            // stored; the ring is what guarantees separation, not a recolor.
             <span
               key={i}
-              className={cn(swatch, "rounded-full border border-border-subtle")}
-              style={{ backgroundColor: cssColor(c) }}
+              className={cn(swatch, "rounded-full")}
+              style={{
+                backgroundColor: cssColor(c),
+                boxShadow: "0 0 0 1.5px var(--competitor-ring)",
+              }}
               title={c}
             />
           ))}

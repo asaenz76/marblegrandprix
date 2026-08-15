@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Bell } from "lucide-react";
+import { Wordmark } from "@/components/Wordmark";
 import { BalancePill } from "@/components/BalancePill";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LogoutButton } from "@/components/LogoutButton";
@@ -43,9 +44,7 @@ export function AppShell({
             maxWidth,
           )}
         >
-          <Link href="/feed" className="font-logo text-lg font-extrabold italic text-text-primary">
-            brohda.
-          </Link>
+          <Wordmark href="/feed" variant="responsive" size="lg" />
           <div className="flex flex-wrap items-center justify-end gap-2">
             <BalancePill balanceCents={balanceCents} />
             {/* Racing operators (Super Admin + assigned Organizers) get a

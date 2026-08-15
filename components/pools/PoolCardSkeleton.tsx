@@ -1,7 +1,10 @@
 // Loading placeholder for SocialPoolCard, shaped to match its real layout
-// (league header -> match identity -> sentiment bar -> social row ->
-// question -> two option buttons -> footer line) so the feed/pool-detail
-// route doesn't jump or reflow once real content streams in. Pure
+// (identity header -> context line -> sentiment bar -> social row ->
+// question -> option buttons -> footer line) so the feed/pool-detail route
+// doesn't jump or reflow once real content streams in. Domain-neutral: the
+// option rows each carry a leading circle so they read equally as a football
+// team badge or a racing competitor swatch, and three rows sit between the
+// football two-option card and an eight-competitor racing grid. Pure
 // presentation, no props — every field is a fixed-width shimmer block.
 export function PoolCardSkeleton() {
   return (
@@ -17,19 +20,9 @@ export function PoolCardSkeleton() {
         </div>
       </div>
 
-      <div className="space-y-2">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex flex-1 items-center gap-2">
-            <span className="size-7 shrink-0 rounded-full bg-surface-elevated" />
-            <div className="h-3.5 w-24 rounded bg-surface-elevated" />
-          </div>
-          <div className="h-3 w-6 shrink-0 rounded bg-surface-elevated" />
-          <div className="flex flex-1 items-center justify-end gap-2">
-            <div className="h-3.5 w-24 rounded bg-surface-elevated" />
-            <span className="size-7 shrink-0 rounded-full bg-surface-elevated" />
-          </div>
-        </div>
-        <div className="mx-auto h-3 w-40 rounded bg-surface-elevated" />
+      <div className="space-y-1.5">
+        <div className="h-3.5 w-40 rounded bg-surface-elevated" />
+        <div className="h-3 w-24 rounded bg-surface-elevated" />
       </div>
 
       <div className="h-2 w-full rounded-full bg-surface-elevated" />
@@ -49,8 +42,15 @@ export function PoolCardSkeleton() {
       </div>
 
       <div className="space-y-2">
-        <div className="h-11 w-full rounded-xl bg-surface-elevated" />
-        <div className="h-11 w-full rounded-xl bg-surface-elevated" />
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            className="flex h-11 w-full items-center gap-3 rounded-xl border-2 border-border-subtle px-4"
+          >
+            <span className="size-4 shrink-0 rounded-full bg-surface-elevated" />
+            <div className="h-3.5 w-28 rounded bg-surface-elevated" />
+          </div>
+        ))}
       </div>
 
       <div className="h-3 w-52 rounded bg-surface-elevated" />

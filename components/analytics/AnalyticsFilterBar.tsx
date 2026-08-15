@@ -37,7 +37,7 @@ export function AnalyticsFilterBar({ activePreset }: { activePreset: DateRangePr
           className={cn(
             "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
             activePreset === value
-              ? "bg-accent-primary text-white"
+              ? "bg-primary text-primary-foreground"
               : "text-text-secondary hover:text-text-primary",
           )}
         >

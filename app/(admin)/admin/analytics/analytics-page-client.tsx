@@ -83,7 +83,7 @@ export function AdminAnalyticsPageClient({ data, preset }: { data: AdminAnalytic
     <div className="space-y-6">
       <AnalyticsPageHeader
         title="Analytics"
-        description="Platform-wide activity across every player. Deposits and withdrawals are excluded from betting results — see Reports for house revenue and operational status."
+        description="Platform-wide activity across every player. Deposits and withdrawals are excluded from pool results — see Reports for house revenue and operational status."
       >
         <AnalyticsFilterBar activePreset={preset} />
       </AnalyticsPageHeader>
@@ -150,7 +150,7 @@ export function AdminAnalyticsPageClient({ data, preset }: { data: AdminAnalytic
                 onClick={() => setTopUsersSort(sort)}
                 className={
                   topUsersSort === sort
-                    ? "rounded-md bg-accent-primary px-2.5 py-1 text-xs font-medium text-white"
+                    ? "rounded-md bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground"
                     : "rounded-md px-2.5 py-1 text-xs font-medium text-text-secondary transition-colors"
                 }
               >

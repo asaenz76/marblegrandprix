@@ -36,32 +36,40 @@ export function FeedFilters({
         <option value="newest">Newest</option>
         <option value="locking_soon">Locking soon</option>
       </select>
-      <select
-        aria-label="Filter by sport"
-        value={searchParams.get("sport") ?? ""}
-        onChange={(e) => updateParam("sport", e.target.value)}
-        className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm"
-      >
-        <option value="">All sports</option>
-        {sportOptions.map((sport) => (
-          <option key={sport} value={sport}>
-            {sport.charAt(0).toUpperCase() + sport.slice(1)}
-          </option>
-        ))}
-      </select>
-      <select
-        aria-label="Filter by league"
-        value={searchParams.get("league") ?? ""}
-        onChange={(e) => updateParam("league", e.target.value)}
-        className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm"
-      >
-        <option value="">All leagues</option>
-        {leagueOptions.map((league) => (
-          <option key={league.key} value={league.key}>
-            {league.label}
-          </option>
-        ))}
-      </select>
+      {/* Sport/league filters come from historical football fixture data;
+          racing pools have neither, so these render only when there's actually
+          something to filter — a racing-only feed just shows the sort control,
+          while historical football pools stay filterable. */}
+      {sportOptions.length > 0 && (
+        <select
+          aria-label="Filter by sport"
+          value={searchParams.get("sport") ?? ""}
+          onChange={(e) => updateParam("sport", e.target.value)}
+          className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm"
+        >
+          <option value="">All sports</option>
+          {sportOptions.map((sport) => (
+            <option key={sport} value={sport}>
+              {sport.charAt(0).toUpperCase() + sport.slice(1)}
+            </option>
+          ))}
+        </select>
+      )}
+      {leagueOptions.length > 0 && (
+        <select
+          aria-label="Filter by league"
+          value={searchParams.get("league") ?? ""}
+          onChange={(e) => updateParam("league", e.target.value)}
+          className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm"
+        >
+          <option value="">All leagues</option>
+          {leagueOptions.map((league) => (
+            <option key={league.key} value={league.key}>
+              {league.label}
+            </option>
+          ))}
+        </select>
+      )}
     </div>
   );
 }

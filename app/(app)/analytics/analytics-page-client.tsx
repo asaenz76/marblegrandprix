@@ -119,7 +119,7 @@ export function AnalyticsPageClient({ data, preset }: { data: UserAnalyticsPageD
     <div className="space-y-6">
       <AnalyticsPageHeader
         title="Analytics"
-        description="Your personal pool performance. Deposits and withdrawals are excluded from betting results."
+        description="Your personal pool performance. Deposits and withdrawals are excluded from pool results."
       >
         <AnalyticsFilterBar activePreset={preset} />
       </AnalyticsPageHeader>

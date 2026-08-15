@@ -208,7 +208,7 @@ export function SlideToConfirm({
             }
           }}
           className={cn(
-            "absolute top-0.5 left-0.5 flex touch-none items-center justify-center rounded-full bg-accent-primary text-white shadow outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+            "absolute top-0.5 left-0.5 flex touch-none items-center justify-center rounded-full bg-primary text-primary-foreground shadow outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
             !dragging && "transition-[left] duration-200",
             pending && "opacity-70",
             justConfirmed && "animate-[celebrate-pop_0.4s_ease-out]",

@@ -57,11 +57,7 @@ export function AcceptInvitationForm({ token, email }: { token: string; email: s
             </p>
           )}
           <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? "Creating account…" : (
-              <>
-                Join <span className="italic">brohda.</span>
-              </>
-            )}
+            {pending ? "Creating account…" : "Join Marble Grand Prix"}
           </Button>
         </form>
       </CardContent>

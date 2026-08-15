@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { CompetitorIdentity, type CompetitorIdentityData } from "@/components/racing/CompetitorIdentity";
+import { humanizeEnum } from "@/lib/utils/humanize";
 
 /**
  * Read-only bracket / elimination structure view (Phase 8, §14). Shows enough to
@@ -84,7 +85,7 @@ export async function BracketView({ competitionId, raceBasePath = "/racing/races
         const stageRaces = raceList.filter((r) => r.stage_id === stage.id);
         return (
           <div key={stage.id} className="space-y-2">
-            <h3 className="text-sm font-semibold">{stage.name} <span className="font-normal text-text-secondary">· {stage.status.toLowerCase()}</span></h3>
+            <h3 className="text-sm font-semibold">{stage.name} <span className="font-normal text-text-secondary">· {humanizeEnum(stage.status)}</span></h3>
             <div className="space-y-2">{stageRaces.map(renderRace)}</div>
             {stageRaces.length === 0 && <p className="text-sm text-text-secondary">No races in this round yet.</p>}
           </div>

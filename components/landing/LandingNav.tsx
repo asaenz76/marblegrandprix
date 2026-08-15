@@ -3,6 +3,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { InstallAppButton } from "@/components/InstallAppButton";
+import { Wordmark } from "@/components/Wordmark";
 
 // Deliberately just logo + how-it-works anchor + the two auth CTAs — no
 // "Community"/"About" links, since those pages don't exist yet and a
@@ -11,7 +12,7 @@ export function LandingNav() {
   return (
     <header className="sticky top-0 z-10 border-b border-border-subtle bg-background/80 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-        <span className="font-logo text-xl font-extrabold italic text-text-primary">brohda.</span>
+        <Wordmark variant="responsive" size="lg" />
         <nav className="hidden items-center gap-6 text-sm font-medium text-text-secondary sm:flex">
           <a href="#how-it-works" className="hover:text-text-primary">
             How it works

@@ -17,6 +17,10 @@
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
   --font-logo: var(--font-logo);
+  /* Same wide athletic grotesk as the wordmark, exposed as font-display for
+     landing hero/section headings. In-app headings stay on --font-heading
+     (Inter) so dense operator/table UIs don't get the expanded width. */
+  --font-display: var(--font-logo);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -90,6 +94,14 @@
   --color-pool-win: var(--pool-win);
   --color-pool-loss: var(--pool-loss);
   --color-pool-live: var(--pool-live);
+  /* Racing positive-result marker (winning option, Champion, finalized) —
+     deliberately distinct from pool-win/credit, which mean a positive
+     FINANCIAL result. A pool's winning option can be marked even for a viewer
+     who didn't back it, so "this competitor won" and "you profited" are
+     separate concepts and must not share a token. Tuned to be legible as small
+     badge/label TEXT in both themes (green-700 on light, green-400 on dark),
+     unlike pool-win's brighter #22c55e which only reads on a fill. */
+  --color-success: var(--success);
   /* Social-first palette additions (2026 refactor) — see the "Social-first
      palette" comment block below :root for the full rationale. Only
      genuinely new concepts get a new token; everything else is a value-only
@@ -104,6 +116,19 @@
   --color-medal-bronze-foreground: var(--medal-bronze-foreground);
   --color-inverted-surface: var(--inverted-surface);
   --color-inverted-surface-foreground: var(--inverted-surface-foreground);
+  /* Marble Grand Prix brand additions (Phase 12):
+     brand-navy  -> deliberate deep-navy structural tone (wordmark, section
+                    eyebrows, footer) that gives the light UI its "blue-and-
+                    white Formula" gravitas WITHOUT touching the indigo
+                    interaction accent. In dark mode it flips to a light cool
+                    tint so the same structural elements stay legible.
+     competitor-ring -> a theme-contrasting hairline stroke placed around every
+                    competitor color swatch so a swatch whose fill matches the
+                    theme (white on light, black/navy on dark) never visually
+                    disappears. Competitor colors are product data and are
+                    never altered; the ring is what guarantees separation. */
+  --color-brand-navy: var(--brand-navy);
+  --color-competitor-ring: var(--competitor-ring);
 }
 
 /*
@@ -161,6 +186,9 @@
   --debit: #ef4444;
   --pool-win: #22c55e;
   --pool-loss: #ef4444;
+  /* Racing winner/champion marker — see --color-success. Green-700: legible
+     as small badge text on light surfaces (5.0:1 on white). */
+  --success: #15803d;
   /* Amber, not orange — orange is reserved exclusively for streaks now, so
      "this match is live" gets the warning hue instead of its old orange.
      Same light-mode contrast fix as --warning-muted above (identical
@@ -187,6 +215,14 @@
      meaning between themes and these never should. */
   --inverted-surface: #15161a;
   --inverted-surface-foreground: #f5f5f5;
+  /* Deliberate deep navy — the "Formula blue-and-white" structural tone.
+     Used sparingly (wordmark, section eyebrows, footer band), never as an
+     interaction color, so it never competes with the indigo accent. */
+  --brand-navy: #1b2a5c;
+  /* Dark hairline ring for competitor color swatches on the near-white
+     surfaces — keeps white/yellow/orange marbles from vanishing (they
+     measure 1.0–2.8:1 against a white card). */
+  --competitor-ring: rgba(17, 17, 17, 0.3);
 
   --foreground: var(--text-primary);
   --card: var(--surface-primary);
@@ -222,27 +258,37 @@
   --sidebar-ring: var(--accent-primary);
 }
 
+/*
+ * Dark mode — "Neutral Night" (Phase 12 redesign). The previous dark ground
+ * (#0f1115) was a blue-gray whose surfaces stepped up in the same blue-gray
+ * family, so the indigo brand and competitor colors lost separation against
+ * it (accent/card measured only ~3.9:1). Neutral Night drops to a near-black
+ * NEUTRAL foundation: the blue family becomes the only chromatic identity and
+ * every competitor color pops off the neutral ground. Racing energy comes from
+ * composition and typography, not a tinted background. Every value below is
+ * measured against WCAG AA (see the Phase 12 Stage A study).
+ */
 .dark {
-  --background: #0f1115;
-  --surface-primary: #181a20;
-  --surface-secondary: #20232a;
-  --surface-elevated: #23262e;
-  --border-subtle: #2a2d35;
-  --border-strong: #3a3d46;
-  --text-primary: #f5f5f5;
-  --text-secondary: #a1a1aa;
-  /* #71717a only clears WCAG AA's 3:1 large-text floor (3.6:1 on
-     surface-primary), not the 4.5:1 normal-text floor this token actually
-     needs at the text-xs sizes it's used at. #8d8d95 measures 5.28:1 on
-     surface-primary and 4.78:1 on surface-secondary. */
-  --text-muted: #8d8d95;
-  --accent-primary: #6366f1;
-  --accent-primary-hover: #818cf8;
-  --accent-primary-subtle: #20264a;
-  /* Lighter than the base accent — legible as small text on a dark card
-     (e.g. the pool lock countdown), same reasoning the previous palette
-     applied here. */
-  --accent-primary-label: #818cf8;
+  --background: #08080a;
+  --surface-primary: #141417;
+  --surface-secondary: #1c1c21;
+  --surface-elevated: #232329;
+  --border-subtle: #2c2c33;
+  --border-strong: #3e3e47;
+  --text-primary: #f4f4f5;
+  --text-secondary: #a8a8b0;
+  /* #8e8e98 measures 5.67:1 on surface-primary and 5.23:1 on
+     surface-secondary — clears the 4.5:1 normal-text floor at the text-xs
+     sizes this token is used at (timestamps, muted labels). */
+  --text-muted: #8e8e98;
+  /* Interaction accent used for borders, selection rings, and small accent
+     TEXT (links, countdowns): #7c83ff measures 5.73:1 on surface-primary, so
+     it is legible as normal-size text — unlike the button-fill primary below,
+     which is intentionally deeper. */
+  --accent-primary: #7c83ff;
+  --accent-primary-hover: #9aa1ff;
+  --accent-primary-subtle: #1d1f3d;
+  --accent-primary-label: #9aa1ff;
   --warning-muted: #f59e0b;
   --danger: #ef4444;
   --credit: #22c55e;
@@ -251,13 +297,27 @@
   --pool-loss: #ef4444;
   --pool-live: #f59e0b;
   --streak: #fb923c;
+  /* Racing winner/champion marker — green-400: legible as small badge text on
+     the near-black surfaces (10.6:1 on the card). */
+  --success: #4ade80;
+  /* Structural navy flips to a light cool tint in dark mode (10.3:1 on the
+     ground) so wordmark/eyebrow elements stay legible. */
+  --brand-navy: #aeb8e6;
+  /* Light hairline ring so black/navy competitor swatches (which measure
+     ~1.1–1.8:1 against the near-black card) never disappear. */
+  --competitor-ring: rgba(255, 255, 255, 0.55);
 
   --foreground: var(--text-primary);
   --card: var(--surface-primary);
   --card-foreground: var(--text-primary);
   --popover: var(--surface-elevated);
   --popover-foreground: var(--text-primary);
-  --primary: var(--accent-primary);
+  /* Button fill is deliberately DECOUPLED from --accent-primary in dark: a
+     deeper #5257e6 clears white-text contrast (5.43:1) for solid buttons,
+     while --accent-primary stays lighter (#7c83ff) so accent-colored text and
+     borders read against the dark ground. In light mode the two stay unified
+     (see :root, where --primary = --accent-primary = #4f46e5). */
+  --primary: #5257e6;
   --primary-foreground: #ffffff;
   --secondary: var(--surface-secondary);
   --secondary-foreground: var(--text-primary);

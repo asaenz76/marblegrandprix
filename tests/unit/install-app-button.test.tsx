@@ -64,7 +64,7 @@ describe("InstallAppButton", () => {
     const button = screen.getByLabelText("Get the app");
     fireEvent.click(button);
 
-    expect(screen.getByRole("dialog", { name: "Add brohda. to your Home Screen" })).toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "Add Marble Grand Prix to your Home Screen" })).toBeInTheDocument();
     expect(screen.getByText(/Add to Home/)).toBeInTheDocument();
   });
 

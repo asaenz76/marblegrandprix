@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { LegalPage } from "@/components/legal/LegalPage";
 
 export const metadata: Metadata = {
-  title: "Terms of Service — brohda.",
+  title: "Terms of Service — Marble Grand Prix",
   robots: { index: false, follow: false },
 };
 
@@ -13,9 +13,9 @@ export default function TermsPage() {
     <LegalPage title="Terms of Service" effectiveDate={EFFECTIVE_DATE}>
       <section>
         <p>
-          These Terms of Service (&quot;Terms&quot;) govern your access to and use of brohda.
-          (&quot;brohda.&quot;, the &quot;App&quot;, the &quot;Service&quot;, &quot;we&quot;, &quot;us&quot;), operated by{" "}
-          <strong>brohda</strong> (the &quot;Company&quot;). By accepting an invitation
+          These Terms of Service (&quot;Terms&quot;) govern your access to and use of Marble Grand
+          Prix (&quot;Marble Grand Prix&quot;, the &quot;App&quot;, the &quot;Service&quot;, &quot;we&quot;, &quot;us&quot;), operated by{" "}
+          <strong>Marble Grand Prix</strong> (the &quot;Company&quot;). By accepting an invitation
           to join, creating an account, or otherwise using the Service, you agree to be bound by
           these Terms. If you do not agree, do not use the Service.
         </p>
@@ -24,7 +24,7 @@ export default function TermsPage() {
       <section>
         <h2>1. Invite-only, private service</h2>
         <p>
-          brohda. is a private, invite-only social platform. Access is granted only to individuals
+          Marble Grand Prix is a private, invite-only social platform. Access is granted only to individuals
           invited by an existing member or administrator of a private group. It is not open to the
           general public, is not advertised or offered to the public at large, and we may decline,
           suspend, or revoke access to anyone at any time, for any reason, in our sole discretion.
@@ -205,8 +205,8 @@ export default function TermsPage() {
         <h2>14. Contact</h2>
         <p>
           Questions about these Terms can be sent to{" "}
-          <a href="mailto:support@brohda.com" className="underline underline-offset-4">
-            support@brohda.com
+          <a href="mailto:support@marblegrandprix.com" className="underline underline-offset-4">
+            support@marblegrandprix.com
           </a>
           .
         </p>

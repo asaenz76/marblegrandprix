@@ -74,7 +74,7 @@ export function HorizontalBarChartCard({
                   onClick={() => onModeChange?.(mode.key)}
                   className={cn(
                     "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
-                    activeMode === mode.key ? "bg-accent-primary text-white" : "text-text-secondary",
+                    activeMode === mode.key ? "bg-primary text-primary-foreground" : "text-text-secondary",
                   )}
                 >
                   {mode.label}

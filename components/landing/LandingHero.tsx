@@ -8,7 +8,7 @@ import { PhoneFrame } from "./PhoneFrame";
 
 const BULLETS = [
   { icon: Users2, label: "Compete with people, not against the house" },
-  { icon: ShieldCheck, label: "Real matches" },
+  { icon: ShieldCheck, label: "Real races and competitions" },
   { icon: Trophy, label: "Community-created pools" },
 ];
 
@@ -20,12 +20,12 @@ export function LandingHero({ heroPool }: { heroPool: SocialPoolCardViewModel | 
           <span className="size-1.5 rounded-full bg-accent-primary" aria-hidden="true" />
           Beta now open
         </span>
-        <h1 className="text-balance text-4xl font-bold tracking-tight text-text-primary sm:text-5xl">
-          Make the call. <span className="text-accent-primary">Challenge your friends.</span>
+        <h1 className="text-balance font-display text-4xl font-extrabold tracking-tight text-text-primary sm:text-5xl">
+          Call the race. <span className="text-accent-primary">Beat the grid.</span>
         </h1>
         <p className="max-w-md text-lg text-text-secondary">
-          Predict football outcomes, join community pools, and prove you know the game better than
-          your group chat.
+          Pick a competitor before the gate drops and enter community pools — then watch the race
+          decide who called it.
         </p>
         <div className="flex flex-wrap items-center gap-3">
           <Link href="/register" className={cn(buttonVariants({ size: "lg" }), "px-6")}>

@@ -145,7 +145,12 @@ export function SocialPoolCard({
             isResolved={!isPreVote && !isPostVote && !isLocked && !isLive}
             hasEntered={viewModel.currentUser.hasEntered}
             leagueFollow={viewModel.fixture.leagueFollow}
-            overrideLabel={viewModel.racing ? (viewModel.racing.scope === "COMPETITION" ? "Competition pool" : "Race pool") : undefined}
+            overrideLabel={
+              viewModel.racing
+                ? (viewModel.racing.competitionName ??
+                  (viewModel.racing.scope === "COMPETITION" ? "Competition pool" : "Race pool"))
+                : undefined
+            }
           />
         </div>
         {collapsible && (

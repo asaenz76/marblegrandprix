@@ -4,7 +4,7 @@ import { requireUser } from "@/lib/auth/session";
 import { Card, CardContent } from "@/components/ui/card";
 
 export const metadata: Metadata = {
-  title: "Rules — brohda.",
+  title: "Rules — Marble Grand Prix",
 };
 
 export default async function RulesPage() {
@@ -24,10 +24,9 @@ export default async function RulesPage() {
           <section>
             <h2>What a pool is</h2>
             <p>
-              A pool is a simple prediction: a question with two or more options. Everyone who
-              wants in picks one option and puts money on it. Once the pool locks, no more entries
-              are accepted, and once the result is known, whoever picked correctly splits the
-              prize.
+              A pool is a simple prediction: a question with two or more options. Everyone who wants
+              in picks one competitor and puts money on it. Once the pool locks, no more entries are
+              accepted, and once the result is confirmed, whoever called it right splits the prize.
             </p>
           </section>
 
@@ -35,24 +34,13 @@ export default async function RulesPage() {
             <h2>Types of pools</h2>
             <ul>
               <li>
-                <strong>Match outcome pools</strong> — built automatically from an imported
-                fixture. &quot;Who will advance?&quot; is for knockout matches and includes extra
-                time and penalties. &quot;Result after regulation&quot; is for league matches and
-                only counts the 90 minutes plus injury time, so a draw is a real outcome.
+                <strong>Race Winner</strong> — pick the competitor you think wins a single race.
+                It settles automatically once an organizer confirms the race result.
               </li>
               <li>
-                <strong>Prop pools</strong> — auto-graded from the match result: things like total
-                goals, both teams to score, clean sheets, cards, first team to score, a specific
-                player to score, and similar stat-based questions.
-              </li>
-              <li>
-                <strong>Custom pools</strong> — a plain yes/no question an admin writes by hand for
-                anything not tied to an official match stat. These are graded manually once the
-                outcome is known.
-              </li>
-              <li>
-                <strong>Combo pools</strong> — a yes/no question with more than one condition
-                attached. Every condition has to hit for &quot;Yes&quot; to win.
+                <strong>Competition Winner</strong> — pick who you think wins a whole competition,
+                whether that&apos;s a Championship, League, Bracket, or Elimination. It settles once
+                the competition is finalized and the champion is set.
               </li>
             </ul>
           </section>
@@ -61,16 +49,16 @@ export default async function RulesPage() {
             <h2>Joining a pool</h2>
             <ul>
               <li>
-                Pick one option to join — the pool&apos;s entry fee, set by whoever created it, is
-                deducted from your wallet balance the moment you submit your pick.
+                Pick one competitor to join — the pool&apos;s entry fee, set by whoever created it,
+                is deducted from your wallet balance the moment you submit your pick.
               </li>
               <li>
                 Entries are final. Once submitted, you can&apos;t change or cancel your own pick —
                 only an admin can void an entry, and only to fix a genuine mistake.
               </li>
               <li>
-                Entries close the moment the pool locks: kickoff for match-based pools, or the
-                time an admin sets for a custom pool. Nothing is accepted after that.
+                Entries close the moment the pool locks — before the race starts, or the time set
+                for a Competition Winner pool. Nothing is accepted after that.
               </li>
             </ul>
           </section>
@@ -79,16 +67,16 @@ export default async function RulesPage() {
             <h2>How payouts work</h2>
             <ul>
               <li>
-                Every pool discloses its service fee upfront — a flat percentage held back from
-                the total pot before anything is paid out.
+                Every pool discloses its service fee upfront — a flat percentage held back from the
+                total pot before anything is paid out.
               </li>
               <li>
-                What&apos;s left is split evenly across everyone who picked the winning option, no
-                matter when they entered.
+                What&apos;s left is split evenly across everyone who picked the winning competitor,
+                no matter when they entered.
               </li>
               <li>
-                If the pot doesn&apos;t divide evenly, the leftover cents stay with the house
-                rather than being redistributed.
+                If the pot doesn&apos;t divide evenly, the leftover cents stay with the house rather
+                than being redistributed.
               </li>
             </ul>
           </section>
@@ -98,19 +86,14 @@ export default async function RulesPage() {
             <p>Your full stake is returned (no fee) when:</p>
             <ul>
               <li>
-                The match is postponed, suspended, abandoned, or cancelled and isn&apos;t completed
-                by the end of that same day.
+                The race is postponed, cancelled, or can&apos;t be resolved to a single winner — for
+                example, a tie at the front — and isn&apos;t settled by the end of that same day.
               </li>
               <li>The pool doesn&apos;t reach its minimum number of entries.</li>
-              <li>Nobody picked the winning option.</li>
-              <li>Everybody picked the winning option.</li>
+              <li>Nobody picked the winning competitor.</li>
+              <li>Everybody picked the winning competitor.</li>
               <li>An admin cancels the pool manually to correct a mistake.</li>
             </ul>
-            <p>
-              One exception: on a combo pool, if nobody wins because a required player didn&apos;t
-              take part in the match, the service fee is still retained, same as a normal
-              settlement — only your stake beyond the fee is refunded.
-            </p>
           </section>
 
           <section>

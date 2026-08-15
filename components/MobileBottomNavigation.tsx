@@ -71,7 +71,7 @@ export function MobileBottomNavigation({
             <Link
               href={createHref}
               aria-label="Create"
-              className="-mt-6 flex size-12 items-center justify-center rounded-full bg-accent-primary text-white shadow-lg transition-transform active:scale-95"
+              className="-mt-6 flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform active:scale-95"
             >
               <Plus className="size-6" aria-hidden="true" />
             </Link>

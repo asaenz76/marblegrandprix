@@ -151,13 +151,13 @@ function IosInstallSheet({ onClose }: { onClose: () => void }) {
         ref={sheetRef}
         role="dialog"
         aria-modal="true"
-        aria-label="Add brohda. to your Home Screen"
+        aria-label="Add Marble Grand Prix to your Home Screen"
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
         className="w-full max-w-[420px] space-y-4 rounded-t-2xl bg-surface-primary p-5 outline-none"
       >
         <div className="mx-auto h-1 w-10 rounded-full bg-border-subtle" aria-hidden="true" />
-        <h2 className="text-lg font-semibold text-text-primary">Add brohda. to your Home Screen</h2>
+        <h2 className="text-lg font-semibold text-text-primary">Add Marble Grand Prix to your Home Screen</h2>
         <ol className="space-y-3 text-sm text-text-secondary">
           <li className="flex items-center gap-3">
             <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-surface-secondary text-xs font-semibold text-text-primary">
@@ -180,7 +180,7 @@ function IosInstallSheet({ onClose }: { onClose: () => void }) {
             <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-surface-secondary text-xs font-semibold text-text-primary">
               3
             </span>
-            <span>Tap &quot;Add&quot; — brohda. opens like a regular app from now on.</span>
+            <span>Tap &quot;Add&quot; — Marble Grand Prix opens like a regular app from now on.</span>
           </li>
         </ol>
         <Button type="button" variant="outline" className="w-full" onClick={onClose}>

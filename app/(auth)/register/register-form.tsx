@@ -159,13 +159,7 @@ export function RegisterForm() {
             )}
             {isLastStep ? (
               <Button type="submit" className="flex-1" disabled={pending}>
-                {pending ? (
-                  "Creating account…"
-                ) : (
-                  <>
-                    Join <span className="italic">brohda.</span>
-                  </>
-                )}
+                {pending ? "Creating account…" : "Join Marble Grand Prix"}
               </Button>
             ) : (
               <Button type="button" className="flex-1" onClick={goNext}>

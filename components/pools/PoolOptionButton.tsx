@@ -66,10 +66,12 @@ export function PoolOptionButton({
       )}
       <div className="flex items-center gap-2">
         {isWinner && (
-          <span className="rounded-full bg-success px-2 py-0.5 text-xs font-medium text-white">Winner</span>
+          <span className="rounded-full bg-success/15 px-2 py-0.5 text-xs font-semibold text-success">
+            Winner
+          </span>
         )}
         {isCurrentUserChoice && (
-          <span className="rounded-full bg-accent-primary px-2 py-0.5 text-xs font-medium text-white">
+          <span className="rounded-full bg-primary px-2 py-0.5 text-xs font-medium text-primary-foreground">
             Your Choice
           </span>
         )}

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Wordmark } from "@/components/Wordmark";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -6,12 +6,10 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <h1>
-            <Link href="/" className="font-logo text-2xl font-extrabold italic text-text-primary">
-              brohda.
-            </Link>
+            <Wordmark href="/" variant="full" size="xl" />
           </h1>
           <p className="mt-1 text-sm text-text-secondary">
-            The Social Prediction Platform.
+            Pick the winner. Race your friends.
           </p>
         </div>
         {children}

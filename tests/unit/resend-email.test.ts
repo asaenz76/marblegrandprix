@@ -106,9 +106,9 @@ describe("buildPoolPublishedEmail", () => {
       },
     }).html;
     expect(withoutLogo).toContain("Copa Libertadores");
-    // The only <img> left is the header wordmark — no placeholder circle
-    // stands in for the missing competition/team logos.
-    expect(withoutLogo.match(/<img/g)).toHaveLength(1);
+    // The header wordmark is now styled text, so with no competition/team
+    // logos there are no <img> tags at all — no placeholder circle stands in.
+    expect(withoutLogo).not.toContain("<img");
   });
 
   it("renders each option's label", () => {
@@ -138,11 +138,12 @@ describe("buildPoolPublishedEmail", () => {
     expect(html).toContain('href="https://brohda.com/profile"');
   });
 
-  it("renders the brand wordmark as a hosted image (not live text or a data URI)", () => {
+  it("renders the Marble Grand Prix wordmark as styled text (no image asset dependency)", () => {
     const { html } = buildPoolPublishedEmail(baseData);
-    // A hosted URL, not live text (no Montserrat fallback risk) or a data:
-    // URI (Gmail and others strip those, showing only the alt text).
-    expect(html).toContain('src="https://brohda.com/email/brohda-logo.png"');
-    expect(html).toContain('alt="brohda."');
+    // Text wordmark rather than an <img>: no asset to host, no image proxying
+    // or data: URI stripping to worry about across email clients.
+    expect(html).toContain("Marble Grand Prix");
+    expect(html).not.toContain("brohda-logo.png");
+    expect(html).not.toContain('alt="brohda."');
   });
 });

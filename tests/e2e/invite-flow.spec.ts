@@ -47,7 +47,7 @@ test("invitation → registration → login", async ({ page }) => {
   // PasswordInput toggle button's aria-label="Show password".
   await page.getByLabel("Password", { exact: true }).fill("invitee-password-123");
   await page.getByRole("checkbox", { name: /accept the community rules/i }).check();
-  await page.getByRole("button", { name: /join brohda/i }).click();
+  await page.getByRole("button", { name: /join marble grand prix/i }).click();
 
   await expect(page).toHaveURL(/\/feed$/);
 

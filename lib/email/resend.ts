@@ -1,10 +1,12 @@
 import "server-only";
 
 const RESEND_API_URL = "https://api.resend.com/emails";
-// Same verified domain the Supabase Auth SMTP relay already sends from
-// (see docs/DEPLOYMENT.md) — a distinct address so these read as app
-// notifications, not password-reset/auth mail.
-const FROM_ADDRESS = "brohda. <notifications@brohda.com>";
+// Display name is the Marble Grand Prix brand; the sending address stays on
+// the already-DNS-verified brohda.com domain that the Supabase Auth SMTP relay
+// uses (see docs/DEPLOYMENT.md) so mail keeps delivering. Moving the sending
+// address to notifications@marblegrandprix.com is a deploy prerequisite (that
+// domain must be verified in Resend + Supabase SMTP first), not a code change.
+const FROM_ADDRESS = "Marble Grand Prix <notifications@brohda.com>";
 
 export interface SendEmailInput {
   to: string;
@@ -160,23 +162,20 @@ export function buildPoolPublishedEmail(data: PoolPublishedEmailData): { subject
 
   const origin = new URL(data.poolUrl).origin;
   const profileUrl = `${origin}/profile`;
-  // A hosted URL rather than an inline data: URI — Gmail (and several other
-  // clients) strip data: URIs from <img src> outright, rendering only the
-  // alt text in a placeholder box instead of the image. A normal https://
-  // URL gets proxied and displayed like any other image in this email (the
-  // team/competition logos below are proof: same treatment, they render
-  // fine). Rendered from the same Montserrat variable font (Black Italic
-  // instance) the app itself uses for the "brohda." wordmark
-  // (app/layout.tsx's --font-logo), so it's pixel-faithful to the in-app
-  // logo rather than a system-font approximation.
-  const logoUrl = `${origin}/email/brohda-logo.png`;
+  // A styled-text wordmark rather than an image asset: the old emailed logo
+  // was the brohda "b." PNG, and there is no Marble Grand Prix logo image yet.
+  // Text rebrands the email cleanly with zero asset dependency and renders
+  // identically across clients (no image proxying or data: URI stripping to
+  // worry about). Weight/spacing/navy mirror the in-app --font-logo wordmark;
+  // the font-family falls back through system stacks since custom web fonts
+  // are unreliable in email clients.
 
   const html = `
     <div style="background-color:#f5f5f5;padding:32px 16px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;">
         <tr>
           <td style="padding-bottom:20px;text-align:center;">
-            <img src="${logoUrl}" width="129" height="32" alt="brohda." style="display:inline-block;" />
+            <span style="display:inline-block;font-size:20px;font-weight:800;letter-spacing:-0.02em;color:#1b2a5c;">Marble Grand Prix</span>
           </td>
         </tr>
         <tr>

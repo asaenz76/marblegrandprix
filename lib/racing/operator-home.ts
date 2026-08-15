@@ -2,6 +2,7 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { UserProfile } from "@/lib/auth/session";
 import { isSuperAdmin } from "@/lib/auth/guards";
+import { RACING_REVIEW_REASON_TEXT } from "@/lib/racing/operator-labels";
 
 /**
  * Read-only data for the racing operator home (Phase 10 UX). Surfaces the small
@@ -96,18 +97,30 @@ export async function getOperatorHome(client: SupabaseClient, actor: UserProfile
     }
   }
 
-  // Pools in manual review on in-scope races/competitions.
+  // Pools in manual review on in-scope races/competitions. Surface the
+  // specific plain-language reason (RACING_REVIEW_REASON_TEXT) when the pool
+  // records one, so the operator sees "The race result couldn't be matched to
+  // a single winning option…" rather than a generic "needs review" — the raw
+  // review_reason enum is never shown.
+  const reviewNoted = new Set<string>();
   const compIdList = competitions.map((c) => c.id);
   if (compIdList.length) {
     const { data: reviewPools } = await client
       .from("pools")
-      .select("id, race_id, template_config")
+      .select("id, race_id, template_config, review_reason")
       .eq("status", "MANUAL_REVIEW")
       .in("template_id", ["RACE_WINNER", "COMPETITION_WINNER"]);
     for (const p of reviewPools ?? []) {
       const compId = (p.template_config?.competition_id as string | undefined) ?? (p.race_id ? races.find((r) => r.id === p.race_id)?.competition_id : undefined);
-      if (compId && nameById.has(compId) && !needsAttention.some((n) => n.id === compId && n.reason.includes("review"))) {
-        needsAttention.push({ id: compId, name: nameById.get(compId)!, format: competitions.find((c) => c.id === compId)?.format ?? "", reason: "A pool needs manual review." });
+      if (compId && nameById.has(compId) && !reviewNoted.has(compId)) {
+        reviewNoted.add(compId);
+        const specific = p.review_reason ? RACING_REVIEW_REASON_TEXT[p.review_reason] : null;
+        needsAttention.push({
+          id: compId,
+          name: nameById.get(compId)!,
+          format: competitions.find((c) => c.id === compId)?.format ?? "",
+          reason: specific ?? "A pool needs manual review.",
+        });
       }
     }
   }

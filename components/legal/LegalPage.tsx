@@ -19,7 +19,7 @@ export function LegalPage({
         href="/login"
         className="text-sm text-text-secondary underline underline-offset-4 hover:text-text-primary"
       >
-        ← Back to brohda.
+        ← Back to Marble Grand Prix
       </Link>
       <h1 className="mt-6 font-heading text-2xl font-semibold text-text-primary sm:text-3xl">
         {title}
@@ -30,8 +30,8 @@ export function LegalPage({
       </div>
       <p className="mt-10 border-t border-border-subtle pt-6 text-sm text-text-muted">
         Questions about these terms?{" "}
-        <a href="mailto:support@brohda.com" className="underline underline-offset-4">
-          support@brohda.com
+        <a href="mailto:support@marblegrandprix.com" className="underline underline-offset-4">
+          support@marblegrandprix.com
         </a>
       </p>
     </div>

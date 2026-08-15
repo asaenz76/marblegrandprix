@@ -2,14 +2,14 @@ import type { MetadataRoute } from "next";
 
 // Next.js auto-serves this at /manifest.webmanifest and injects the
 // <link rel="manifest"> tag — nothing to wire up in layout.tsx. Icon
-// source is app/icon.svg (the existing "b." brand mark, already used as
-// the browser-tab favicon), rasterized to PNG since manifest icons need
-// broad OS/launcher support that raw SVG doesn't reliably get on Android.
+// source is the Marble Grand Prix checkered-flag mark (app/icon.svg),
+// rasterized to PNG (public/icons/*) on the navy tile since manifest icons
+// need broad OS/launcher support that raw SVG doesn't reliably get on Android.
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "brohda. — The Social Prediction Platform",
-    short_name: "brohda.",
-    description: "Predict football outcomes, join community pools, and prove you know the game better than your group chat.",
+    name: "Marble Grand Prix",
+    short_name: "Marble GP",
+    description: "Predict race and competition winners, join community pools, and call it before your group chat.",
     start_url: "/",
     display: "standalone",
     background_color: "#fafafa",

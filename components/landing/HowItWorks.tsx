@@ -1,28 +1,30 @@
-import { ClipboardCheck, Users2, Trophy } from "lucide-react";
+import { ClipboardCheck, Flag, Trophy } from "lucide-react";
 
 const STEPS = [
   {
     icon: ClipboardCheck,
     title: "Pick",
-    description: "Choose an outcome before the pool locks.",
+    description: "Choose a competitor before the race locks, and enter the pool.",
   },
   {
-    icon: Users2,
-    title: "Compete",
-    description: "Join friends and community members making their own predictions.",
+    icon: Flag,
+    title: "Race",
+    description: "Watch the race run and the field finish alongside everyone else's picks.",
   },
   {
     icon: Trophy,
-    title: "Prove it",
-    description: "Track your record, build streaks, and climb the leaderboard.",
+    title: "Result",
+    description: "The confirmed result settles every winning pool entry automatically.",
   },
 ];
 
 export function HowItWorks() {
   return (
     <section id="how-it-works" className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-      <h2 className="text-center text-2xl font-bold text-text-primary sm:text-3xl">How it works</h2>
-      <p className="mt-2 text-center text-text-secondary">Three simple steps to join the action.</p>
+      <h2 className="text-center font-display text-2xl font-extrabold text-text-primary sm:text-3xl">
+        How it works
+      </h2>
+      <p className="mt-2 text-center text-text-secondary">Three steps, from your pick to the result.</p>
       <div className="mt-10 grid gap-8 sm:grid-cols-3">
         {STEPS.map(({ icon: Icon, title, description }, i) => (
           <div key={title} className="space-y-3 text-center sm:text-left">
