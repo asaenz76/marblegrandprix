@@ -7,6 +7,7 @@ import { getRaceResultView } from "@/lib/racing/pool-presentation";
 import { CompetitorIdentity } from "@/components/racing/CompetitorIdentity";
 import { RaceResultSummary } from "@/components/racing/RaceResultSummary";
 import { humanizeEnum } from "@/lib/utils/humanize";
+import { CreateRacingPoolForm } from "@/components/racing/CreateRacingPoolForm";
 import { ResultForm } from "./result-form";
 import { CorrectionForm } from "./correction-form";
 
@@ -16,7 +17,7 @@ import { CorrectionForm } from "./correction-form";
 export default async function RaceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const admin = createAdminClient();
-  const { data: race } = await admin.from("races").select("id, title, status, competition_id, racing_competitions(name)").eq("id", id).maybeSingle();
+  const { data: race } = await admin.from("races").select("id, title, status, competition_id, scheduled_start_utc, racing_competitions(name)").eq("id", id).maybeSingle();
   if (!race) notFound();
 
   // Enforce per-competition authorization (redirects if not permitted).
@@ -34,6 +35,12 @@ export default async function RaceDetailPage({ params }: { params: Promise<{ id:
   const comp = race.racing_competitions as unknown as { name: string } | null;
   const canCorrect = isSuperAdmin(profile);
   const result = confirmed ? await getRaceResultView(id) : null;
+
+  const { data: racePools } = await admin
+    .from("pools")
+    .select("id, status, visibility")
+    .eq("race_id", id)
+    .order("created_at", { ascending: false });
 
   return (
     <div className="mx-auto max-w-xl space-y-6">
@@ -67,6 +74,32 @@ export default async function RaceDetailPage({ params }: { params: Promise<{ id:
           </>
         ) : (
           <ResultForm raceId={id} competitors={competitors} alreadyConfirmed={false} />
+        )}
+      </section>
+
+      <section className="space-y-2">
+        <h2 className="text-sm font-semibold">Race Winner pools ({(racePools ?? []).length})</h2>
+        {(racePools ?? []).length > 0 && (
+          <ul className="divide-y divide-border-subtle rounded-md border border-border-subtle">
+            {(racePools ?? []).map((p) => (
+              <li key={p.id} className="flex items-center justify-between px-3 py-2 text-sm">
+                <Link href={`/pool/${p.id}`} className="text-accent-primary hover:underline">Race Winner pool</Link>
+                <span className="text-text-secondary">
+                  {p.visibility === "HIDDEN" ? "Hidden · " : ""}{humanizeEnum(p.status)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+        {competitors.length < 2 ? (
+          <p className="text-sm text-text-secondary">Add at least 2 competitors to this race before creating a pool.</p>
+        ) : (
+          <CreateRacingPoolForm
+            scope="RACE"
+            raceId={id}
+            contextLabel={race.title ?? "Race"}
+            defaultLockIso={race.scheduled_start_utc ?? undefined}
+          />
         )}
       </section>
     </div>

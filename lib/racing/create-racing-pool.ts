@@ -26,6 +26,13 @@ export const createRacingPoolSchema = z
     houseFeeBps: z.number().int().min(0).max(10000).default(0),
     locksAt: z.string().datetime({ offset: true }),
     openAt: z.string().datetime({ offset: true }).optional(),
+    // Phase 13 (approved additive exception): pool visibility is part of the
+    // pool's creation state and is written atomically in the same insert.
+    // Optional + defaulted to the existing Public value, so every prior caller
+    // that omits it behaves exactly as before (the pools column also defaults
+    // to VISIBLE_TO_ALL_MEMBERS). Reuses the existing pool_visibility enum —
+    // no new states. Nothing else about creation semantics changes.
+    visibility: z.enum(["VISIBLE_TO_ALL_MEMBERS", "HIDDEN"]).default("VISIBLE_TO_ALL_MEMBERS"),
   })
   .strict()
   .superRefine((v, ctx) => {
@@ -121,6 +128,7 @@ export async function createRacingPoolForActor(
       house_fee_bps: data.houseFeeBps,
       open_at: data.openAt ?? new Date().toISOString(),
       locks_at: data.locksAt,
+      visibility: data.visibility,
       status: "OPEN",
       created_by: actor.id,
     })

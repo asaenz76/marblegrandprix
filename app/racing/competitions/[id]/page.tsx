@@ -9,6 +9,7 @@ import type { CompetitorIdentityData } from "@/components/racing/CompetitorIdent
 import { StandingsTable } from "@/components/racing/StandingsTable";
 import { FinalizeForm } from "./finalize-form";
 import { BracketView } from "@/components/racing/BracketView";
+import { CreateRacingPoolForm } from "@/components/racing/CreateRacingPoolForm";
 import { OrganizersSection } from "./organizers-section";
 
 // Competition detail + standings (Phase 7). Access re-checked server-side:
@@ -30,6 +31,13 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
   const isBracket = comp.format === "BRACKET" || comp.format === "ELIMINATION";
 
   const { data: races } = await admin.from("races").select("id, title, status, race_number").eq("competition_id", id).order("race_number", { ascending: true, nullsFirst: false }).order("created_at", { ascending: true });
+
+  const { data: compPools } = await admin
+    .from("pools")
+    .select("id, status, visibility")
+    .eq("template_id", "COMPETITION_WINNER")
+    .eq("template_config->>competition_id", id)
+    .order("created_at", { ascending: false });
 
   // Standings are only meaningful for CHAMPIONSHIP/LEAGUE.
   const standings: StandingsResult | null = isStandings ? await computeStandings(admin, id) : null;
@@ -124,6 +132,30 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
             ))}
           </ul>
         )}
+      </section>
+
+      <section className="space-y-2">
+        <h2 className="text-sm font-semibold">Competition Winner pool ({(compPools ?? []).length})</h2>
+        {(compPools ?? []).length > 0 && (
+          <ul className="divide-y divide-border-subtle rounded-md border border-border-subtle">
+            {(compPools ?? []).map((p) => (
+              <li key={p.id} className="flex items-center justify-between px-3 py-2 text-sm">
+                <Link href={`/pool/${p.id}`} className="text-accent-primary hover:underline">Competition Winner pool</Link>
+                <span className="text-text-secondary">
+                  {p.visibility === "HIDDEN" ? "Hidden · " : ""}{humanizeEnum(p.status)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+        {canManage &&
+          ((races ?? []).length === 0 ? (
+            <p className="text-sm text-text-secondary">
+              Add races and competitors before creating a Competition Winner pool.
+            </p>
+          ) : (
+            <CreateRacingPoolForm scope="COMPETITION" competitionId={comp.id} contextLabel={comp.name} />
+          ))}
       </section>
 
       {eligibleToFinalize && (
