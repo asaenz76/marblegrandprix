@@ -14,7 +14,8 @@
 
 const LOCAL_HOSTS = new Set(["127.0.0.1", "localhost", "0.0.0.0", "::1"]);
 
-function hostOf(url: string): string {
+/** The hostname of a Supabase URL, or "" if it isn't a valid URL. */
+export function supabaseHostname(url: string): string {
   try {
     return new URL(url).hostname;
   } catch {
@@ -22,10 +23,21 @@ function hostOf(url: string): string {
   }
 }
 
+/**
+ * True only when the Supabase URL points at the local dev stack. Exported so
+ * the one legitimate exception to the local-only rule — the first-Super-Admin
+ * bootstrap (lib/dev/prod-bootstrap.ts) — can share the exact same definition
+ * of "local" rather than reimplement it. This does NOT relax assertLocalSupabase
+ * for any of its callers; that guard is unchanged and still absolute.
+ */
+export function isLocalSupabaseUrl(url: string): boolean {
+  return LOCAL_HOSTS.has(supabaseHostname(url));
+}
+
 /** Throw loudly unless NEXT_PUBLIC_SUPABASE_URL points at a local Supabase stack. */
 export function assertLocalSupabase(context = "this local command"): void {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-  const host = hostOf(url);
+  const host = supabaseHostname(url);
   if (LOCAL_HOSTS.has(host)) return;
 
   throw new Error(

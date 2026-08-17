@@ -3,13 +3,25 @@
  * admin account for MVP"). Invite-only registration has no path for the
  * very first user, since there's no admin yet to send an invitation.
  *
- * Usage:
+ * LOCAL (default):
  *   pnpm create-super-admin --email you@example.com --password 'xxxx' --name "Admin Name"
+ *
+ * PRODUCTION (one-time, explicit opt-in — see docs/DEPLOYMENT.md §4):
+ *   ALLOW_PROD_BOOTSTRAP=1 \
+ *   NEXT_PUBLIC_SUPABASE_URL=https://<project-ref>.supabase.co \
+ *   SUPABASE_SERVICE_ROLE_KEY=<service-role-key> \
+ *   pnpm create-super-admin --email you@example.com --password 'xxxx' --name "Admin" \
+ *     --project-host <project-ref>.supabase.co
+ *
+ * This script is the ONE sanctioned exception to the local-only Supabase guard.
+ * The exception is gated here (lib/dev/prod-bootstrap.ts), NOT by weakening
+ * assertLocalSupabase — which stays absolute for seeds, dev-grading,
+ * verification scripts, and the integration suite. A hosted target is refused
+ * unless ALLOW_PROD_BOOTSTRAP=1 AND a --project-host that matches the target are
+ * both present; and if a Super Admin already exists, it refuses safely.
  */
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
-import { assertLocalSupabase } from "../lib/dev/assert-local-supabase";
-
-assertLocalSupabase("create-super-admin");
+import { assessBootstrapTarget, superAdminExists } from "../lib/dev/prod-bootstrap";
 
 // Not importing lib/supabase/admin.ts here: it's guarded by the `server-only`
 // package, which throws unconditionally when required outside Next's
@@ -40,7 +52,33 @@ async function main() {
     process.exit(1);
   }
 
+  // --- Target gating (no DB connection yet) --------------------------------
+  const assessment = assessBootstrapTarget({
+    url: process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
+    allowProdBootstrap: process.env.ALLOW_PROD_BOOTSTRAP === "1",
+    expectedHost: getArg("--project-host") ?? process.env.EXPECTED_SUPABASE_HOST ?? null,
+  });
+
+  if (assessment.decision === "refused") {
+    console.error(`⛔  ${assessment.reason}`);
+    process.exit(1);
+  }
+  console.log(`Target Supabase host: ${assessment.host}`);
+  if (assessment.decision === "prod-authorized") {
+    console.log(
+      "⚠️  PRODUCTION BOOTSTRAP AUTHORIZED — creating the first Super Admin against a hosted project.",
+    );
+  }
+
   const admin = createAdminClient();
+
+  // --- Idempotency: one-time only ------------------------------------------
+  if (await superAdminExists(admin)) {
+    console.error(
+      "A Super Admin already exists. Bootstrap is a one-time action and will not create another, modify the existing one, or reset credentials.",
+    );
+    process.exit(1);
+  }
 
   const { data: created, error: createError } = await admin.auth.admin.createUser({
     email,
