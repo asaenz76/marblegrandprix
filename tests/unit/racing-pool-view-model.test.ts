@@ -5,7 +5,7 @@
  * neutral copy. No DB, no money.
  */
 import { describe, expect, it } from "vitest";
-import { buildPoolCardViewModel, type BuildViewModelInput } from "@/lib/pools/view-model";
+import { buildPoolCardViewModel, deriveRacingQuestion, type BuildViewModelInput } from "@/lib/pools/view-model";
 import { buildNoticeCopy } from "@/lib/pools/notices";
 import type { RacingPoolContext } from "@/lib/racing/pool-presentation";
 
@@ -96,6 +96,47 @@ describe("Phase 9 — buildPoolCardViewModel racing branch", () => {
       currentUserEntry: { option_id: "o2", amount: 1000, status: "REFUNDED" },
     }));
     expect(refunded.currentUser.refundedAmount).toBe(1000);
+  });
+});
+
+describe("scope/format-aware pool question", () => {
+  it("derives the question from scope + competition format", () => {
+    expect(deriveRacingQuestion("RACE", null)).toBe("Who wins this race?");
+    expect(deriveRacingQuestion("RACE", "CHAMPIONSHIP")).toBe("Who wins this race?");
+    expect(deriveRacingQuestion("COMPETITION", "CHAMPIONSHIP")).toBe("Who wins the championship?");
+    expect(deriveRacingQuestion("COMPETITION", "LEAGUE")).toBe("Who wins the league?");
+    expect(deriveRacingQuestion("COMPETITION", "BRACKET")).toBe("Who wins the bracket?");
+    expect(deriveRacingQuestion("COMPETITION", "ELIMINATION")).toBe("Who's last standing?");
+    expect(deriveRacingQuestion("COMPETITION", "SINGLE_RACE")).toBe("Who wins this race?");
+    expect(deriveRacingQuestion("COMPETITION", "MIXED")).toBe("Who wins the competition?");
+    expect(deriveRacingQuestion("COMPETITION", null)).toBe("Who wins the competition?");
+  });
+
+  it("the racing card shows the derived question, overriding the stored template string", () => {
+    // A championship-format competition pool whose stored pool.question is the
+    // generic template text still renders the format-specific question.
+    const compChampionship = buildPoolCardViewModel(
+      makeInput({
+        pool: { ...makeInput().pool, question: "Who wins this competition?" },
+        racing: racingContext({ scope: "COMPETITION", competitionFormat: "CHAMPIONSHIP" }),
+      }),
+    );
+    expect(compChampionship.question).toBe("Who wins the championship?");
+
+    const elimination = buildPoolCardViewModel(
+      makeInput({ racing: racingContext({ scope: "COMPETITION", competitionFormat: "ELIMINATION" }) }),
+    );
+    expect(elimination.question).toBe("Who's last standing?");
+
+    const race = buildPoolCardViewModel(makeInput({ racing: racingContext({ scope: "RACE" }) }));
+    expect(race.question).toBe("Who wins this race?");
+  });
+
+  it("a non-racing pool keeps its stored question verbatim", () => {
+    const custom = buildPoolCardViewModel(
+      makeInput({ racing: null, pool: { ...makeInput().pool, pool_type: "CUSTOM", question: "Who wins?" } }),
+    );
+    expect(custom.question).toBe("Who wins?");
   });
 });
 

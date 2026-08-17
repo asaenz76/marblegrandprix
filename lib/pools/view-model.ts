@@ -189,6 +189,35 @@ export function computeOptionStats(
   }));
 }
 
+/**
+ * Player-facing pool question, derived from the racing scope + competition
+ * format so the wording is always truthful to what's being predicted — a
+ * standalone race vs a championship / league / bracket / elimination. Derived
+ * at render (never the stored generic template string), so existing and new
+ * racing pools read identically. Grading never depends on this text — it's
+ * decided by competitor in lib/racing/grade-race-pool.ts — so deriving it for
+ * display is safe. */
+export function deriveRacingQuestion(
+  scope: "RACE" | "COMPETITION",
+  competitionFormat: string | null,
+): string {
+  if (scope === "RACE") return "Who wins this race?";
+  switch (competitionFormat) {
+    case "CHAMPIONSHIP":
+      return "Who wins the championship?";
+    case "LEAGUE":
+      return "Who wins the league?";
+    case "BRACKET":
+      return "Who wins the bracket?";
+    case "ELIMINATION":
+      return "Who's last standing?";
+    case "SINGLE_RACE":
+      return "Who wins this race?";
+    default:
+      return "Who wins the competition?";
+  }
+}
+
 /** Shapes raw DB rows (pool + pool_options_public + fixture + entry +
  * participants) into the X.14 SocialPoolCardViewModel contract. Kept
  * separate from the page-level data fetching so it's independently
@@ -290,7 +319,7 @@ export function buildPoolCardViewModel(input: BuildViewModelInput): SocialPoolCa
       awayTeamFollow: fixture.away_team_follow ?? null,
       leagueFollow: fixture.league_follow ?? null,
     },
-    question: pool.question,
+    question: racing ? deriveRacingQuestion(racing.scope, racing.competitionFormat) : pool.question,
     title: pool.title,
     racing: racing ?? null,
     poolType: pool.pool_type,

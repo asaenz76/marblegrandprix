@@ -5,7 +5,6 @@ import type { SocialPoolCardViewModel } from "@/lib/pools/view-model";
 import { formatCents, formatBps } from "@/lib/utils/money";
 import { PoolLeagueHeader } from "@/components/pools/PoolLeagueHeader";
 import { MatchIdentity } from "@/components/pools/MatchIdentity";
-import { RulePill } from "@/components/pools/RulePill";
 import { PoolOptionButton } from "@/components/pools/PoolOptionButton";
 import { PoolDistributionBar } from "@/components/pools/PoolDistributionBar";
 import { AvatarStack } from "@/components/pools/AvatarStack";
@@ -64,9 +63,6 @@ export function PoolPreviewCard({ viewModel }: { viewModel: SocialPoolCardViewMo
 
       <div>
         <h3 className="text-lg font-bold text-text-primary">{viewModel.question}</h3>
-        <div className="mt-1.5">
-          <RulePill label={viewModel.ruleLabel} />
-        </div>
       </div>
 
       <div className="space-y-2">

@@ -5,14 +5,12 @@ import { enterPoolAction, type EnterPoolState } from "@/lib/actions/entries";
 import { formatCents, formatBps } from "@/lib/utils/money";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { LocalDateTime } from "@/components/LocalDateTime";
-import { RulePill } from "./RulePill";
 import { SlideToConfirm } from "./SlideToConfirm";
 
 interface EntryConfirmationSheetProps {
   poolId: string;
   optionId: string;
   optionLabel: string;
-  ruleLabel: string;
   entryFee: number;
   houseFeeBasisPoints: number;
   balanceCents: number;
@@ -30,7 +28,6 @@ export function EntryConfirmationSheet({
   poolId,
   optionId,
   optionLabel,
-  ruleLabel,
   entryFee,
   houseFeeBasisPoints,
   balanceCents,
@@ -72,8 +69,6 @@ export function EntryConfirmationSheet({
           <p className="text-xs text-text-muted">Your choice</p>
           <p className="text-lg font-semibold text-text-primary">{optionLabel}</p>
         </div>
-
-        <RulePill label={ruleLabel} />
 
         <dl className="space-y-1.5 text-sm">
           <div className="flex justify-between">

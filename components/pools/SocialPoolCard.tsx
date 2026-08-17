@@ -16,7 +16,6 @@ import { MatchIdentity } from "./MatchIdentity";
 import { CompetitorIdentity } from "@/components/racing/CompetitorIdentity";
 import { RacingPoolHeader } from "@/components/racing/RacingPoolHeader";
 import { RaceResultSummary } from "@/components/racing/RaceResultSummary";
-import { RulePill } from "./RulePill";
 import { PoolOptionButton } from "./PoolOptionButton";
 import { PoolDistributionBar } from "./PoolDistributionBar";
 import { AvatarStack } from "./AvatarStack";
@@ -237,9 +236,6 @@ export function SocialPoolCard({
 
           <div>
             <h3 className="text-lg font-bold text-text-primary">{viewModel.question}</h3>
-            <div className="mt-1.5">
-              <RulePill label={viewModel.ruleLabel} />
-            </div>
           </div>
 
           {/* Read-only context for what Yes/No actually grades against —
@@ -323,7 +319,6 @@ export function SocialPoolCard({
             poolId={viewModel.poolId}
             optionId={selectedOption.optionId}
             optionLabel={selectedOption.label}
-            ruleLabel={viewModel.ruleLabel}
             entryFee={viewModel.entryFee}
             houseFeeBasisPoints={viewModel.houseFeeBasisPoints}
             balanceCents={balanceCents}

@@ -1,6 +1,7 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { buildPoolCardViewModel, type SocialPoolCardViewModel } from "@/lib/pools/view-model";
+import { getRacingPoolContexts } from "@/lib/racing/pool-presentation";
 
 export interface LandingStats {
   betaTesters: number;
@@ -109,6 +110,19 @@ async function buildPublicViewModel(
     avatar_url: string | null;
   }>;
 
+  // Same racing presentation context the logged-in Feed builds via
+  // getPoolCardViewModels — without it, a racing pool would fall back to the
+  // generic football labels ("Custom Poll" / "fixture result") and lose its
+  // competition name on the marketing page.
+  const racingByPoolId = await getRacingPoolContexts([
+    {
+      id: poolId,
+      template_id: (pool.template_id as string | null) ?? null,
+      race_id: (pool.race_id as string | null) ?? null,
+      template_config: (pool.template_config as Record<string, unknown> | null) ?? null,
+    },
+  ]);
+
   return buildPoolCardViewModel({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     pool: pool as any,
@@ -123,6 +137,7 @@ async function buildPublicViewModel(
     finalPayout: null,
     isLikedByCurrentUser: false,
     comboLegs: [],
+    racing: racingByPoolId.get(poolId) ?? null,
   });
 }
 
