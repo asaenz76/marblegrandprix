@@ -10,6 +10,7 @@ import { StandingsTable } from "@/components/racing/StandingsTable";
 import { FinalizeForm } from "./finalize-form";
 import { BracketView } from "@/components/racing/BracketView";
 import { CreateRacingPoolForm } from "@/components/racing/CreateRacingPoolForm";
+import { CompetitionImageEditor } from "@/components/racing/CompetitionImageEditor";
 import { OrganizersSection } from "./organizers-section";
 
 // Competition detail + standings (Phase 7). Access re-checked server-side:
@@ -20,7 +21,7 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
   const admin = createAdminClient();
   const { data: comp } = await admin
     .from("racing_competitions")
-    .select("id, name, format, status, winner_competitor_id")
+    .select("id, name, format, status, winner_competitor_id, image_url")
     .eq("id", id)
     .maybeSingle();
   if (!comp) notFound();
@@ -81,13 +82,26 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
 
   return (
     <div className="mx-auto max-w-xl space-y-6">
-      <div>
-        <h1 className="text-lg font-semibold">{comp.name}</h1>
-        <p className="text-sm text-text-secondary">
-          {humanizeEnum(comp.format)} · {humanizeEnum(comp.status)}
-          {isStandings && comp.status === "ACTIVE" && standings!.racesAwaitingResult > 0 && ` · ${standings!.racesAwaitingResult} race(s) awaiting result`}
-        </p>
+      <div className="flex items-center gap-3">
+        {comp.image_url && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={comp.image_url} alt="" className="size-12 shrink-0 rounded-full object-cover" />
+        )}
+        <div>
+          <h1 className="text-lg font-semibold">{comp.name}</h1>
+          <p className="text-sm text-text-secondary">
+            {humanizeEnum(comp.format)} · {humanizeEnum(comp.status)}
+            {isStandings && comp.status === "ACTIVE" && standings!.racesAwaitingResult > 0 && ` · ${standings!.racesAwaitingResult} race(s) awaiting result`}
+          </p>
+        </div>
       </div>
+
+      {canManage && (
+        <section className="space-y-2">
+          <h2 className="text-sm font-semibold">Icon</h2>
+          <CompetitionImageEditor competitionId={comp.id} imageUrl={comp.image_url} />
+        </section>
+      )}
 
       {isStandings && standings ? (
         <section className="space-y-2">

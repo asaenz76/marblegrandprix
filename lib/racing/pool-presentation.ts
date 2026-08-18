@@ -39,11 +39,15 @@ export interface RacingPoolContext {
   competitionName: string | null;
   competitionFormat: string | null;
   competitionStatus: string | null;
+  /** Optional rounded icon for the competition (Phase 16). */
+  competitionImageUrl: string | null;
   championCompetitorId: string | null;
   champion: CompetitorIdentityData | null;
   raceId: string | null;
   raceTitle: string | null;
   raceStatus: string | null;
+  /** Optional rounded icon for the race (Phase 16). */
+  raceImageUrl: string | null;
   scheduledStartUtc: string | null;
   /** optionId -> competitor identity, so the card renders CompetitorIdentity. */
   optionCompetitors: Record<string, CompetitorIdentityData>;
@@ -131,9 +135,9 @@ export async function getRacingPoolContexts(pools: PoolRacingInput[]): Promise<M
   }
 
   // Batch-load races (and their competition ids).
-  const raceById = new Map<string, { id: string; title: string | null; status: string; competition_id: string; scheduled_start_utc: string | null }>();
+  const raceById = new Map<string, { id: string; title: string | null; status: string; competition_id: string; scheduled_start_utc: string | null; image_url: string | null }>();
   if (raceIds.size) {
-    const { data: races } = await admin.from("races").select("id, title, status, competition_id, scheduled_start_utc").in("id", [...raceIds]);
+    const { data: races } = await admin.from("races").select("id, title, status, competition_id, scheduled_start_utc, image_url").in("id", [...raceIds]);
     for (const r of races ?? []) {
       raceById.set(r.id, r);
       competitionIds.add(r.competition_id);
@@ -141,9 +145,9 @@ export async function getRacingPoolContexts(pools: PoolRacingInput[]): Promise<M
   }
 
   // Batch-load competitions.
-  const compById = new Map<string, { id: string; name: string; format: string; status: string; winner_competitor_id: string | null }>();
+  const compById = new Map<string, { id: string; name: string; format: string; status: string; winner_competitor_id: string | null; image_url: string | null }>();
   if (competitionIds.size) {
-    const { data: comps } = await admin.from("racing_competitions").select("id, name, format, status, winner_competitor_id").in("id", [...competitionIds]);
+    const { data: comps } = await admin.from("racing_competitions").select("id, name, format, status, winner_competitor_id, image_url").in("id", [...competitionIds]);
     for (const c of comps ?? []) compById.set(c.id, c);
   }
 
@@ -214,11 +218,13 @@ export async function getRacingPoolContexts(pools: PoolRacingInput[]): Promise<M
       competitionName: comp?.name ?? null,
       competitionFormat: comp?.format ?? null,
       competitionStatus: comp?.status ?? null,
+      competitionImageUrl: comp?.image_url ?? null,
       championCompetitorId: comp?.winner_competitor_id ?? null,
       champion: comp?.winner_competitor_id ? identityById.get(comp.winner_competitor_id) ?? null : null,
       raceId: meta.raceId,
       raceTitle: race?.title ?? null,
       raceStatus: race?.status ?? null,
+      raceImageUrl: race?.image_url ?? null,
       scheduledStartUtc: race?.scheduled_start_utc ?? null,
       optionCompetitors,
       winnerOptionId,

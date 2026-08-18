@@ -8,6 +8,7 @@ import { CompetitorIdentity } from "@/components/racing/CompetitorIdentity";
 import { RaceResultSummary } from "@/components/racing/RaceResultSummary";
 import { humanizeEnum } from "@/lib/utils/humanize";
 import { CreateRacingPoolForm } from "@/components/racing/CreateRacingPoolForm";
+import { RaceImageEditor } from "@/components/racing/RaceImageEditor";
 import { ResultForm } from "./result-form";
 import { CorrectionForm } from "./correction-form";
 
@@ -17,7 +18,7 @@ import { CorrectionForm } from "./correction-form";
 export default async function RaceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const admin = createAdminClient();
-  const { data: race } = await admin.from("races").select("id, title, status, competition_id, scheduled_start_utc, racing_competitions(name)").eq("id", id).maybeSingle();
+  const { data: race } = await admin.from("races").select("id, title, status, competition_id, scheduled_start_utc, image_url, racing_competitions(name)").eq("id", id).maybeSingle();
   if (!race) notFound();
 
   // Enforce per-competition authorization (redirects if not permitted).
@@ -44,13 +45,24 @@ export default async function RaceDetailPage({ params }: { params: Promise<{ id:
 
   return (
     <div className="mx-auto max-w-xl space-y-6">
-      <div>
-        <h1 className="text-lg font-semibold">{race.title ?? "Race"}</h1>
-        <p className="text-sm text-text-secondary">
-          <Link href={`/racing/competitions/${race.competition_id}`} className="text-accent-primary hover:underline">{comp?.name}</Link>
-          {" · "}{humanizeEnum(race.status)}
-        </p>
+      <div className="flex items-center gap-3">
+        {race.image_url && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={race.image_url} alt="" className="size-12 shrink-0 rounded-full object-cover" />
+        )}
+        <div>
+          <h1 className="text-lg font-semibold">{race.title ?? "Race"}</h1>
+          <p className="text-sm text-text-secondary">
+            <Link href={`/racing/competitions/${race.competition_id}`} className="text-accent-primary hover:underline">{comp?.name}</Link>
+            {" · "}{humanizeEnum(race.status)}
+          </p>
+        </div>
       </div>
+
+      <section className="space-y-2">
+        <h2 className="text-sm font-semibold">Icon</h2>
+        <RaceImageEditor raceId={race.id} imageUrl={race.image_url} />
+      </section>
 
       <section className="space-y-2">
         <h2 className="text-sm font-semibold">Competitors ({competitors.length})</h2>

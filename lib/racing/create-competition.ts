@@ -23,6 +23,9 @@ export const createCompetitionSchema = z
   .object({
     name: z.string().trim().min(1, "A competition needs a name.").max(120),
     format: z.enum(["SINGLE_RACE", "CHAMPIONSHIP", "LEAGUE", "BRACKET", "ELIMINATION"]),
+    // Optional rounded icon (Phase 16). A public URL produced by the
+    // /api/racing-image upload route; never a browser-supplied storage write.
+    imageUrl: z.string().trim().url().max(2048).optional(),
   })
   .strict();
 
@@ -37,11 +40,11 @@ export async function createCompetitionForActor(
   if (!isSuperAdmin(actor)) return { error: "Only a Super Admin can create a competition." };
   const parsed = createCompetitionSchema.safeParse(input);
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Invalid competition details." };
-  const { name, format } = parsed.data;
+  const { name, format, imageUrl } = parsed.data;
 
   const { data, error } = await client
     .from("racing_competitions")
-    .insert({ name, format, status: format === "SINGLE_RACE" ? "DRAFT" : "ACTIVE", created_by: actor.id })
+    .insert({ name, format, image_url: imageUrl ?? null, status: format === "SINGLE_RACE" ? "DRAFT" : "ACTIVE", created_by: actor.id })
     .select("id")
     .single();
   if (error || !data) return { error: "Could not create the competition." };

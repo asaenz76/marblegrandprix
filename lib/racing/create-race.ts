@@ -88,6 +88,7 @@ export async function createRaceForActor(
         scheduled_start_utc: data.scheduledStartUtc ?? null,
         locks_at: data.locksAt ?? null,
         video_url: data.videoUrl ?? null,
+        image_url: data.imageUrl ?? null,
         status: "SCHEDULED",
         created_by: actor.id,
       })

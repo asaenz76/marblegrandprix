@@ -82,6 +82,9 @@ export const createRaceSchema = z
     scheduledStartUtc: z.string().datetime({ offset: true }).optional(),
     locksAt: z.string().datetime({ offset: true }).optional(),
     videoUrl: z.string().trim().url().max(2048).optional(),
+    // Optional rounded icon (Phase 16). A public URL from the
+    // /api/racing-image upload route; never a browser-supplied storage write.
+    imageUrl: z.string().trim().url().max(2048).optional(),
 
     competitors: z.array(raceCompetitorInputSchema).min(2, "A race needs at least 2 competitors."),
   })

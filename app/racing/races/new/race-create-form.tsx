@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createRaceAction } from "@/lib/actions/races";
 import { CompetitorIdentity } from "@/components/racing/CompetitorIdentity";
+import { RacingImageUploader } from "@/components/racing/RacingImageUploader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -60,6 +61,7 @@ export function RaceCreateForm({
   const [title, setTitle] = useState("");
   const [scheduledStart, setScheduledStart] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [rows, setRows] = useState<Row[]>([emptyRow(), emptyRow()]);
 
   function update(i: number, patch: Partial<Row>) {
@@ -94,6 +96,7 @@ export function RaceCreateForm({
       title: title.trim(),
       scheduledStartUtc: scheduledStart ? new Date(scheduledStart).toISOString() : undefined,
       videoUrl: videoUrl.trim() || undefined,
+      imageUrl: imageUrl ?? undefined,
       competitors,
     };
 
@@ -169,6 +172,10 @@ export function RaceCreateForm({
             <div className="space-y-1.5">
               <Label htmlFor="video">Video / stream URL (optional)</Label>
               <Input id="video" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="https://…" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Icon (optional)</Label>
+              <RacingImageUploader value={imageUrl} onChange={(url) => setImageUrl(url)} label="icon" disabled={pending} />
             </div>
           </div>
         </CardContent>

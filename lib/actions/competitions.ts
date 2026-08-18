@@ -1,8 +1,9 @@
 "use server";
 
+import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { requireOrganizerOrAbove, requireSuperAdmin } from "@/lib/auth/session";
+import { requireCompetitionAccess, requireOrganizerOrAbove, requireSuperAdmin } from "@/lib/auth/session";
 import {
   finalizeCompetitionForActor,
   refinalizeCompetitionForActor,
@@ -33,6 +34,41 @@ export async function createCompetitionAction(input: CreateCompetitionInput): Pr
     revalidatePath("/racing");
   }
   return res;
+}
+
+// A public racing-image URL (from /api/racing-image) or null to clear it.
+const racingImageUrlSchema = z.string().trim().url().max(2048).nullable();
+
+/**
+ * Phase 16: set or clear a competition's rounded icon. Cosmetic identity only —
+ * no money, grading, or standings effect. Scoped to whoever can manage the
+ * competition (assigned Organizer or Super Admin) via requireCompetitionAccess;
+ * the image itself was already uploaded through the operator-only route.
+ */
+export async function updateCompetitionImageAction(input: {
+  competitionId: string;
+  imageUrl: string | null;
+}): Promise<{ error: string | null }> {
+  const actor = await requireCompetitionAccess(input.competitionId);
+  const parsed = racingImageUrlSchema.safeParse(input.imageUrl);
+  if (!parsed.success) return { error: "That image link is not valid." };
+
+  const { error } = await createAdminClient()
+    .from("racing_competitions")
+    .update({ image_url: parsed.data })
+    .eq("id", input.competitionId);
+  if (error) return { error: "Could not update the competition image." };
+
+  await writeAuditLog({
+    actorId: actor.id,
+    action: "racing_competition.image_updated",
+    entityType: "racing_competition",
+    entityId: input.competitionId,
+    after: { image_url: parsed.data },
+  });
+  revalidatePath(`/racing/competitions/${input.competitionId}`);
+  revalidatePath("/racing/competitions");
+  return { error: null };
 }
 
 export async function finalizeCompetitionAction(input: { competitionId: string }): Promise<FinalizeResult> {

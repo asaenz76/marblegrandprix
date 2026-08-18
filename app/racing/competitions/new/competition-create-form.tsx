@@ -6,6 +6,7 @@ import { createCompetitionAction } from "@/lib/actions/competitions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RacingImageUploader } from "@/components/racing/RacingImageUploader";
 
 type Format = "SINGLE_RACE" | "CHAMPIONSHIP" | "LEAGUE" | "BRACKET" | "ELIMINATION";
 
@@ -28,11 +29,12 @@ export function CompetitionCreateForm() {
   const [error, setError] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [format, setFormat] = useState<Format>("CHAMPIONSHIP");
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   function submit() {
     setError(null);
     startTransition(async () => {
-      const res = await createCompetitionAction({ name: name.trim(), format });
+      const res = await createCompetitionAction({ name: name.trim(), format, imageUrl: imageUrl ?? undefined });
       if (res.error || !res.competitionId) return setError(res.error ?? "Could not create the competition.");
       router.push(`/racing/competitions/${res.competitionId}`);
     });
@@ -54,6 +56,10 @@ export function CompetitionCreateForm() {
           <option value="SINGLE_RACE">Single race</option>
         </select>
         <p className="text-xs text-text-secondary">{FORMAT_HELP[format]}</p>
+      </div>
+      <div className="space-y-1.5">
+        <Label>Icon (optional)</Label>
+        <RacingImageUploader value={imageUrl} onChange={(url) => setImageUrl(url)} label="icon" disabled={pending} />
       </div>
       {error && <p className="text-sm text-danger">{error}</p>}
       <div className="flex gap-2">

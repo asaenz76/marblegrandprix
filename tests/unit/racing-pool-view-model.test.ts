@@ -19,8 +19,8 @@ const neutralFixture: BuildViewModelInput["fixture"] = {
 function racingContext(overrides: Partial<RacingPoolContext> = {}): RacingPoolContext {
   return {
     scope: "RACE", competitionId: "c1", competitionName: "Marble Cup", competitionFormat: "SINGLE_RACE",
-    competitionStatus: "ACTIVE", championCompetitorId: null, champion: null, raceId: "r1", raceTitle: "Race 1",
-    raceStatus: "SCHEDULED", scheduledStartUtc: "2035-01-01T00:00:00Z", optionCompetitors: {}, winnerOptionId: null,
+    competitionStatus: "ACTIVE", competitionImageUrl: null, championCompetitorId: null, champion: null, raceId: "r1", raceTitle: "Race 1",
+    raceStatus: "SCHEDULED", raceImageUrl: null, scheduledStartUtc: "2035-01-01T00:00:00Z", optionCompetitors: {}, winnerOptionId: null,
     result: { status: "PENDING", winner: null, winnerCompetitorId: null, order: [] }, ...overrides,
   };
 }

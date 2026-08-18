@@ -12,9 +12,20 @@ import { humanizeEnum } from "@/lib/utils/humanize";
  * read as one product family. No fixture/home/away/draw.
  */
 export function RacingPoolHeader({ racing }: { racing: RacingPoolContext }) {
+  // Rounded icon (Phase 16): the race's own image for a RACE pool (falling back
+  // to its competition's), or the competition's image for a COMPETITION pool.
+  const iconUrl =
+    racing.scope === "RACE"
+      ? (racing.raceImageUrl ?? racing.competitionImageUrl)
+      : racing.competitionImageUrl;
   return (
-    <div className="space-y-0.5">
-      <div className="flex flex-wrap items-center gap-x-2 text-sm">
+    <div className="flex items-center gap-2">
+      {iconUrl && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={iconUrl} alt="" className="size-8 shrink-0 rounded-full object-cover" />
+      )}
+      <div className="space-y-0.5">
+        <div className="flex flex-wrap items-center gap-x-2 text-sm">
         {racing.scope === "RACE" ? (
           <>
             {racing.raceId ? (
@@ -42,9 +53,10 @@ export function RacingPoolHeader({ racing }: { racing: RacingPoolContext }) {
           <span className="font-semibold text-text-primary">Overall winner</span>
         )}
       </div>
-      {racing.competitionFormat && (
-        <div className="text-xs text-text-muted">{humanizeEnum(racing.competitionFormat)}</div>
-      )}
+        {racing.competitionFormat && (
+          <div className="text-xs text-text-muted">{humanizeEnum(racing.competitionFormat)}</div>
+        )}
+      </div>
     </div>
   );
 }
