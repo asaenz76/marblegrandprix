@@ -151,7 +151,7 @@
  * now use text-primary (a plain, high-contrast neutral) instead.
  */
 :root {
-  --background: #fafafa;
+  --background: #ffffff;
   --surface-primary: #ffffff;
   /* Nested panels sitting on top of a card (combo-leg lists, admin table
      rows) — spec's "surface-subtle". */
@@ -165,17 +165,18 @@
      border-subtle without becoming a colored accent (e.g. the "remaining"
      segment of a two-side percentage bar). */
   --border-strong: #d4d4d4;
-  --text-primary: #111111;
+  --text-primary: #0a0a0a;
   --text-secondary: #737373;
   /* #a3a3a3 measured 2.52:1 against surface-primary — well under WCAG AA's
      4.5:1 floor for the text-xs sizes this token is actually used at
      (timestamps, footer notes, muted labels throughout the app). #707070
      measures 4.95:1 on surface-primary and 4.54:1 on surface-secondary. */
   --text-muted: #707070;
-  --accent-primary: #4f46e5;
-  --accent-primary-hover: #4338ca;
-  --accent-primary-subtle: #eef2ff;
-  --accent-primary-label: var(--accent-primary); /* fine as-is on a light card */
+  /* Fire & Gold: red is the interaction accent (replacing the old indigo). */
+  --accent-primary: #f00000;
+  --accent-primary-hover: #c40000;
+  --accent-primary-subtle: #ffecec;
+  --accent-primary-label: #cc0000; /* deeper red so small accent text clears AA on white */
   /* #f59e0b (amber-500) measured 2.15:1 against surface-primary — badly
      fails WCAG AA. Only overridden here in light mode: the same hex passes
      comfortably (8.1:1) against .dark's darker surfaces below, so it's
@@ -200,7 +201,7 @@
      colors, not redefined in .dark below, since a gold medal is gold
      regardless of theme. Foreground pairs are fixed dark text for contrast
      against these bright badge fills in both themes. */
-  --medal-gold: #fbbf24;
+  --medal-gold: #ffc917;
   --medal-gold-foreground: #78350f;
   --medal-silver: #d4d4d8;
   --medal-silver-foreground: #3f3f46;
@@ -213,12 +214,12 @@
      mode by coincidence (text-primary is near-black there) but inverts to
      a near-white band/bezel in dark mode, since text-primary flips
      meaning between themes and these never should. */
-  --inverted-surface: #15161a;
+  --inverted-surface: #050505;
   --inverted-surface-foreground: #f5f5f5;
   /* Deliberate deep navy — the "Formula blue-and-white" structural tone.
      Used sparingly (wordmark, section eyebrows, footer band), never as an
      interaction color, so it never competes with the indigo accent. */
-  --brand-navy: #1b2a5c;
+  --brand-navy: #b00000;
   /* Dark hairline ring for competitor color swatches on the near-white
      surfaces — keeps white/yellow/orange marbles from vanishing (they
      measure 1.0–2.8:1 against a white card). */
@@ -269,7 +270,7 @@
  * measured against WCAG AA (see the Phase 12 Stage A study).
  */
 .dark {
-  --background: #08080a;
+  --background: #050505;
   --surface-primary: #141417;
   --surface-secondary: #1c1c21;
   --surface-elevated: #232329;
@@ -285,10 +286,10 @@
      TEXT (links, countdowns): #7c83ff measures 5.73:1 on surface-primary, so
      it is legible as normal-size text — unlike the button-fill primary below,
      which is intentionally deeper. */
-  --accent-primary: #7c83ff;
-  --accent-primary-hover: #9aa1ff;
-  --accent-primary-subtle: #1d1f3d;
-  --accent-primary-label: #9aa1ff;
+  --accent-primary: #ff5252;
+  --accent-primary-hover: #ff7070;
+  --accent-primary-subtle: #2a0d0d;
+  --accent-primary-label: #ff7070;
   --warning-muted: #f59e0b;
   --danger: #ef4444;
   --credit: #22c55e;
@@ -302,7 +303,7 @@
   --success: #4ade80;
   /* Structural navy flips to a light cool tint in dark mode (10.3:1 on the
      ground) so wordmark/eyebrow elements stay legible. */
-  --brand-navy: #aeb8e6;
+  --brand-navy: #ff9a9a;
   /* Light hairline ring so black/navy competitor swatches (which measure
      ~1.1–1.8:1 against the near-black card) never disappear. */
   --competitor-ring: rgba(255, 255, 255, 0.55);
@@ -312,12 +313,10 @@
   --card-foreground: var(--text-primary);
   --popover: var(--surface-elevated);
   --popover-foreground: var(--text-primary);
-  /* Button fill is deliberately DECOUPLED from --accent-primary in dark: a
-     deeper #5257e6 clears white-text contrast (5.43:1) for solid buttons,
-     while --accent-primary stays lighter (#7c83ff) so accent-colored text and
-     borders read against the dark ground. In light mode the two stay unified
-     (see :root, where --primary = --accent-primary = #4f46e5). */
-  --primary: #5257e6;
+  /* Solid button fill = the brand red. --accent-primary stays a lighter red
+     (#ff5252) so accent-colored TEXT and borders read against the dark ground,
+     while the fill below carries white button labels. */
+  --primary: #f00000;
   --primary-foreground: #ffffff;
   --secondary: var(--surface-secondary);
   --secondary-foreground: var(--text-primary);
