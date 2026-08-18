@@ -5,6 +5,8 @@ import type { SocialPoolCardViewModel } from "@/lib/pools/view-model";
 import { formatCents, formatBps } from "@/lib/utils/money";
 import { PoolLeagueHeader } from "@/components/pools/PoolLeagueHeader";
 import { MatchIdentity } from "@/components/pools/MatchIdentity";
+import { RacingPoolHeader } from "@/components/racing/RacingPoolHeader";
+import { CompetitorIdentity } from "@/components/racing/CompetitorIdentity";
 import { PoolOptionButton } from "@/components/pools/PoolOptionButton";
 import { PoolDistributionBar } from "@/components/pools/PoolDistributionBar";
 import { AvatarStack } from "@/components/pools/AvatarStack";
@@ -32,10 +34,19 @@ export function PoolPreviewCard({ viewModel }: { viewModel: SocialPoolCardViewMo
         locksAt={viewModel.locksAt}
         isLocked={false}
         isResolved={false}
+        overrideLabel={
+          viewModel.racing
+            ? (viewModel.racing.competitionName ??
+              (viewModel.racing.scope === "COMPETITION" ? "Competition pool" : "Race pool"))
+            : undefined
+        }
       />
 
       {viewModel.fixture.homeTeamName && <MatchIdentity fixture={viewModel.fixture} />}
-      {viewModel.title && (
+      {/* Racing pools show their competition/race context where a football
+          MatchIdentity would otherwise render — same as SocialPoolCard. */}
+      {viewModel.racing && <RacingPoolHeader racing={viewModel.racing} />}
+      {viewModel.title && !viewModel.racing && (
         <p className="text-sm font-medium text-text-secondary">{viewModel.title}</p>
       )}
 
@@ -66,18 +77,25 @@ export function PoolPreviewCard({ viewModel }: { viewModel: SocialPoolCardViewMo
       </div>
 
       <div className="space-y-2">
-        {viewModel.options.map((option) => (
-          <PoolOptionButton
-            key={option.optionId}
-            label={option.label}
-            logoUrl={option.teamLogoUrl}
-            percentage={option.percentage}
-            estimatedPayout={option.estimatedPayout}
-            isCurrentUserChoice={false}
-            disabled
-            onSelect={() => {}}
-          />
-        ))}
+        {viewModel.options.map((option) => {
+          const competitor = viewModel.racing?.optionCompetitors[option.optionId];
+          return (
+            <PoolOptionButton
+              key={option.optionId}
+              label={option.label}
+              logoUrl={option.teamLogoUrl}
+              // Racing options render the full competitor identity
+              // (colors/number/name/image), N-agnostically — same as the feed.
+              leading={competitor ? <CompetitorIdentity competitor={competitor} /> : undefined}
+              isWinner={viewModel.racing?.winnerOptionId === option.optionId}
+              percentage={option.percentage}
+              estimatedPayout={option.estimatedPayout}
+              isCurrentUserChoice={false}
+              disabled
+              onSelect={() => {}}
+            />
+          );
+        })}
       </div>
 
       <p className="text-xs text-text-muted">
