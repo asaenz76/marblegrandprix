@@ -73,15 +73,30 @@ describe.skipIf(!SR)("Phase 17 — delete competitions and races", () => {
     expect((await admin.from("pool_options").select("id").eq("pool_id", poolId)).data).toEqual([]);
   });
 
-  it("refuses to delete when a dependent pool has locked (protects in-progress/settled money)", async () => {
+  it("refuses to delete when a dependent pool has SETTLED (protects paid-out money)", async () => {
     const { competitionId, poolId } = await raceWinnerPool();
-    await admin.from("pools").update({ status: "LOCKED" }).eq("id", poolId);
+    await admin.from("pools").update({ status: "SETTLED" }).eq("id", poolId);
 
     const res = await deleteCompetitionForActor(admin, sa, competitionId);
-    expect(res.error).toMatch(/locked or settled/i);
+    expect(res.error).toMatch(/settled/i);
     // Nothing was deleted.
     expect(await exists("racing_competitions", competitionId)).toBe(true);
     expect(await exists("pools", poolId)).toBe(true);
+  });
+
+  it("deletes a merely LOCKED pool (lock time passed) and still refunds its entry", async () => {
+    const { competitionId, poolId, firstOption } = await raceWinnerPool();
+    const player = await makeUser("player", 5000);
+    await enter(poolId, player.id, firstOption); // debited 1000 -> 4000
+    expect(await balance(player.id)).toBe(4000);
+    // The lock cron would flip an open pool to LOCKED once its lock time passes.
+    await admin.from("pools").update({ status: "LOCKED" }).eq("id", poolId);
+
+    const res = await deleteCompetitionForActor(admin, sa, competitionId);
+    expect(res.error).toBeNull();
+    expect(await balance(player.id)).toBe(5000); // refunded despite being locked
+    expect(await exists("racing_competitions", competitionId)).toBe(false);
+    expect(await exists("pools", poolId)).toBe(false);
   });
 
   it("deleteRace removes one race + its pool but leaves the competition and other races", async () => {

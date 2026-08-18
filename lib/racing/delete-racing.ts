@@ -9,28 +9,36 @@ import { isSuperAdmin } from "@/lib/auth/guards";
  * through the EXISTING audited money path (void_pool_entry -> apply_wallet_
  * transaction), never by hand-editing balances.
  *
- * Money safety: deletion is refused unless every dependent pool is still in the
- * pre-lock phase (DRAFT/SCHEDULED/OPEN). A pool that has locked, is awaiting a
- * result, or has settled/reversed is protected — its financial state is never
- * destroyed. That guard is also what lets us reuse void_pool_entry, which only
- * refunds entries on an OPEN pool.
+ * Money safety: deletion is refused only if a dependent pool has reached a
+ * finalized-money state (SETTLED or a reversal state) — payout records are never
+ * destroyed. A pool that is merely OPEN, LOCKED, awaiting a result, or already
+ * voided/cancelled has NOT paid out, so its live entries are refunded (fees
+ * credited back) and it's removed. A pool that has locked only because its lock
+ * time passed is still safely deletable.
  *
  * Runs with the caller's service-role client (bypasses RLS); authority is
  * enforced here and re-enforced by the thin server-action wrapper. No new RPC
- * or SECURITY DEFINER surface is introduced.
+ * or SECURITY DEFINER surface is introduced — refunds reuse the same
+ * apply_wallet_transaction primitive void_pool_entry itself uses.
  */
 
 type Client = SupabaseClient;
 
-const DELETABLE_POOL_STATUSES = new Set(["DRAFT", "SCHEDULED", "OPEN"]);
+// Only finalized-money states protect a pool from deletion; everything else
+// (open, locked, awaiting result, voided, cancelled) has not paid out.
+const FINALIZED_POOL_STATUSES = new Set([
+  "SETTLED",
+  "SETTLEMENT_REVERSED",
+  "REVERSAL_FAILED_MANUAL_REVIEW",
+]);
 
 export type DeleteResult = { error: string | null };
 
-/** Pure guard: an error string if any pool is past the pre-lock phase, else null. */
+/** Pure guard: an error string if any pool has settled/reversed, else null. */
 export function poolsBlockDeletion(pools: { status: string }[]): string | null {
-  const blocked = pools.some((p) => !DELETABLE_POOL_STATUSES.has(p.status));
+  const blocked = pools.some((p) => FINALIZED_POOL_STATUSES.has(p.status));
   return blocked
-    ? "Can't delete: a pool here has already locked or settled. Only pools still open (before lock) can be removed — reverse or finalize the locked pool first."
+    ? "Can't delete: a pool here has already settled (money paid out). Reverse the settlement first if you really need to remove it."
     : null;
 }
 
@@ -42,22 +50,31 @@ async function refundAndDeletePools(
   const poolIds = pools.map((p) => p.id);
   if (poolIds.length === 0) return null;
 
-  // Refund every active entry through the audited money path (credits the fee
-  // back via apply_wallet_transaction) before anything is torn down.
+  // Refund every still-active entry before teardown: credit the fee back via
+  // apply_wallet_transaction — the exact wallet primitive void_pool_entry uses
+  // for its refund — so it works whether the pool is OPEN or already LOCKED
+  // (void_pool_entry itself only accepts OPEN pools). A finalized (SETTLED)
+  // pool never reaches here; it's blocked by the guard. Only ACTIVE entries owe
+  // a refund — a voided/cancelled pool's entries are already REFUNDED. The
+  // per-entry idempotency key makes a retry safe (no double credit).
   const { data: activeEntries, error: activeErr } = await client
     .from("entries")
-    .select("id")
+    .select("id, user_id, amount")
     .in("pool_id", poolIds)
     .eq("status", "ACTIVE");
   if (activeErr) return `Could not read entries: ${activeErr.message}`;
   for (const e of activeEntries ?? []) {
-    const { error: voidErr } = await client.rpc("void_pool_entry", {
-      p_entry_id: e.id,
+    const { error: refundErr } = await client.rpc("apply_wallet_transaction", {
+      p_account_type: "user",
+      p_user_id: e.user_id,
+      p_type: "pool_refund_credit",
+      p_direction: "credit",
+      p_amount: e.amount,
       p_admin_id: actor.id,
       p_reason: "Pool removed by operator",
-      p_idempotency_key: `delete-pool-entry-${e.id}`,
+      p_idempotency_key: `delete-pool-refund-${e.id}`,
     });
-    if (voidErr) return `Could not refund an entry: ${voidErr.message}`;
+    if (refundErr) return `Could not refund an entry: ${refundErr.message}`;
   }
 
   // Detach any wallet top-up requests that named these pools (FK would block).
