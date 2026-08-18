@@ -9,6 +9,7 @@ import { RaceResultSummary } from "@/components/racing/RaceResultSummary";
 import { humanizeEnum } from "@/lib/utils/humanize";
 import { CreateRacingPoolForm } from "@/components/racing/CreateRacingPoolForm";
 import { RaceImageEditor } from "@/components/racing/RaceImageEditor";
+import { CompetitorImageEditor } from "@/components/racing/CompetitorImageEditor";
 import { ResultForm } from "./result-form";
 import { CorrectionForm } from "./correction-form";
 
@@ -26,11 +27,16 @@ export default async function RaceDetailPage({ params }: { params: Promise<{ id:
 
   const { data: rc } = await admin
     .from("race_competitors")
-    .select("competitor_id, competitors ( id, name, number, colors )")
+    .select("competitor_id, competitors ( id, name, number, colors, image_url )")
     .eq("race_id", id)
     .not("competitor_id", "is", null)
     .order("sort_order");
-  const competitors = (rc ?? []).map((r) => r.competitors as unknown as { id: string; name: string | null; number: string | null; colors: string[] | null }).filter(Boolean);
+  const competitors = (rc ?? [])
+    .map((r) => {
+      const c = r.competitors as unknown as { id: string; name: string | null; number: string | null; colors: string[] | null; image_url: string | null };
+      return c ? { id: c.id, name: c.name, number: c.number, colors: c.colors, imageUrl: c.image_url } : null;
+    })
+    .filter((c): c is NonNullable<typeof c> => c !== null);
 
   const { data: confirmed } = await admin.from("race_results").select("id, winner_competitor_id").eq("race_id", id).eq("status", "CONFIRMED").maybeSingle();
   const comp = race.racing_competitions as unknown as { name: string } | null;
@@ -66,9 +72,12 @@ export default async function RaceDetailPage({ params }: { params: Promise<{ id:
 
       <section className="space-y-2">
         <h2 className="text-sm font-semibold">Competitors ({competitors.length})</h2>
-        <ul className="space-y-1">
+        <ul className="space-y-2">
           {competitors.map((c) => (
-            <li key={c.id} className="text-sm"><CompetitorIdentity competitor={c} /></li>
+            <li key={c.id} className="flex items-center justify-between gap-3">
+              <CompetitorIdentity competitor={c} />
+              <CompetitorImageEditor raceId={id} competitorId={c.id} imageUrl={c.imageUrl} />
+            </li>
           ))}
         </ul>
       </section>

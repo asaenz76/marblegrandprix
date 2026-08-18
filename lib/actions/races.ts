@@ -74,3 +74,52 @@ export async function updateRaceImageAction(input: {
   revalidatePath("/");
   return { error: null };
 }
+
+/**
+ * Phase 16: set or clear a competitor's photo. Cosmetic identity only — no
+ * money, grading, or result effect. Authorized against the race's competition
+ * (assigned Organizer or Super Admin); the competitor must belong to that race.
+ * Lets an operator add a photo to an already-created competitor without
+ * recreating the race.
+ */
+export async function updateCompetitorImageAction(input: {
+  raceId: string;
+  competitorId: string;
+  imageUrl: string | null;
+}): Promise<{ error: string | null }> {
+  const admin = createAdminClient();
+  const { data: race } = await admin
+    .from("races")
+    .select("competition_id")
+    .eq("id", input.raceId)
+    .maybeSingle();
+  if (!race) return { error: "That race does not exist." };
+
+  const actor = await requireCompetitionAccess(race.competition_id);
+
+  const { data: link } = await admin
+    .from("race_competitors")
+    .select("competitor_id")
+    .eq("race_id", input.raceId)
+    .eq("competitor_id", input.competitorId)
+    .maybeSingle();
+  if (!link) return { error: "That competitor is not in this race." };
+
+  const parsed = racingImageUrlSchema.safeParse(input.imageUrl);
+  if (!parsed.success) return { error: "That image link is not valid." };
+
+  const { error } = await admin.from("competitors").update({ image_url: parsed.data }).eq("id", input.competitorId);
+  if (error) return { error: "Could not update the competitor image." };
+
+  await writeAuditLog({
+    actorId: actor.id,
+    action: "competitor.image_updated",
+    entityType: "competitor",
+    entityId: input.competitorId,
+    after: { image_url: parsed.data },
+  });
+  revalidatePath(`/racing/races/${input.raceId}`);
+  revalidatePath("/feed");
+  revalidatePath("/");
+  return { error: null };
+}

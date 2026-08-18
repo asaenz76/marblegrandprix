@@ -227,11 +227,14 @@ export function RaceCreateForm({
                 </select>
               ) : (
                 <>
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-4">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                     <Input placeholder="Name" value={r.name} onChange={(e) => update(i, { name: e.target.value })} />
                     <Input placeholder="Number (#7)" value={r.number} onChange={(e) => update(i, { number: e.target.value })} />
                     <Input placeholder="Colors (Red, White)" value={r.colorsText} onChange={(e) => update(i, { colorsText: e.target.value })} />
-                    <Input placeholder="Image URL (optional)" value={r.imageUrl} onChange={(e) => update(i, { imageUrl: e.target.value })} />
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-xs text-text-secondary">Photo (optional)</span>
+                    <RacingImageUploader value={r.imageUrl || null} onChange={(url) => update(i, { imageUrl: url ?? "" })} label="photo" disabled={pending} />
                   </div>
                   <div className="flex items-center justify-between">
                     <label className="flex items-center gap-2 text-xs text-text-secondary">
