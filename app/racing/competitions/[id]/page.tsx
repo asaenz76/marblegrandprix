@@ -12,6 +12,8 @@ import { BracketView } from "@/components/racing/BracketView";
 import { CreateRacingPoolForm } from "@/components/racing/CreateRacingPoolForm";
 import { CompetitionImageEditor } from "@/components/racing/CompetitionImageEditor";
 import { DeleteRacingEntityButton } from "@/components/racing/DeleteRacingEntityButton";
+import { PointsEditor } from "@/components/racing/PointsEditor";
+import { LocalDateTime } from "@/components/LocalDateTime";
 import { OrganizersSection } from "./organizers-section";
 
 // Competition detail + standings (Phase 7). Access re-checked server-side:
@@ -22,7 +24,7 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
   const admin = createAdminClient();
   const { data: comp } = await admin
     .from("racing_competitions")
-    .select("id, name, format, status, winner_competitor_id, image_url")
+    .select("id, name, format, status, winner_competitor_id, image_url, points_config")
     .eq("id", id)
     .maybeSingle();
   if (!comp) notFound();
@@ -32,7 +34,7 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
   const isStandings = comp.format === "CHAMPIONSHIP" || comp.format === "LEAGUE";
   const isBracket = comp.format === "BRACKET" || comp.format === "ELIMINATION";
 
-  const { data: races } = await admin.from("races").select("id, title, status, race_number").eq("competition_id", id).order("race_number", { ascending: true, nullsFirst: false }).order("created_at", { ascending: true });
+  const { data: races } = await admin.from("races").select("id, title, status, race_number, scheduled_start_utc").eq("competition_id", id).order("race_number", { ascending: true, nullsFirst: false }).order("created_at", { ascending: true });
 
   const { data: compPools } = await admin
     .from("pools")
@@ -104,6 +106,16 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
         </section>
       )}
 
+      {canManage && isStandings && (
+        <section className="space-y-2 rounded-md border border-border-subtle p-3">
+          <h2 className="text-sm font-semibold">Championship points</h2>
+          <p className="text-xs text-text-secondary">
+            Points awarded per finishing position across the season. Standings use these live.
+          </p>
+          <PointsEditor competitionId={comp.id} pointsConfig={(comp.points_config as Record<string, number>) ?? {}} />
+        </section>
+      )}
+
       {isStandings && standings ? (
         <section className="space-y-2">
           <h2 className="text-sm font-semibold">Standings</h2>
@@ -138,9 +150,18 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
         ) : (
           <ul className="divide-y divide-border-subtle rounded-md border border-border-subtle">
             {(races ?? []).map((r) => (
-              <li key={r.id} className="flex items-center justify-between px-3 py-2 text-sm">
-                <Link href={`/racing/races/${r.id}`} className="text-accent-primary hover:underline">{r.title ?? "Untitled race"}</Link>
-                <span className="text-text-secondary">
+              <li key={r.id} className="flex items-center justify-between gap-2 px-3 py-2 text-sm">
+                <div className="min-w-0">
+                  <Link href={`/racing/races/${r.id}`} className="text-accent-primary hover:underline">{r.title ?? "Untitled race"}</Link>
+                  <p className="text-xs text-text-muted">
+                    {r.scheduled_start_utc ? (
+                      <LocalDateTime iso={r.scheduled_start_utc} options={{ dateStyle: "medium", timeStyle: "short" }} />
+                    ) : (
+                      "No date set"
+                    )}
+                  </p>
+                </div>
+                <span className="shrink-0 text-text-secondary">
                   {confirmedByRace.has(r.id) ? "Result confirmed" : humanizeEnum(r.status)}
                 </span>
               </li>

@@ -60,6 +60,50 @@ export async function deleteRaceAction(input: { raceId: string }): Promise<{ err
 // A public racing-image URL (from /api/racing-image) or null to clear it.
 const racingImageUrlSchema = z.string().trim().url().max(2048).nullable();
 
+const raceScheduleSchema = z
+  .object({
+    title: z.string().trim().min(1, "A race needs a title.").max(120),
+    scheduledStartUtc: z.string().datetime({ offset: true }).nullable(),
+  })
+  .strict();
+
+/**
+ * Phase 19: edit a race's title and scheduled date/time after creation.
+ * Authorized against the race's competition (assigned Organizer or Super Admin).
+ * Doesn't touch results or an existing pool's own lock time.
+ */
+export async function updateRaceScheduleAction(input: {
+  raceId: string;
+  title: string;
+  scheduledStartUtc: string | null;
+}): Promise<{ error: string | null }> {
+  const admin = createAdminClient();
+  const { data: race } = await admin.from("races").select("competition_id").eq("id", input.raceId).maybeSingle();
+  if (!race) return { error: "That race does not exist." };
+
+  const actor = await requireCompetitionAccess(race.competition_id);
+  const parsed = raceScheduleSchema.safeParse({ title: input.title, scheduledStartUtc: input.scheduledStartUtc });
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Invalid schedule." };
+
+  const { error } = await admin
+    .from("races")
+    .update({ title: parsed.data.title, scheduled_start_utc: parsed.data.scheduledStartUtc })
+    .eq("id", input.raceId);
+  if (error) return { error: "Could not update the race." };
+
+  await writeAuditLog({
+    actorId: actor.id,
+    action: "race.schedule_updated",
+    entityType: "race",
+    entityId: input.raceId,
+    after: { title: parsed.data.title, scheduled_start_utc: parsed.data.scheduledStartUtc },
+  });
+  revalidatePath(`/racing/races/${input.raceId}`);
+  revalidatePath(`/racing/competitions/${race.competition_id}`);
+  revalidatePath("/racing/races");
+  return { error: null };
+}
+
 /**
  * Phase 16: set or clear a race's rounded icon. Cosmetic identity only — no
  * money, grading, or result effect. Authorized against the race's competition

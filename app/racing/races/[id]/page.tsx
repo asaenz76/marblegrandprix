@@ -10,7 +10,9 @@ import { humanizeEnum } from "@/lib/utils/humanize";
 import { CreateRacingPoolForm } from "@/components/racing/CreateRacingPoolForm";
 import { RaceImageEditor } from "@/components/racing/RaceImageEditor";
 import { CompetitorImageEditor } from "@/components/racing/CompetitorImageEditor";
+import { RaceScheduleEditor } from "@/components/racing/RaceScheduleEditor";
 import { DeleteRacingEntityButton } from "@/components/racing/DeleteRacingEntityButton";
+import { LocalDateTime } from "@/components/LocalDateTime";
 import { ResultForm } from "./result-form";
 import { CorrectionForm } from "./correction-form";
 
@@ -69,6 +71,18 @@ export default async function RaceDetailPage({ params }: { params: Promise<{ id:
       <section className="space-y-2">
         <h2 className="text-sm font-semibold">Icon</h2>
         <RaceImageEditor raceId={race.id} imageUrl={race.image_url} />
+      </section>
+
+      <section className="space-y-2">
+        <h2 className="text-sm font-semibold">Schedule</h2>
+        <p className="text-sm text-text-secondary">
+          {race.scheduled_start_utc ? (
+            <LocalDateTime iso={race.scheduled_start_utc} options={{ dateStyle: "full", timeStyle: "short" }} />
+          ) : (
+            "No date set."
+          )}
+        </p>
+        <RaceScheduleEditor raceId={race.id} title={race.title ?? "Race"} scheduledStartUtc={race.scheduled_start_utc} />
       </section>
 
       <section className="space-y-2">

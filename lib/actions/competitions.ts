@@ -11,6 +11,7 @@ import {
 } from "@/lib/racing/finalize-competition";
 import { createCompetitionForActor, type CreateCompetitionInput, type CreateCompetitionResult } from "@/lib/racing/create-competition";
 import { deleteCompetitionForActor } from "@/lib/racing/delete-racing";
+import { pointsConfigSchema } from "@/lib/racing/points";
 import { writeAuditLog } from "@/lib/audit/log";
 
 /**
@@ -39,6 +40,36 @@ export async function createCompetitionAction(input: CreateCompetitionInput): Pr
 
 // A public racing-image URL (from /api/racing-image) or null to clear it.
 const racingImageUrlSchema = z.string().trim().url().max(2048).nullable();
+
+/**
+ * Phase 19: edit a competition's championship points table (position -> points),
+ * used live by standings. Scoped to whoever manages the competition (assigned
+ * Organizer or Super Admin). Standings recompute from this immediately.
+ */
+export async function updateCompetitionPointsAction(input: {
+  competitionId: string;
+  pointsConfig: Record<string, number>;
+}): Promise<{ error: string | null }> {
+  const actor = await requireCompetitionAccess(input.competitionId);
+  const parsed = pointsConfigSchema.safeParse(input.pointsConfig);
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Invalid points table." };
+
+  const { error } = await createAdminClient()
+    .from("racing_competitions")
+    .update({ points_config: parsed.data })
+    .eq("id", input.competitionId);
+  if (error) return { error: "Could not update the points table." };
+
+  await writeAuditLog({
+    actorId: actor.id,
+    action: "racing_competition.points_updated",
+    entityType: "racing_competition",
+    entityId: input.competitionId,
+    after: { points_config: parsed.data },
+  });
+  revalidatePath(`/racing/competitions/${input.competitionId}`);
+  return { error: null };
+}
 
 /**
  * Phase 16: set or clear a competition's rounded icon. Cosmetic identity only —
