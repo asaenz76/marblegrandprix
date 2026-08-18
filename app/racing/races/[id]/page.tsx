@@ -10,6 +10,7 @@ import { humanizeEnum } from "@/lib/utils/humanize";
 import { CreateRacingPoolForm } from "@/components/racing/CreateRacingPoolForm";
 import { RaceImageEditor } from "@/components/racing/RaceImageEditor";
 import { CompetitorImageEditor } from "@/components/racing/CompetitorImageEditor";
+import { DeleteRacingEntityButton } from "@/components/racing/DeleteRacingEntityButton";
 import { ResultForm } from "./result-form";
 import { CorrectionForm } from "./correction-form";
 
@@ -123,6 +124,13 @@ export default async function RaceDetailPage({ params }: { params: Promise<{ id:
           />
         )}
       </section>
+
+      {canCorrect && (
+        <section className="space-y-2 rounded-md border border-destructive/30 p-3">
+          <h2 className="text-sm font-semibold text-destructive">Danger zone</h2>
+          <DeleteRacingEntityButton kind="race" id={race.id} name={race.title ?? "Race"} />
+        </section>
+      )}
     </div>
   );
 }

@@ -3,9 +3,10 @@
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { requireCompetitionAccess, requireOrganizerOrAbove } from "@/lib/auth/session";
+import { requireCompetitionAccess, requireOrganizerOrAbove, requireSuperAdmin } from "@/lib/auth/session";
 import { writeAuditLog } from "@/lib/audit/log";
 import { createRaceForActor, type CreateRaceResult } from "@/lib/racing/create-race";
+import { deleteRaceForActor } from "@/lib/racing/delete-racing";
 import type { CreateRaceInput } from "@/lib/validations/races";
 
 /**
@@ -31,6 +32,29 @@ export async function createRaceAction(input: CreateRaceInput): Promise<CreateRa
     revalidatePath("/admin/races");
   }
   return result;
+}
+
+/**
+ * Phase 17: permanently delete a race and everything under it (its race-only
+ * competitors and pools). Super-Admin only. Live entries are refunded through
+ * the audited money path; a locked/settled pool blocks the delete. Irreversible.
+ */
+export async function deleteRaceAction(input: { raceId: string }): Promise<{ error: string | null }> {
+  const actor = await requireSuperAdmin();
+  const res = await deleteRaceForActor(createAdminClient(), actor, input.raceId);
+  if (!res.error) {
+    await writeAuditLog({
+      actorId: actor.id,
+      action: "race.deleted",
+      entityType: "race",
+      entityId: input.raceId,
+    });
+    revalidatePath("/racing/races");
+    revalidatePath("/racing");
+    revalidatePath("/feed");
+    revalidatePath("/");
+  }
+  return res;
 }
 
 // A public racing-image URL (from /api/racing-image) or null to clear it.

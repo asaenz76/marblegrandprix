@@ -11,6 +11,7 @@ import { FinalizeForm } from "./finalize-form";
 import { BracketView } from "@/components/racing/BracketView";
 import { CreateRacingPoolForm } from "@/components/racing/CreateRacingPoolForm";
 import { CompetitionImageEditor } from "@/components/racing/CompetitionImageEditor";
+import { DeleteRacingEntityButton } from "@/components/racing/DeleteRacingEntityButton";
 import { OrganizersSection } from "./organizers-section";
 
 // Competition detail + standings (Phase 7). Access re-checked server-side:
@@ -181,6 +182,13 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
 
       {superAdmin && (
         <OrganizersSection competitionId={comp.id} assigned={assignedOrganizers} assignable={assignableOrganizers} />
+      )}
+
+      {superAdmin && (
+        <section className="space-y-2 rounded-md border border-destructive/30 p-3">
+          <h2 className="text-sm font-semibold text-destructive">Danger zone</h2>
+          <DeleteRacingEntityButton kind="competition" id={comp.id} name={comp.name} />
+        </section>
       )}
     </div>
   );

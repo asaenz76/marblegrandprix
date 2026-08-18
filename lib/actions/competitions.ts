@@ -10,6 +10,7 @@ import {
   type FinalizeResult,
 } from "@/lib/racing/finalize-competition";
 import { createCompetitionForActor, type CreateCompetitionInput, type CreateCompetitionResult } from "@/lib/racing/create-competition";
+import { deleteCompetitionForActor } from "@/lib/racing/delete-racing";
 import { writeAuditLog } from "@/lib/audit/log";
 
 /**
@@ -72,6 +73,30 @@ export async function updateCompetitionImageAction(input: {
   revalidatePath("/feed");
   revalidatePath("/");
   return { error: null };
+}
+
+/**
+ * Phase 17: permanently delete a competition and everything under it (races,
+ * race-only competitors, and pools). Super-Admin only. Live entries are
+ * refunded through the audited money path; pools that have locked or settled
+ * block the delete. Destructive and irreversible.
+ */
+export async function deleteCompetitionAction(input: { competitionId: string }): Promise<{ error: string | null }> {
+  const actor = await requireSuperAdmin();
+  const res = await deleteCompetitionForActor(createAdminClient(), actor, input.competitionId);
+  if (!res.error) {
+    await writeAuditLog({
+      actorId: actor.id,
+      action: "racing_competition.deleted",
+      entityType: "racing_competition",
+      entityId: input.competitionId,
+    });
+    revalidatePath("/racing/competitions");
+    revalidatePath("/racing");
+    revalidatePath("/feed");
+    revalidatePath("/");
+  }
+  return res;
 }
 
 export async function finalizeCompetitionAction(input: { competitionId: string }): Promise<FinalizeResult> {
