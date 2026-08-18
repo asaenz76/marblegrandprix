@@ -94,8 +94,10 @@ async function refundAndDeletePools(
     if (error) return `Could not clear settlement payouts: ${error.message}`;
   }
   for (const step of [
+    () => client.from("notifications").delete().in("pool_id", poolIds),
     () => client.from("settlements").delete().in("pool_id", poolIds),
     () => client.from("correct_prediction_log").delete().in("pool_id", poolIds),
+    () => client.from("pool_combo_legs").delete().in("pool_id", poolIds), // no-op for racing pools
     () => client.from("entries").delete().in("pool_id", poolIds),
     () => client.from("pool_options").delete().in("pool_id", poolIds),
     // pool_likes / pool_comments cascade on pool delete.

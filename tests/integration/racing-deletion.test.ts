@@ -58,6 +58,9 @@ describe.skipIf(!SR)("Phase 17 — delete competitions and races", () => {
     const player = await makeUser("player", 5000);
     await enter(poolId, player.id, firstOption); // debited 1000 -> 4000
     expect(await balance(player.id)).toBe(4000);
+    // A pool-scoped notification (as real pool activity generates) must not
+    // block the teardown via its RESTRICT FK.
+    await admin.from("notifications").insert({ user_id: player.id, type: "pool_update", title: "t", body: "b", pool_id: poolId });
 
     const res = await deleteCompetitionForActor(admin, sa, competitionId);
     expect(res.error).toBeNull();
