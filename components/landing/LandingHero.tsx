@@ -48,20 +48,20 @@ export function LandingHero({ heroPool }: { heroPool: SocialPoolCardViewModel | 
         </ul>
       </div>
 
-      {heroPool && (
-        <div className="mx-auto w-full max-w-sm lg:mx-0 lg:ml-auto">
-          <PoolPreviewCard viewModel={heroPool} />
-        </div>
-      )}
-      {!heroPool && (
-        <div className="hidden lg:block">
-          <PhoneFrame>
-            <div className="flex h-64 items-center justify-center text-sm text-text-muted">
+      {/* The preview always lives inside the phone frame — its fixed height +
+          internal scroll keeps a big pool (e.g. a 16-competitor championship)
+          from blowing out the hero, and matches the showcase section below. */}
+      <div className="mx-auto w-full lg:mx-0 lg:ml-auto">
+        <PhoneFrame>
+          {heroPool ? (
+            <PoolPreviewCard viewModel={heroPool} />
+          ) : (
+            <div className="flex h-full items-center justify-center text-sm text-text-muted">
               New pools open soon.
             </div>
-          </PhoneFrame>
-        </div>
-      )}
+          )}
+        </PhoneFrame>
+      </div>
     </section>
   );
 }
