@@ -100,8 +100,8 @@ export default async function RulesPage() {
             <h2>Wallet, deposits, and withdrawals</h2>
             <p>
               Your wallet balance is a running record, not money actually held by the app. Every
-              deposit and withdrawal happens off-platform, using whatever method your group&apos;s
-              admins accept (bank transfer, mobile payment, cash, etc.).
+              deposit and withdrawal happens off-platform, using whatever method is made available
+              by the platform admin (bank transfer, mobile payment, cash, etc.).
             </p>
             <p>
               To add or remove funds, submit a request from your wallet page describing what you
