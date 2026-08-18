@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createRaceAction } from "@/lib/actions/races";
 import { CompetitorIdentity } from "@/components/racing/CompetitorIdentity";
 import { RacingImageUploader } from "@/components/racing/RacingImageUploader";
+import { ColorChips } from "@/components/racing/ColorChips";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -227,10 +228,16 @@ export function RaceCreateForm({
                 </select>
               ) : (
                 <>
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <Input placeholder="Name" value={r.name} onChange={(e) => update(i, { name: e.target.value })} />
                     <Input placeholder="Number (#7)" value={r.number} onChange={(e) => update(i, { number: e.target.value })} />
-                    <Input placeholder="Colors (Red, White)" value={r.colorsText} onChange={(e) => update(i, { colorsText: e.target.value })} />
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-xs text-text-secondary">Colors (up to 4, optional)</span>
+                    <ColorChips
+                      value={r.colorsText.split(",").map((c) => c.trim()).filter(Boolean).slice(0, 4)}
+                      onChange={(colors) => update(i, { colorsText: colors.join(", ") })}
+                    />
                   </div>
                   <div className="space-y-1">
                     <span className="text-xs text-text-secondary">Photo (optional)</span>
