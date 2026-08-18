@@ -36,6 +36,10 @@ interface PoolLeagueHeaderProps {
   // Phase 9: racing pools have no football competition to name here — pass a
   // neutral label ("Race pool"/"Competition pool") instead of "Custom Poll".
   overrideLabel?: string;
+  // Phase 16: racing pools have no football competition logo — pass the
+  // competition's uploaded rounded icon here so it shows as the card's
+  // top-line identity on every racing card (race pools included).
+  overrideLogoUrl?: string | null;
 }
 
 function relativeTime(iso: string): string {
@@ -92,6 +96,7 @@ export function PoolLeagueHeader({
   hasEntered = false,
   leagueFollow = null,
   overrideLabel,
+  overrideLogoUrl = null,
 }: PoolLeagueHeaderProps) {
   // relativeTime()/countdown() below are pure reads of Date.now() — with
   // nothing else ticking this component's re-render (no interval anywhere
@@ -120,6 +125,11 @@ export function PoolLeagueHeader({
       {poolType === "COMBO" ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src="/logo-combo.svg" alt="" className="size-8 rounded-full object-contain" />
+      ) : overrideLogoUrl ? (
+        // Racing competition icon (Phase 16): a photo/logo, so cover-fit like
+        // an avatar rather than contain-fit like a provider crest.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={overrideLogoUrl} alt="" className="size-8 rounded-full object-cover" />
       ) : competitionLogoUrl ? (
         // External provider logos (arbitrary CDN domains) — plain <img>
         // rather than next/image, same reasoning as MatchIdentity's team

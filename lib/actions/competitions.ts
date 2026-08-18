@@ -68,6 +68,9 @@ export async function updateCompetitionImageAction(input: {
   });
   revalidatePath(`/racing/competitions/${input.competitionId}`);
   revalidatePath("/racing/competitions");
+  // The icon is the card's top-line identity everywhere a racing pool renders.
+  revalidatePath("/feed");
+  revalidatePath("/");
   return { error: null };
 }
 

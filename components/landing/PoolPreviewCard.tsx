@@ -40,6 +40,7 @@ export function PoolPreviewCard({ viewModel }: { viewModel: SocialPoolCardViewMo
               (viewModel.racing.scope === "COMPETITION" ? "Competition pool" : "Race pool"))
             : undefined
         }
+        overrideLogoUrl={viewModel.racing?.competitionImageUrl ?? null}
       />
 
       {viewModel.fixture.homeTeamName && <MatchIdentity fixture={viewModel.fixture} />}

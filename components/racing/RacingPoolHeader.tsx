@@ -12,12 +12,11 @@ import { humanizeEnum } from "@/lib/utils/humanize";
  * read as one product family. No fixture/home/away/draw.
  */
 export function RacingPoolHeader({ racing }: { racing: RacingPoolContext }) {
-  // Rounded icon (Phase 16): the race's own image for a RACE pool (falling back
-  // to its competition's), or the competition's image for a COMPETITION pool.
-  const iconUrl =
-    racing.scope === "RACE"
-      ? (racing.raceImageUrl ?? racing.competitionImageUrl)
-      : racing.competitionImageUrl;
+  // Rounded icon (Phase 16): the race's own image, shown next to the race
+  // title. The competition icon lives on the card's top line (PoolLeagueHeader)
+  // for every racing pool, so it isn't repeated here — a COMPETITION pool's
+  // identity is entirely the top line.
+  const iconUrl = racing.scope === "RACE" ? racing.raceImageUrl : null;
   return (
     <div className="flex items-center gap-2">
       {iconUrl && (

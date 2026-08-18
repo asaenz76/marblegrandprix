@@ -150,6 +150,7 @@ export function SocialPoolCard({
                   (viewModel.racing.scope === "COMPETITION" ? "Competition pool" : "Race pool"))
                 : undefined
             }
+            overrideLogoUrl={viewModel.racing?.competitionImageUrl ?? null}
           />
         </div>
         {collapsible && (

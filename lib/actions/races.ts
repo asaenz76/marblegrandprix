@@ -69,5 +69,8 @@ export async function updateRaceImageAction(input: {
   });
   revalidatePath(`/racing/races/${input.raceId}`);
   revalidatePath("/racing/races");
+  // The race icon shows on its pool cards in the feed/landing too.
+  revalidatePath("/feed");
+  revalidatePath("/");
   return { error: null };
 }
