@@ -6,6 +6,8 @@ import { Podium } from "@/components/leaderboard/Podium";
 import { RankedList } from "@/components/leaderboard/RankedList";
 import { PhoneFrame } from "./PhoneFrame";
 import { PoolPreviewCard } from "./PoolPreviewCard";
+import { LandingCompetitionGroup } from "./LandingCompetitionGroup";
+import { groupPoolsByCompetition } from "@/lib/pools/feed-grouping";
 
 const NIL_USER_ID = "00000000-0000-0000-0000-000000000000";
 
@@ -64,9 +66,13 @@ export function ProductShowcase({
               description="See which races the community is calling, and jump in."
             >
               <div className="space-y-3">
-                {feedPools.map((vm) => (
-                  <PoolPreviewCard key={vm.poolId} viewModel={vm} />
-                ))}
+                {groupPoolsByCompetition(feedPools).map((item) =>
+                  item.kind === "competition" ? (
+                    <LandingCompetitionGroup key={`comp-${item.competitionId}`} group={item} />
+                  ) : (
+                    <PoolPreviewCard key={item.vm.poolId} viewModel={item.vm} />
+                  ),
+                )}
               </div>
             </ShowcasePanel>
           )}

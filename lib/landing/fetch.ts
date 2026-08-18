@@ -205,10 +205,12 @@ export async function getLandingPageData(): Promise<LandingPageData> {
     .filter((p, i, arr) => arr.findIndex((x) => x.id === p.id) === i);
   // A single real open pool is still a real feed — better to show the
   // hero pool a second time here than to leave "Your feed" empty just
-  // because there's nothing else open yet.
+  // because there's nothing else open yet. Widened past 2 so a competition's
+  // winner + race pools can appear together and fold into one nested card
+  // (groupPoolsByCompetition collapses the races, so it stays compact).
   const feedCandidates = (otherPools.length > 0 ? otherPools : heroCandidate ? [heroCandidate] : []).slice(
     0,
-    2,
+    8,
   );
 
   const [heroPool, feedPools] = await Promise.all([

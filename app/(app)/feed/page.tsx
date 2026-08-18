@@ -7,6 +7,8 @@ import { getPoolCardViewModels } from "@/lib/pools/fetch";
 import { getPaymentMethods } from "@/lib/payment-methods/fetch";
 import { effectivePoolStatus } from "@/lib/pools/status-filter";
 import { SocialPoolCard } from "@/components/pools/SocialPoolCard";
+import { CompetitionGroupCard } from "@/components/pools/CompetitionGroupCard";
+import { groupPoolsByCompetition } from "@/lib/pools/feed-grouping";
 import { EmptyFeedState } from "@/components/EmptyFeedState";
 import { StoriesRow, type StoryEntry } from "@/components/feed/StoriesRow";
 import { FeedFilters } from "./feed-filters";
@@ -168,15 +170,25 @@ export default async function FeedPage({
           }
         />
       ) : (
-        viewModels.map((vm) => (
-          <SocialPoolCard
-            key={vm.poolId}
-            viewModel={vm}
-            balanceCents={balanceCents}
-            paymentMethods={enabledPaymentMethods}
-            viewer={{ id: user.id, isModerator: isAdminOrAbove(user) }}
-          />
-        ))
+        groupPoolsByCompetition(viewModels).map((item) =>
+          item.kind === "competition" ? (
+            <CompetitionGroupCard
+              key={`comp-${item.competitionId}`}
+              group={item}
+              balanceCents={balanceCents}
+              paymentMethods={enabledPaymentMethods}
+              viewer={{ id: user.id, isModerator: isAdminOrAbove(user) }}
+            />
+          ) : (
+            <SocialPoolCard
+              key={item.vm.poolId}
+              viewModel={item.vm}
+              balanceCents={balanceCents}
+              paymentMethods={enabledPaymentMethods}
+              viewer={{ id: user.id, isModerator: isAdminOrAbove(user) }}
+            />
+          ),
+        )
       )}
     </div>
   );
