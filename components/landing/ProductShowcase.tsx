@@ -51,7 +51,7 @@ export function ProductShowcase({
   let panelIndex = 0;
 
   return (
-    <section className="border-y border-border-subtle bg-[#3b2114] py-16 text-inverted-surface-foreground">
+    <section className="border-y border-border-subtle bg-inverted-surface py-16 text-inverted-surface-foreground dark:bg-[#3b2114]">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <h2 className="text-balance text-center font-display text-2xl font-extrabold sm:text-3xl">
           Built for <span className="text-[#ffc440]">competition</span>. Made for{" "}
