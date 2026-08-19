@@ -29,10 +29,10 @@ export function HowItWorks() {
         {STEPS.map(({ icon: Icon, title, description }, i) => (
           <div key={title} className="space-y-3 text-center sm:text-left">
             <div className="flex items-center justify-center gap-2.5 sm:justify-start">
-              <span className="flex size-9 items-center justify-center rounded-full bg-accent-primary-subtle text-sm font-semibold text-accent-primary">
+              <span className="flex size-9 items-center justify-center rounded-full bg-black text-sm font-semibold text-[#ffe100]">
                 {i + 1}
               </span>
-              <Icon className="size-5 text-accent-primary" aria-hidden="true" />
+              <Icon className="size-5 text-text-primary" aria-hidden="true" />
             </div>
             <h3 className="text-lg font-semibold text-text-primary">{title}</h3>
             <p className="text-sm text-text-secondary">{description}</p>
