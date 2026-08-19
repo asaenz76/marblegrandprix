@@ -17,7 +17,13 @@ import { AvatarStack } from "@/components/pools/AvatarStack";
 // recreation of it. No entry sheet, no like/comment actions, no realtime
 // subscription: nothing here is clickable, matching a marketing page's
 // "look, don't touch" expectation.
-export function PoolPreviewCard({ viewModel }: { viewModel: SocialPoolCardViewModel }) {
+export function PoolPreviewCard({
+  viewModel,
+  hideEconomics = false,
+}: {
+  viewModel: SocialPoolCardViewModel;
+  hideEconomics?: boolean;
+}) {
   const isPreVote = viewModel.status === "OPEN_PRE_VOTE";
   const isPostVote = viewModel.status === "OPEN_POST_VOTE";
   const showDistribution = isPreVote || isPostVote;
@@ -99,16 +105,20 @@ export function PoolPreviewCard({ viewModel }: { viewModel: SocialPoolCardViewMo
         })}
       </div>
 
-      <p className="text-xs text-text-muted">
-        Entry {formatCents(viewModel.entryFee)} · Platform Fee{" "}
-        {formatBps(viewModel.houseFeeBasisPoints)}
-        {showDistribution && (
-          <>
-            {" · Requires "}
-            {viewModel.minTotalEntries}+ entries to run
-          </>
-        )}
-      </p>
+      {(!hideEconomics || showDistribution) && (
+        <p className="text-xs text-text-muted">
+          {!hideEconomics && (
+            <>
+              Entry {formatCents(viewModel.entryFee)} · Platform Fee {formatBps(viewModel.houseFeeBasisPoints)}
+            </>
+          )}
+          {showDistribution && (
+            <>
+              {!hideEconomics && " · "}Requires {viewModel.minTotalEntries}+ entries to run
+            </>
+          )}
+        </p>
+      )}
     </article>
   );
 }

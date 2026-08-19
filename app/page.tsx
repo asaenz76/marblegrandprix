@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getRegistrationEnabled } from "@/lib/settings/registration";
-import { getLandingPageData } from "@/lib/landing/fetch";
+import { getHomepageData } from "@/lib/landing/fetch";
 import { LandingPage } from "@/components/landing/LandingPage";
 
 // Marketing/beta-signup home page. Only shown while self-service
@@ -19,6 +19,6 @@ export default async function Home() {
   const registrationEnabled = await getRegistrationEnabled();
   if (!registrationEnabled) redirect("/login");
 
-  const data = await getLandingPageData();
+  const data = await getHomepageData();
   return <LandingPage data={data} />;
 }

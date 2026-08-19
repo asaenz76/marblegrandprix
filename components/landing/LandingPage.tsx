@@ -1,26 +1,39 @@
-import type { LandingPageData } from "@/lib/landing/fetch";
+import type { HomepageData } from "@/lib/landing/fetch";
 import { LandingNav } from "./LandingNav";
-import { LandingHero } from "./LandingHero";
-import { ActivityStrip } from "./ActivityStrip";
-import { HowItWorks } from "./HowItWorks";
-import { ProductShowcase } from "./ProductShowcase";
-import { FormatsSection } from "./FormatsSection";
-import { BetaStats } from "./BetaStats";
-import { FinalCta } from "./FinalCta";
 import { LandingFooter } from "./LandingFooter";
+import { HomeHero } from "./home/HomeHero";
+import { RaceWeekTracker } from "./home/RaceWeekTracker";
+import { PracticeRaceCard } from "./home/PracticeRaceCard";
+import { ChampionshipStandings } from "./home/ChampionshipStandings";
+import { UpcomingGrandPrix } from "./home/UpcomingGrandPrix";
+import { MeetTheGrid } from "./home/MeetTheGrid";
+import { GrandPrixEntry } from "./home/GrandPrixEntry";
+import { HowRaceWeekWorks } from "./home/HowRaceWeekWorks";
+import { LatestResult } from "./home/LatestResult";
+import { PlayerLeaderboard } from "./home/PlayerLeaderboard";
 
-export function LandingPage({ data }: { data: LandingPageData }) {
+/**
+ * Public homepage (v2) — a recurring motorsport competition, not a menu of game
+ * formats. Modules follow the spec hierarchy: the next official Grand Prix owns
+ * the top; the free weekday Practice Race drives daily return; standings, the
+ * schedule, and the grid build attachment to the championship; the paid Grand
+ * Prix entry stays tied to the featured event.
+ */
+export function LandingPage({ data }: { data: HomepageData }) {
   return (
-    <div className="flex min-h-full flex-col">
+    <div className="min-h-screen bg-background text-foreground">
       <LandingNav />
-      <main className="flex-1">
-        <LandingHero heroPool={data.heroPool} />
-        <ActivityStrip items={data.activity} />
-        <HowItWorks />
-        <ProductShowcase feedPools={data.feedPools} leaderboard={data.leaderboard} />
-        <FormatsSection />
-        <BetaStats stats={data.stats} />
-        <FinalCta />
+      <main className="space-y-14 pb-20">
+        <HomeHero championship={data.championship} nextGrandPrix={data.nextGrandPrix} />
+        <RaceWeekTracker />
+        <PracticeRaceCard pool={data.practiceRace} />
+        <ChampionshipStandings rows={data.standings} />
+        <UpcomingGrandPrix rounds={data.upcomingRounds} />
+        <MeetTheGrid grid={data.grid} />
+        <GrandPrixEntry pool={data.grandPrixPool} grandPrix={data.nextGrandPrix} />
+        <HowRaceWeekWorks />
+        <LatestResult result={data.latestResult} />
+        <PlayerLeaderboard entries={data.leaderboard} />
       </main>
       <LandingFooter />
     </div>

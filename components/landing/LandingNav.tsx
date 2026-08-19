@@ -14,9 +14,10 @@ export function LandingNav() {
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
         <Wordmark variant="responsive" size="lg" />
         <nav className="hidden items-center gap-6 text-sm font-medium text-text-secondary sm:flex">
-          <a href="#how-it-works" className="hover:text-text-primary">
-            How it works
-          </a>
+          <a href="#schedule" className="hover:text-text-primary">Championship</a>
+          <a href="#schedule" className="hover:text-text-primary">Schedule</a>
+          <a href="#standings" className="hover:text-text-primary">Standings</a>
+          <a href="#how-it-works" className="hover:text-text-primary">How it works</a>
         </nav>
         <div className="flex items-center gap-2">
           <InstallAppButton />

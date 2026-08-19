@@ -1,7 +1,10 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { buildPoolCardViewModel, type SocialPoolCardViewModel } from "@/lib/pools/view-model";
-import { getRacingPoolContexts } from "@/lib/racing/pool-presentation";
+import { getRacingPoolContexts, getRaceResultView } from "@/lib/racing/pool-presentation";
+import { computeStandings } from "@/lib/racing/standings";
+
+const NIL_UUID = "00000000-0000-0000-0000-000000000000";
 
 export interface LandingStats {
   betaTesters: number;
@@ -258,6 +261,259 @@ export async function getLandingPageData(): Promise<LandingPageData> {
     leaderboard,
     activity,
     sampleAnalytics,
+  };
+}
+
+// ============================================================================
+// Homepage (v2) — motorsport "Grand Prix Championship" model.
+// Practice Race = free Single-Race pool; Grand Prix = a Championship race with
+// a cash pool. All read-only, from the same admin client. Qualifying/grid are
+// deferred, so those modules render a simplified state for now.
+// ============================================================================
+
+export interface MarbleIdentity {
+  id: string;
+  name: string | null;
+  number: string | null;
+  colors: string[];
+  imageUrl: string | null;
+}
+
+export interface HomeStandingRow {
+  /** Championship position (1-based); null when tied on points with another. */
+  position: number | null;
+  marble: MarbleIdentity;
+  points: number;
+  wins: number;
+  /** Points behind the leader (0 for the leader). */
+  gapToLeader: number;
+}
+
+export interface HomeRound {
+  raceId: string;
+  title: string;
+  roundNumber: number | null;
+  scheduledStartUtc: string | null;
+  status: string;
+  /** Confirmed winner marble, when the round has a confirmed result. */
+  winner: MarbleIdentity | null;
+}
+
+export interface HomepageData {
+  championship: { id: string; name: string; imageUrl: string | null; status: string } | null;
+  /** The next official Grand Prix round (a scheduled championship race). */
+  nextGrandPrix: HomeRound | null;
+  /** The paid cash pool tied to the next Grand Prix (or the championship winner pool). */
+  grandPrixPool: SocialPoolCardViewModel | null;
+  /** An open free Single-Race pool — "Today's Practice Race". */
+  practiceRace: SocialPoolCardViewModel | null;
+  /** Top-5 championship standings. */
+  standings: HomeStandingRow[];
+  /** Every marble in the championship, standings order — "Meet the Grid". */
+  grid: HomeStandingRow[];
+  /** Next official Grand Prix rounds (up to 5). */
+  upcomingRounds: HomeRound[];
+  /** Latest confirmed Grand Prix result + podium. */
+  latestResult: { round: HomeRound; winner: MarbleIdentity | null; podium: MarbleIdentity[] } | null;
+  leaderboard: LandingLeaderboardEntry[];
+  stats: LandingStats;
+}
+
+function mapLeaderboard(rows: unknown): LandingLeaderboardEntry[] {
+  return ((rows as Array<Record<string, unknown>>) ?? []).slice(0, 5).map((row) => ({
+    userId: row.user_id as string,
+    displayName: row.display_name as string,
+    username: (row.username as string | null) ?? null,
+    avatarUrl: (row.avatar_url as string | null) ?? null,
+    correctCount: (row.correct_count as number) ?? 0,
+    totalCount: (row.total_count as number) ?? 0,
+    rank: (row.rank as number) ?? 0,
+  }));
+}
+
+// Distinct marble identities across a championship's races (competitors attach
+// to races, never directly to a competition).
+async function loadMarbles(
+  admin: ReturnType<typeof createAdminClient>,
+  raceIds: string[],
+): Promise<Map<string, MarbleIdentity>> {
+  const map = new Map<string, MarbleIdentity>();
+  if (raceIds.length === 0) return map;
+  const { data } = await admin
+    .from("race_competitors")
+    .select("competitor_id, competitors ( id, name, number, colors, image_url )")
+    .in("race_id", raceIds)
+    .not("competitor_id", "is", null);
+  for (const row of (data ?? []) as Array<{ competitors: unknown }>) {
+    const c = row.competitors as { id: string; name: string | null; number: string | null; colors: string[] | null; image_url: string | null } | null;
+    if (c && !map.has(c.id)) {
+      map.set(c.id, { id: c.id, name: c.name, number: c.number, colors: c.colors ?? [], imageUrl: c.image_url });
+    }
+  }
+  return map;
+}
+
+export async function getHomepageData(): Promise<HomepageData> {
+  const admin = createAdminClient();
+  const nowIso = new Date().toISOString();
+
+  const [
+    { count: betaTesters },
+    { count: predictionsMade },
+    { count: poolsCompleted },
+    { data: leaderboardRows },
+    { data: champRows },
+    { data: practicePools },
+  ] = await Promise.all([
+    admin.from("user_profiles").select("id", { count: "exact", head: true }).eq("role", "player").eq("is_active", true),
+    admin.from("entries").select("id", { count: "exact", head: true }),
+    admin.from("pools").select("id", { count: "exact", head: true }).eq("status", "SETTLED"),
+    admin.rpc("get_leaderboard", { p_scope: "global", p_range: "all_time", p_caller_id: NIL_UUID }),
+    admin
+      .from("racing_competitions")
+      .select("id, name, image_url, status")
+      .eq("format", "CHAMPIONSHIP")
+      .neq("status", "CANCELLED")
+      .order("created_at", { ascending: false }),
+    // Today's Practice Race: an open free Single-Race (RACE_WINNER) pool.
+    admin
+      .from("pools")
+      .select("*")
+      .eq("status", "OPEN")
+      .eq("stakes", "FREE")
+      .eq("template_id", "RACE_WINNER")
+      .gt("locks_at", nowIso)
+      .order("locks_at", { ascending: true })
+      .limit(1),
+  ]);
+
+  const stats: LandingStats = {
+    betaTesters: betaTesters ?? 0,
+    predictionsMade: predictionsMade ?? 0,
+    poolsCompleted: poolsCompleted ?? 0,
+  };
+  const leaderboard = mapLeaderboard(leaderboardRows);
+  const practiceRace = practicePools?.[0] ? await buildPublicViewModel(admin, practicePools[0]) : null;
+
+  const championships = (champRows ?? []) as Array<{ id: string; name: string; image_url: string | null; status: string }>;
+  const champ = championships.find((c) => c.status === "ACTIVE") ?? championships[0] ?? null;
+
+  const empty: HomepageData = {
+    championship: null,
+    nextGrandPrix: null,
+    grandPrixPool: null,
+    practiceRace,
+    standings: [],
+    grid: [],
+    upcomingRounds: [],
+    latestResult: null,
+    leaderboard,
+    stats,
+  };
+  if (!champ) return empty;
+
+  const { data: raceRows } = await admin
+    .from("races")
+    .select("id, title, race_number, scheduled_start_utc, status")
+    .eq("competition_id", champ.id)
+    .neq("status", "CANCELLED")
+    .neq("status", "ABANDONED");
+  const races = (raceRows ?? []) as Array<{ id: string; title: string | null; race_number: number | null; scheduled_start_utc: string | null; status: string }>;
+  const raceIds = races.map((r) => r.id);
+
+  const [standingsResult, marbleMap, confirmed] = await Promise.all([
+    computeStandings(admin, champ.id),
+    loadMarbles(admin, raceIds),
+    raceIds.length
+      ? admin.from("race_results").select("race_id, winner_competitor_id").in("race_id", raceIds).eq("status", "CONFIRMED")
+      : Promise.resolve({ data: [] as Array<{ race_id: string; winner_competitor_id: string }> }),
+  ]);
+  const winnerByRace = new Map(
+    ((confirmed.data ?? []) as Array<{ race_id: string; winner_competitor_id: string }>).map((r) => [r.race_id, r.winner_competitor_id]),
+  );
+
+  const toRound = (r: (typeof races)[number]): HomeRound => ({
+    raceId: r.id,
+    title: r.title ?? "Race",
+    roundNumber: r.race_number,
+    scheduledStartUtc: r.scheduled_start_utc,
+    status: r.status,
+    winner: winnerByRace.has(r.id) ? (marbleMap.get(winnerByRace.get(r.id)!) ?? null) : null,
+  });
+
+  const byStart = (a: (typeof races)[number], b: (typeof races)[number]) =>
+    (a.scheduled_start_utc ?? "").localeCompare(b.scheduled_start_utc ?? "") ||
+    (a.race_number ?? 0) - (b.race_number ?? 0);
+
+  const scheduled = races.filter((r) => r.status === "SCHEDULED").sort(byStart);
+  const futureScheduled = scheduled.filter((r) => r.scheduled_start_utc && r.scheduled_start_utc > nowIso);
+  const upcomingPool = futureScheduled.length ? futureScheduled : scheduled;
+  const nextRace = upcomingPool[0] ?? null;
+  const nextGrandPrix = nextRace ? toRound(nextRace) : null;
+  const upcomingRounds = upcomingPool.slice(0, 5).map(toRound);
+
+  // Latest confirmed result (most recent by scheduled start).
+  const resultRaces = races.filter((r) => winnerByRace.has(r.id)).sort((a, b) => byStart(b, a));
+  let latestResult: HomepageData["latestResult"] = null;
+  if (resultRaces[0]) {
+    const view = await getRaceResultView(resultRaces[0].id);
+    const podium: MarbleIdentity[] = view.order
+      .filter((o) => o.finishStatus === "FINISHED" && o.position != null && o.position <= 3)
+      .sort((a, b) => (a.position ?? 99) - (b.position ?? 99))
+      .map((o) => ({ id: "", name: o.competitor.name ?? null, number: o.competitor.number ?? null, colors: o.competitor.colors ?? [], imageUrl: o.competitor.imageUrl ?? null }));
+    latestResult = {
+      round: toRound(resultRaces[0]),
+      winner: marbleMap.get(winnerByRace.get(resultRaces[0].id)!) ?? null,
+      podium,
+    };
+  }
+
+  // Standings rows + full grid (standings first, then any marble not yet scored).
+  const leaderPoints = standingsResult.rows[0]?.points ?? 0;
+  const scoredRows: HomeStandingRow[] = standingsResult.rows.map((row) => ({
+    position: row.rank,
+    marble: marbleMap.get(row.competitorId) ?? { id: row.competitorId, name: "Marble", number: null, colors: [], imageUrl: null },
+    points: row.points,
+    wins: row.wins,
+    gapToLeader: leaderPoints - row.points,
+  }));
+  const scoredIds = new Set(scoredRows.map((r) => r.marble.id));
+  const unscored: HomeStandingRow[] = [...marbleMap.values()]
+    .filter((m) => !scoredIds.has(m.id))
+    .sort((a, b) => (a.number ?? "").localeCompare(b.number ?? "") || (a.name ?? "").localeCompare(b.name ?? ""))
+    .map((marble) => ({ position: null, marble, points: 0, wins: 0, gapToLeader: leaderPoints }));
+  const grid = [...scoredRows, ...unscored];
+  const standings = scoredRows.slice(0, 5);
+
+  // Grand Prix entry pool: the next round's cash pool, else the championship-winner cash pool.
+  let grandPrixPool: SocialPoolCardViewModel | null = null;
+  if (nextRace) {
+    const { data } = await admin.from("pools").select("*").eq("race_id", nextRace.id).eq("stakes", "CASH").eq("status", "OPEN").limit(1);
+    grandPrixPool = data?.[0] ? await buildPublicViewModel(admin, data[0]) : null;
+  }
+  if (!grandPrixPool) {
+    const { data } = await admin
+      .from("pools")
+      .select("*")
+      .eq("template_id", "COMPETITION_WINNER")
+      .eq("template_config->>competition_id", champ.id)
+      .eq("stakes", "CASH")
+      .eq("status", "OPEN")
+      .limit(1);
+    grandPrixPool = data?.[0] ? await buildPublicViewModel(admin, data[0]) : null;
+  }
+
+  return {
+    championship: { id: champ.id, name: champ.name, imageUrl: champ.image_url, status: champ.status },
+    nextGrandPrix,
+    grandPrixPool,
+    practiceRace,
+    standings,
+    grid,
+    upcomingRounds,
+    latestResult,
+    leaderboard,
+    stats,
   };
 }
 
