@@ -9,15 +9,15 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "border-2 border-border-subtle bg-primary text-primary-foreground shadow-sticker-sm hover:bg-primary/85 dark:border-transparent dark:shadow-none",
+          "border-2 border-border-subtle bg-primary text-primary-foreground shadow-sticker-sm hover:translate-x-[0.15rem] hover:translate-y-[0.15rem] hover:shadow-none! hover:bg-primary/85",
         outline:
-          "border-2 border-border-subtle bg-surface-primary text-text-primary shadow-sticker-sm hover:bg-surface-secondary aria-expanded:bg-surface-secondary dark:border-input dark:bg-input/30 dark:text-foreground dark:hover:bg-input/50 dark:shadow-none",
+          "border-2 border-border-subtle bg-surface-primary text-text-primary shadow-sticker-sm hover:translate-x-[0.15rem] hover:translate-y-[0.15rem] hover:shadow-none! hover:bg-surface-secondary aria-expanded:bg-surface-secondary",
         secondary:
-          "border-2 border-border-subtle bg-secondary text-secondary-foreground shadow-sticker-sm hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] dark:border-transparent dark:shadow-none",
+          "border-2 border-border-subtle bg-secondary text-secondary-foreground shadow-sticker-sm hover:translate-x-[0.15rem] hover:translate-y-[0.15rem] hover:shadow-none! hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)]",
         ghost:
           "hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50",
         destructive:
-          "border-2 border-destructive bg-destructive/10 text-destructive shadow-sticker-sm hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:border-transparent dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40 dark:shadow-none",
+          "border-2 border-destructive bg-destructive/10 text-destructive shadow-sticker-sm hover:translate-x-[0.15rem] hover:translate-y-[0.15rem] hover:shadow-none! hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         link: "text-accent-primary underline-offset-4 hover:underline",
       },
       size: {

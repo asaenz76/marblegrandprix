@@ -15,12 +15,12 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-display);
   --font-logo: var(--font-logo);
   /* Same wide athletic grotesk as the wordmark, exposed as font-display for
      landing hero/section headings. In-app headings stay on --font-heading
      (Inter) so dense operator/table UIs don't get the expanded width. */
-  --font-display: var(--font-logo);
+  --font-display: "Avenir Next", Avenir, "Segoe UI", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -259,7 +259,10 @@
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --radius: 0.5rem;
+  /* Sharp neo-brutalist corners (Reclaim uses 4-8px). This base drives the
+     whole rounded-sm..2xl scale (@theme inline), so cards land ~6-7px and
+     buttons/inputs ~4px. Pills/avatars use rounded-full and stay round. */
+  --radius: 0.25rem;
   --sidebar: var(--surface-primary);
   --sidebar-foreground: var(--text-primary);
   --sidebar-primary: var(--accent-primary);
@@ -281,18 +284,18 @@
  * measured against WCAG AA (see the Phase 12 Stage A study).
  */
 .dark {
-  --background: #050505;
-  --surface-primary: #141417;
-  --surface-secondary: #1c1c21;
-  --surface-elevated: #232329;
-  --border-subtle: #2c2c33;
-  --border-strong: #3e3e47;
-  --text-primary: #f4f4f5;
-  --text-secondary: #a8a8b0;
+  --background: #1b120d;
+  --surface-primary: #2a1a13;
+  --surface-secondary: #3c2619;
+  --surface-elevated: #4b2b18;
+  --border-subtle: #fff0cf;
+  --border-strong: #e4c6a4;
+  --text-primary: #fff0cf;
+  --text-secondary: #e4c6a4;
   /* #8e8e98 measures 5.67:1 on surface-primary and 5.23:1 on
      surface-secondary — clears the 4.5:1 normal-text floor at the text-xs
      sizes this token is used at (timestamps, muted labels). */
-  --text-muted: #8e8e98;
+  --text-muted: #c9ad86;
   /* Interaction accent used for borders, selection rings, and small accent
      TEXT (links, countdowns): #7c83ff measures 5.73:1 on surface-primary, so
      it is legible as normal-size text — unlike the button-fill primary below,
@@ -300,27 +303,27 @@
   /* Dark mode leans into the "Gold" half: accent TEXT/links/selection are gold
      (pops on near-black, ~15:1), while solid buttons stay red (--primary below).
      Light mode keeps red accents — gold on white would be illegible. */
-  --accent-primary: #ffe100;
-  --accent-primary-hover: #fff04d;
-  --accent-primary-subtle: #2b2400;
-  --accent-primary-label: #ffe100;
-  --warning-muted: #f59e0b;
-  --danger: #ef4444;
-  --credit: #22c55e;
-  --debit: #ef4444;
-  --pool-win: #22c55e;
-  --pool-loss: #ef4444;
-  --pool-live: #f59e0b;
-  --streak: #fb923c;
+  --accent-primary: #ff9f43;
+  --accent-primary-hover: #ffd166;
+  --accent-primary-subtle: #4b2b18;
+  --accent-primary-label: #ffd166;
+  --warning-muted: #ffb45a;
+  --danger: #ff7a5c;
+  --credit: #4ade80;
+  --debit: #ff7a5c;
+  --pool-win: #4ade80;
+  --pool-loss: #ff7a5c;
+  --pool-live: #ffb45a;
+  --streak: #ff7a5c;
   /* Racing winner/champion marker — green-400: legible as small badge text on
      the near-black surfaces (10.6:1 on the card). */
   --success: #4ade80;
   /* Structural navy flips to a light cool tint in dark mode (10.3:1 on the
      ground) so wordmark/eyebrow elements stay legible. */
-  --brand-navy: #ff9a9a;
+  --brand-navy: #ffd166;
   /* Light hairline ring so black/navy competitor swatches (which measure
      ~1.1–1.8:1 against the near-black card) never disappear. */
-  --competitor-ring: rgba(255, 255, 255, 0.55);
+  --competitor-ring: rgba(255, 240, 207, 0.55);
 
   --foreground: var(--text-primary);
   --card: var(--surface-primary);
@@ -330,8 +333,8 @@
   /* Solid button fill = the brand red. --accent-primary stays a lighter red
      (#ff5252) so accent-colored TEXT and borders read against the dark ground,
      while the fill below carries white button labels. */
-  --primary: #f00000;
-  --primary-foreground: #ffffff;
+  --primary: #ffc440;
+  --primary-foreground: #102337;
   --secondary: var(--surface-secondary);
   --secondary-foreground: var(--text-primary);
   --muted: var(--surface-secondary);
@@ -339,7 +342,7 @@
   --accent: var(--surface-elevated);
   --accent-foreground: var(--text-primary);
   --destructive: var(--danger);
-  --destructive-foreground: #ffffff;
+  --destructive-foreground: #1b120d;
   --border: var(--border-subtle);
   --input: var(--border-subtle);
   --ring: var(--accent-primary);
@@ -351,7 +354,7 @@
   --sidebar: var(--surface-primary);
   --sidebar-foreground: var(--text-primary);
   --sidebar-primary: var(--accent-primary);
-  --sidebar-primary-foreground: #ffffff;
+  --sidebar-primary-foreground: #102337;
   --sidebar-accent: var(--surface-elevated);
   --sidebar-accent-foreground: var(--text-primary);
   --sidebar-border: var(--border-subtle);
@@ -365,9 +368,9 @@
   .shadow-sticker { box-shadow: 0.25rem 0.25rem 0 rgba(16, 35, 55, 0.28); }
   .shadow-sticker-sm { box-shadow: 0.15rem 0.15rem 0 rgba(16, 35, 55, 0.28); }
   :root[data-theme="dark"] .shadow-sticker,
+  .dark .shadow-sticker { box-shadow: 0.25rem 0.25rem 0 rgba(0, 0, 0, 0.55); }
   :root[data-theme="dark"] .shadow-sticker-sm,
-  .dark .shadow-sticker,
-  .dark .shadow-sticker-sm { box-shadow: none; }
+  .dark .shadow-sticker-sm { box-shadow: 0.15rem 0.15rem 0 rgba(0, 0, 0, 0.55); }
 }
 
 /* Bold gold-ground form treatment (BoldFormSurface). On the light FFC917
@@ -379,8 +382,8 @@
   --text-muted: var(--text-primary);
 }
 .dark .bold-form-text {
-  --text-secondary: #a8a8b0;
-  --text-muted: #8e8e98;
+  --text-secondary: #e4c6a4;
+  --text-muted: #c9ad86;
 }
 
 @layer base {
@@ -413,6 +416,15 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Brand "stamp wiggle" — the playful spring the Reclaim logo does on hover. */
+@keyframes brand-stamp-wiggle {
+  0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+  30% { transform: translate(-0.08rem, -0.16rem) rotate(-7deg) scale(1.08); }
+  60% { transform: translate(0.04rem, -0.08rem) rotate(4deg) scale(1.05); }
+  80% { transform: translate(-0.04rem, -0.1rem) rotate(-2deg) scale(1.04); }
+  100% { transform: translate(0, 0) rotate(0deg) scale(1); }
 }
 
 @keyframes celebrate-pop {
