@@ -13,6 +13,7 @@ interface EntryConfirmationSheetProps {
   optionLabel: string;
   entryFee: number;
   houseFeeBasisPoints: number;
+  isFree?: boolean;
   balanceCents: number;
   locksAt: string;
   onClose: () => void;
@@ -30,6 +31,7 @@ export function EntryConfirmationSheet({
   optionLabel,
   entryFee,
   houseFeeBasisPoints,
+  isFree = false,
   balanceCents,
   locksAt,
   onClose,
@@ -70,27 +72,36 @@ export function EntryConfirmationSheet({
           <p className="text-lg font-semibold text-text-primary">{optionLabel}</p>
         </div>
 
-        <dl className="space-y-1.5 text-sm">
-          <div className="flex justify-between">
-            <dt className="text-text-secondary">Entry Fee × 1</dt>
-            <dd className="text-text-primary">{formatCents(entryFee)}</dd>
-          </div>
-          <div className="flex justify-between font-medium">
-            <dt className="text-text-secondary">Total</dt>
-            <dd className="text-text-primary">{formatCents(entryFee)}</dd>
-          </div>
-          <div className="flex justify-between">
-            <dt className="text-text-secondary">Balance after entry</dt>
-            <dd className="text-text-primary">{formatCents(balanceAfter)}</dd>
-          </div>
-        </dl>
+        {isFree ? (
+          <p className="text-sm text-text-secondary">
+            This is a <span className="font-medium text-text-primary">free pool</span> — no entry fee
+            and nothing at stake. Your pick counts toward the free leaderboard.
+          </p>
+        ) : (
+          <>
+            <dl className="space-y-1.5 text-sm">
+              <div className="flex justify-between">
+                <dt className="text-text-secondary">Entry Fee × 1</dt>
+                <dd className="text-text-primary">{formatCents(entryFee)}</dd>
+              </div>
+              <div className="flex justify-between font-medium">
+                <dt className="text-text-secondary">Total</dt>
+                <dd className="text-text-primary">{formatCents(entryFee)}</dd>
+              </div>
+              <div className="flex justify-between">
+                <dt className="text-text-secondary">Balance after entry</dt>
+                <dd className="text-text-primary">{formatCents(balanceAfter)}</dd>
+              </div>
+            </dl>
 
-        {/* Restated right at the moment of commitment, not just on the feed
-            card's small footer text — silence about money is the product's
-            single biggest trust gap (see the wallet pending-state fix). */}
-        <p className="text-xs text-text-muted">
-          Platform Fee {formatBps(houseFeeBasisPoints)} — applies to winnings, not your entry.
-        </p>
+            {/* Restated right at the moment of commitment, not just on the feed
+                card's small footer text — silence about money is the product's
+                single biggest trust gap (see the wallet pending-state fix). */}
+            <p className="text-xs text-text-muted">
+              Platform Fee {formatBps(houseFeeBasisPoints)} — applies to winnings, not your entry.
+            </p>
+          </>
+        )}
 
         <p className="text-xs text-text-muted">
           Locks{" "}

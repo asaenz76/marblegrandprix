@@ -15,6 +15,13 @@ const RANGE_OPTIONS = [
   { value: "monthly", label: "This month" },
 ] as const;
 
+// Cash and Free are two separate leaderboards — the primary switch, always
+// visible. Cash is the default board.
+const STAKES_TABS = [
+  { value: "CASH", label: "Cash" },
+  { value: "FREE", label: "Free" },
+] as const;
+
 // Launch simplification: the leaderboard opens straight to one view — the
 // whole group, all-time — with zero decisions in front of the ranking
 // itself (see PRODUCT_SIMPLICITY_REVIEW.md / UX_FRICTION_REPORT.md).
@@ -30,41 +37,29 @@ export function LeaderboardFilters() {
   const searchParams = useSearchParams();
   const scope = searchParams.get("scope") ?? "global";
   const range = searchParams.get("range") ?? "all_time";
+  const stakes = searchParams.get("stakes") ?? "CASH";
   const hasNonDefaultView = scope !== "global" || range !== "all_time";
   const [expanded, setExpanded] = useState(hasNonDefaultView);
 
-  function updateParam(key: "scope" | "range", value: string) {
+  function updateParam(key: "scope" | "range" | "stakes", value: string) {
     const params = new URLSearchParams(searchParams.toString());
     params.set(key, value);
     router.push(`/leaderboard?${params.toString()}`);
   }
 
-  if (!expanded) {
-    return (
-      <div className="flex justify-end">
-        <button
-          type="button"
-          onClick={() => setExpanded(true)}
-          className="text-xs font-medium text-accent-primary hover:underline"
-        >
-          More views
-        </button>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex items-center justify-between gap-2">
+    <div className="space-y-3">
+      {/* Primary switch: which leaderboard — Cash (paid) vs Free. */}
       <div className="flex gap-4 border-b border-border-subtle">
-        {SCOPE_TABS.map(({ value, label }) => (
+        {STAKES_TABS.map(({ value, label }) => (
           <button
             key={value}
             type="button"
-            onClick={() => updateParam("scope", value)}
-            aria-current={scope === value ? "page" : undefined}
+            onClick={() => updateParam("stakes", value)}
+            aria-current={stakes === value ? "page" : undefined}
             className={cn(
               "-mb-px border-b-2 px-1 pb-2 text-sm font-semibold transition-colors",
-              scope === value
+              stakes === value
                 ? "border-accent-primary text-text-primary"
                 : "border-transparent text-text-muted hover:text-text-secondary",
             )}
@@ -74,18 +69,51 @@ export function LeaderboardFilters() {
         ))}
       </div>
 
-      <select
-        aria-label="Range"
-        value={range}
-        onChange={(e) => updateParam("range", e.target.value)}
-        className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm"
-      >
-        {RANGE_OPTIONS.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
+      {!expanded ? (
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={() => setExpanded(true)}
+            className="text-xs font-medium text-accent-primary hover:underline"
+          >
+            More views
+          </button>
+        </div>
+      ) : (
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex gap-4 border-b border-border-subtle">
+            {SCOPE_TABS.map(({ value, label }) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => updateParam("scope", value)}
+                aria-current={scope === value ? "page" : undefined}
+                className={cn(
+                  "-mb-px border-b-2 px-1 pb-2 text-sm font-semibold transition-colors",
+                  scope === value
+                    ? "border-accent-primary text-text-primary"
+                    : "border-transparent text-text-muted hover:text-text-secondary",
+                )}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <select
+            aria-label="Range"
+            value={range}
+            onChange={(e) => updateParam("range", e.target.value)}
+            className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm"
+          >
+            {RANGE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
     </div>
   );
 }

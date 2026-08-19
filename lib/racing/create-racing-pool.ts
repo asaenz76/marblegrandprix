@@ -22,8 +22,11 @@ export const createRacingPoolSchema = z
     scope: z.enum(["RACE", "COMPETITION"]),
     raceId: z.string().uuid().optional(),
     competitionId: z.string().uuid().optional(),
-    entryFeeCents: z.number().int().positive(),
+    entryFeeCents: z.number().int().nonnegative(),
     houseFeeBps: z.number().int().min(0).max(10000).default(0),
+    // FREE pools bypass the wallet entirely (no entry fee, no house fee, no
+    // payouts) and feed a separate leaderboard; CASH is the existing paid path.
+    stakes: z.enum(["CASH", "FREE"]).default("CASH"),
     locksAt: z.string().datetime({ offset: true }),
     openAt: z.string().datetime({ offset: true }).optional(),
     // Phase 13 (approved additive exception): pool visibility is part of the
@@ -38,6 +41,12 @@ export const createRacingPoolSchema = z
   .superRefine((v, ctx) => {
     if (v.scope === "RACE" && !v.raceId) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "raceId is required for a Race Winner pool.", path: ["raceId"] });
     if (v.scope === "COMPETITION" && !v.competitionId) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "competitionId is required for a Competition Winner pool.", path: ["competitionId"] });
+    if (v.stakes === "FREE") {
+      if (v.entryFeeCents !== 0) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Free pools can't have an entry fee.", path: ["entryFeeCents"] });
+      if ((v.houseFeeBps ?? 0) !== 0) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Free pools can't have a platform fee.", path: ["houseFeeBps"] });
+    } else if (v.entryFeeCents <= 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Cash pools need an entry fee.", path: ["entryFeeCents"] });
+    }
   });
 
 export type CreateRacingPoolInput = z.input<typeof createRacingPoolSchema>;
@@ -126,6 +135,7 @@ export async function createRacingPoolForActor(
       question: template.question,
       entry_fee: data.entryFeeCents,
       house_fee_bps: data.houseFeeBps,
+      stakes: data.stakes,
       open_at: data.openAt ?? new Date().toISOString(),
       locks_at: data.locksAt,
       visibility: data.visibility,

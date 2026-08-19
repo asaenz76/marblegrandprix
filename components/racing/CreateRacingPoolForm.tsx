@@ -53,6 +53,7 @@ export function CreateRacingPoolForm({
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [lockLocal, setLockLocal] = useState(() => isoToLocalInput(defaultLockIso));
+  const [stakes, setStakes] = useState<"CASH" | "FREE">("CASH");
   const [state, formAction, pending] = useActionState(createRacingPoolFromFormAction, INITIAL);
 
   // Refresh the page's server data so the new pool appears in the list above.
@@ -93,31 +94,61 @@ export function CreateRacingPoolForm({
         {scope === "RACE" ? "Race Winner pool" : "Competition Winner pool"} · {contextLabel}
       </p>
 
-      <div className="space-y-1.5">
-        <Label htmlFor="entryFee">Entry fee</Label>
-        <div className="flex items-center gap-2">
-          <span className="text-text-muted" aria-hidden="true">
-            $
-          </span>
-          <Input id="entryFee" name="entryFee" inputMode="decimal" placeholder="5.00" required />
+      <fieldset className="space-y-1.5">
+        <legend className="text-sm font-medium">Pool type</legend>
+        <div className="flex gap-4 text-sm text-text-secondary">
+          <label className="flex items-center gap-1.5">
+            <input
+              type="radio"
+              name="stakes"
+              value="CASH"
+              checked={stakes === "CASH"}
+              onChange={() => setStakes("CASH")}
+            />{" "}
+            Cash — play for money
+          </label>
+          <label className="flex items-center gap-1.5">
+            <input
+              type="radio"
+              name="stakes"
+              value="FREE"
+              checked={stakes === "FREE"}
+              onChange={() => setStakes("FREE")}
+            />{" "}
+            Free — just for the leaderboard
+          </label>
         </div>
-      </div>
+      </fieldset>
 
-      <div className="space-y-1.5">
-        <Label htmlFor="platformFee">Platform fee</Label>
-        <div className="flex items-center gap-2">
-          <Input
-            id="platformFee"
-            name="platformFee"
-            inputMode="decimal"
-            defaultValue="10"
-            className="max-w-24"
-          />
-          <span className="text-text-muted" aria-hidden="true">
-            %
-          </span>
-        </div>
-      </div>
+      {stakes === "CASH" && (
+        <>
+          <div className="space-y-1.5">
+            <Label htmlFor="entryFee">Entry fee</Label>
+            <div className="flex items-center gap-2">
+              <span className="text-text-muted" aria-hidden="true">
+                $
+              </span>
+              <Input id="entryFee" name="entryFee" inputMode="decimal" placeholder="5.00" required />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="platformFee">Platform fee</Label>
+            <div className="flex items-center gap-2">
+              <Input
+                id="platformFee"
+                name="platformFee"
+                inputMode="decimal"
+                defaultValue="10"
+                className="max-w-24"
+              />
+              <span className="text-text-muted" aria-hidden="true">
+                %
+              </span>
+            </div>
+          </div>
+        </>
+      )}
 
       <div className="space-y-1.5">
         <Label htmlFor="lock">Locks at</Label>

@@ -41,16 +41,34 @@ export async function enterPoolAction(
     return { error: "Something went wrong — try again.", success: false };
   }
 
-  // create_pool_entry is REVOKEd from PUBLIC (service_role only) — the
-  // requireUser() check above is what actually authorizes this call.
+  // create_pool_entry / create_free_pool_entry are REVOKEd from PUBLIC
+  // (service_role only) — the requireUser() check above is what actually
+  // authorizes this call.
   const adminClient = createAdminClient();
-  const { error } = await adminClient.rpc("create_pool_entry", {
-    p_pool_id: parsed.data.poolId,
-    p_user_id: user.id,
-    p_option_id: parsed.data.optionId,
-    p_amount: parsed.data.amountCents,
-    p_idempotency_key: parsed.data.idempotencyKey,
-  });
+
+  // Free pools route to the no-money entry RPC: no fee, no wallet touch, no
+  // balance check. Cash pools take the existing paid path unchanged.
+  const { data: pool } = await adminClient
+    .from("pools")
+    .select("stakes")
+    .eq("id", parsed.data.poolId)
+    .maybeSingle();
+  const isFree = pool?.stakes === "FREE";
+
+  const { error } = isFree
+    ? await adminClient.rpc("create_free_pool_entry", {
+        p_pool_id: parsed.data.poolId,
+        p_user_id: user.id,
+        p_option_id: parsed.data.optionId,
+        p_idempotency_key: parsed.data.idempotencyKey,
+      })
+    : await adminClient.rpc("create_pool_entry", {
+        p_pool_id: parsed.data.poolId,
+        p_user_id: user.id,
+        p_option_id: parsed.data.optionId,
+        p_amount: parsed.data.amountCents,
+        p_idempotency_key: parsed.data.idempotencyKey,
+      });
 
   if (error) {
     if (error.message.includes("insufficient_balance")) {

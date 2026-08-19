@@ -52,14 +52,26 @@ export async function createRacingPoolFromFormAction(
     return { error: "Something went wrong — reload the page and try again." };
   }
 
-  const entryFeeCents = parseDollarsToCents(String(formData.get("entryFee") ?? ""));
-  if (entryFeeCents === null) {
-    return { error: "Enter a valid entry fee — a positive dollar amount like 5 or 5.00." };
+  const stakes = String(formData.get("stakes") ?? "CASH");
+  if (stakes !== "CASH" && stakes !== "FREE") {
+    return { error: "Choose whether this pool is free or paid." };
   }
 
-  const houseFeeBps = parsePercentToBps(String(formData.get("platformFee") ?? ""));
-  if (houseFeeBps === null) {
-    return { error: "Platform fee must be a percentage between 0 and 100." };
+  // Free pools carry no money at all — ignore the fee fields and force zeros.
+  let entryFeeCents = 0;
+  let houseFeeBps = 0;
+  if (stakes === "CASH") {
+    const fee = parseDollarsToCents(String(formData.get("entryFee") ?? ""));
+    if (fee === null || fee <= 0) {
+      return { error: "Enter a valid entry fee — a positive dollar amount like 5 or 5.00." };
+    }
+    entryFeeCents = fee;
+
+    const bps = parsePercentToBps(String(formData.get("platformFee") ?? ""));
+    if (bps === null) {
+      return { error: "Platform fee must be a percentage between 0 and 100." };
+    }
+    houseFeeBps = bps;
   }
 
   const locksAt = String(formData.get("locksAt") ?? "");
@@ -84,6 +96,7 @@ export async function createRacingPoolFromFormAction(
     houseFeeBps,
     locksAt,
     visibility,
+    stakes,
   });
 
   if (!result.error && result.poolId) {

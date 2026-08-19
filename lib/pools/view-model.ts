@@ -68,6 +68,9 @@ export interface SocialPoolCardViewModel {
   comboLegs: Array<{ id: string; label: string }> | null;
   entryFee: number;
   houseFeeBasisPoints: number;
+  /** FREE pools carry no money (no entry fee, no payout) and feed a separate
+   *  leaderboard; the card shows "Free" instead of the fee line. */
+  isFree: boolean;
   minTotalEntries: number;
   locksAt: string;
   totalEntries: number;
@@ -112,6 +115,7 @@ export interface BuildViewModelInput {
     pool_type: PoolType;
     entry_fee: number;
     house_fee_bps: number;
+    stakes: "CASH" | "FREE";
     min_total_entries: number;
     locks_at: string;
     status: PoolStatus;
@@ -330,6 +334,7 @@ export function buildPoolCardViewModel(input: BuildViewModelInput): SocialPoolCa
         : null,
     entryFee: pool.entry_fee,
     houseFeeBasisPoints: pool.house_fee_bps,
+    isFree: pool.stakes === "FREE",
     minTotalEntries: pool.min_total_entries,
     locksAt: pool.locks_at,
     totalEntries: totals.total_entries,

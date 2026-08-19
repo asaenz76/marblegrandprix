@@ -297,8 +297,14 @@ export function SocialPoolCard({
           {showDistribution && <PotentialPayoutFooter />}
 
           <p className="text-xs text-text-muted">
-            Entry {formatCents(viewModel.entryFee)} · Platform Fee{" "}
-            {formatBps(viewModel.houseFeeBasisPoints)}
+            {viewModel.isFree ? (
+              "Free entry"
+            ) : (
+              <>
+                Entry {formatCents(viewModel.entryFee)} · Platform Fee{" "}
+                {formatBps(viewModel.houseFeeBasisPoints)}
+              </>
+            )}
             {(isPreVote || isPostVote) && (
               <>
                 {" · Requires "}
@@ -327,6 +333,7 @@ export function SocialPoolCard({
             optionLabel={selectedOption.label}
             entryFee={viewModel.entryFee}
             houseFeeBasisPoints={viewModel.houseFeeBasisPoints}
+            isFree={viewModel.isFree}
             balanceCents={balanceCents}
             locksAt={viewModel.locksAt}
             onClose={() => setSelectedOptionId(null)}

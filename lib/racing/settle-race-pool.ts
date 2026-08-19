@@ -46,9 +46,20 @@ export async function settleRacePool(client: Client, pool: RacingPoolRow): Promi
   const winningOptionId = grading.winningOptionId!;
 
   // 2) Read current pool state; short-circuit if already terminal (idempotent).
-  const { data: p } = await client.from("pools").select("id, status, snapshot_version, house_fee_bps").eq("id", pool.id).single();
+  const { data: p } = await client.from("pools").select("id, status, snapshot_version, house_fee_bps, stakes").eq("id", pool.id).single();
   if (!p) return "failed";
   if (TERMINAL.has(p.status)) return "alreadyTerminal";
+
+  // Free pools settle with no money at all: grade the winner, mark entries
+  // WON/LOST and record the leaderboard credit inside settle_free_pool. None
+  // of the money settlement RPCs (prepare/confirm/refund) are ever called.
+  if (p.stakes === "FREE") {
+    const { error: freeErr } = await client.rpc("settle_free_pool", {
+      p_pool_id: pool.id,
+      p_winning_option_id: winningOptionId,
+    });
+    return freeErr ? "failed" : "settled";
+  }
 
   // 3) Move to a gradable status. A confirmed race result means the race is over
   //    and entries are closed. prepare_pool_settlement_manual requires LOCKED or

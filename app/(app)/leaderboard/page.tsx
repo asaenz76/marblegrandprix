@@ -9,6 +9,7 @@ import { LeaderboardFilters } from "./leaderboard-filters";
 
 type Scope = "global" | "following";
 type Range = "all_time" | "weekly" | "monthly";
+type Stakes = "CASH" | "FREE";
 
 function isScope(value: string | undefined): value is Scope {
   return value === "global" || value === "following";
@@ -18,20 +19,26 @@ function isRange(value: string | undefined): value is Range {
   return value === "all_time" || value === "weekly" || value === "monthly";
 }
 
+function isStakes(value: string | undefined): value is Stakes {
+  return value === "CASH" || value === "FREE";
+}
+
 export default async function LeaderboardPage({
   searchParams,
 }: {
-  searchParams: Promise<{ scope?: string; range?: string }>;
+  searchParams: Promise<{ scope?: string; range?: string; stakes?: string }>;
 }) {
-  const { scope: scopeParam, range: rangeParam } = await searchParams;
+  const { scope: scopeParam, range: rangeParam, stakes: stakesParam } = await searchParams;
   const scope: Scope = isScope(scopeParam) ? scopeParam : "global";
   const range: Range = isRange(rangeParam) ? rangeParam : "all_time";
+  // Separate Cash and Free leaderboards; Cash is the default board.
+  const stakes: Stakes = isStakes(stakesParam) ? stakesParam : "CASH";
 
   const user = await requireUser();
   const supabase = await createClient();
 
   const [{ data: rows }, { data: profile }] = await Promise.all([
-    supabase.rpc("get_leaderboard", { p_scope: scope, p_range: range, p_caller_id: user.id }),
+    supabase.rpc("get_leaderboard", { p_scope: scope, p_range: range, p_caller_id: user.id, p_stakes: stakes }),
     supabase.from("user_profiles").select("current_streak, best_streak").eq("id", user.id).single(),
   ]);
 

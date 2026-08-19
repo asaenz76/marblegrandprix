@@ -47,7 +47,9 @@ export const enterPoolSchema = z
   .object({
     poolId: z.string().uuid(),
     optionId: z.string().uuid(),
-    amountCents: z.number().int().positive(),
+    // Free pools enter at 0; cash pools are still enforced positive by
+    // create_pool_entry's amount == entry_fee check.
+    amountCents: z.number().int().nonnegative(),
     idempotencyKey: z.string().uuid(),
   })
   .strict();
