@@ -7,9 +7,9 @@ import { PoolPreviewCard } from "./PoolPreviewCard";
 import { PhoneFrame } from "./PhoneFrame";
 
 const BULLETS = [
-  { icon: Users2, label: "Compete with people, not against the house" },
+  { icon: Users2, label: "Compete against others" },
   { icon: ShieldCheck, label: "Real races and competitions" },
-  { icon: Trophy, label: "Community-created pools" },
+  { icon: Trophy, label: "Lots of races-lots of pools" },
 ];
 
 export function LandingHero({ heroPool }: { heroPool: SocialPoolCardViewModel | null }) {
