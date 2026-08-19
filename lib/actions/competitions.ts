@@ -106,6 +106,42 @@ export async function updateCompetitionImageAction(input: {
   return { error: null };
 }
 
+const competitionNameSchema = z.string().trim().min(1, "A competition needs a name.").max(120);
+
+/**
+ * Rename a competition. Scoped to whoever manages it (assigned Organizer or
+ * Super Admin). Cosmetic identity only — no money/grading/standings effect —
+ * but the name is the card's league line wherever a racing pool renders, so
+ * the feed/landing are revalidated too.
+ */
+export async function updateCompetitionNameAction(input: {
+  competitionId: string;
+  name: string;
+}): Promise<{ error: string | null }> {
+  const actor = await requireCompetitionAccess(input.competitionId);
+  const parsed = competitionNameSchema.safeParse(input.name);
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Invalid name." };
+
+  const { error } = await createAdminClient()
+    .from("racing_competitions")
+    .update({ name: parsed.data })
+    .eq("id", input.competitionId);
+  if (error) return { error: "Could not rename the competition." };
+
+  await writeAuditLog({
+    actorId: actor.id,
+    action: "racing_competition.name_updated",
+    entityType: "racing_competition",
+    entityId: input.competitionId,
+    after: { name: parsed.data },
+  });
+  revalidatePath(`/racing/competitions/${input.competitionId}`);
+  revalidatePath("/racing/competitions");
+  revalidatePath("/feed");
+  revalidatePath("/");
+  return { error: null };
+}
+
 /**
  * Phase 17: permanently delete a competition and everything under it (races,
  * race-only competitors, and pools). Super-Admin only. Live entries are

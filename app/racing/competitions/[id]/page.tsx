@@ -11,6 +11,7 @@ import { FinalizeForm } from "./finalize-form";
 import { BracketView } from "@/components/racing/BracketView";
 import { CreateRacingPoolForm } from "@/components/racing/CreateRacingPoolForm";
 import { CompetitionImageEditor } from "@/components/racing/CompetitionImageEditor";
+import { CompetitionNameEditor } from "@/components/racing/CompetitionNameEditor";
 import { DeleteRacingEntityButton } from "@/components/racing/DeleteRacingEntityButton";
 import { PointsEditor } from "@/components/racing/PointsEditor";
 import { LocalDateTime } from "@/components/LocalDateTime";
@@ -99,6 +100,13 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
           </p>
         </div>
       </div>
+
+      {canManage && (
+        <section className="space-y-2">
+          <h2 className="text-sm font-semibold">Name</h2>
+          <CompetitionNameEditor competitionId={comp.id} name={comp.name} />
+        </section>
+      )}
 
       {canManage && (
         <section className="space-y-2">
