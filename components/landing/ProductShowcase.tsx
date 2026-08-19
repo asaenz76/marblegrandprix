@@ -25,13 +25,13 @@ function ShowcasePanel({
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2 text-sm font-semibold">
-        <span className="flex size-6 items-center justify-center rounded-full bg-accent-primary/20 text-accent-primary-label">
+        <span className="flex size-6 items-center justify-center rounded-full bg-[#ffe100]/20 text-[#ffe100]">
           {index}
         </span>
         {title}
       </div>
       <p className="text-sm text-inverted-surface-foreground/70">{description}</p>
-      <PhoneFrame>{children}</PhoneFrame>
+      <PhoneFrame onDark>{children}</PhoneFrame>
     </div>
   );
 }
@@ -54,8 +54,8 @@ export function ProductShowcase({
     <section className="border-y border-border-subtle bg-inverted-surface py-16 text-inverted-surface-foreground">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <h2 className="text-balance text-center font-display text-2xl font-extrabold sm:text-3xl">
-          Built for <span className="text-accent-primary-label">competition</span>. Made for{" "}
-          <span className="text-accent-primary-label">community</span>.
+          Built for <span className="text-[#ffe100]">competition</span>. Made for{" "}
+          <span className="text-[#ffe100]">community</span>.
         </h2>
 
         <div className="mx-auto mt-12 grid max-w-3xl gap-10 sm:grid-cols-2">
