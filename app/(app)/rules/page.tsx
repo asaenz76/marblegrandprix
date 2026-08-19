@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth/session";
 import { Card, CardContent } from "@/components/ui/card";
+import { BoldFormSurface } from "@/components/ui/bold-form-surface";
 
 export const metadata: Metadata = {
   title: "Rules — Marble Grand Prix",
@@ -11,7 +12,7 @@ export default async function RulesPage() {
   await requireUser();
 
   return (
-    <div className="space-y-6">
+    <BoldFormSurface className="space-y-6">
       <div>
         <h1 className="font-heading text-2xl font-semibold text-text-primary">How pools work</h1>
         <p className="mt-1 text-sm text-text-muted">
@@ -135,6 +136,6 @@ export default async function RulesPage() {
           </section>
         </CardContent>
       </Card>
-    </div>
+    </BoldFormSurface>
   );
 }

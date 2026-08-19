@@ -17,26 +17,24 @@ export function CreateUserForm() {
     <Card>
       <CardContent className="space-y-3 pt-6">
         <form action={formAction} className="space-y-2">
-          <div className="flex gap-2">
-            <div className="flex-1 space-y-1.5">
-              <Label htmlFor="createUserDisplayName">Create an account manually</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="createUserDisplayName">Create an account manually</Label>
+            <div className="flex gap-2">
               <Input
                 id="createUserDisplayName"
                 name="displayName"
                 required
                 placeholder="Display name"
+                className="flex-1"
               />
-            </div>
-            <div className="flex-1 space-y-1.5">
-              <Label htmlFor="createUserEmail" className="sr-only">
-                Email
-              </Label>
               <Input
                 id="createUserEmail"
                 name="email"
                 type="email"
                 required
                 placeholder="friend@example.com"
+                aria-label="Email"
+                className="flex-1"
               />
             </div>
           </div>

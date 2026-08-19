@@ -49,7 +49,7 @@ export default async function AdminWalletRequestsPage() {
       <h1 className="sr-only">Ledger Requests</h1>
       <div className="overflow-x-auto rounded-xl border border-border-subtle">
         <table className="w-full text-sm">
-          <thead className="bg-surface-secondary text-left text-text-muted">
+          <thead className="bg-black text-left text-[#ffe100] dark:bg-surface-secondary dark:text-text-muted">
             <tr>
               <th className="px-3 py-2 font-medium">Player</th>
               <th className="px-3 py-2 font-medium">Type</th>

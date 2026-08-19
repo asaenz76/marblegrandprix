@@ -23,7 +23,7 @@ export function StandingsTable({
   return (
     <div className="overflow-x-auto rounded-md border border-border-subtle">
       <table className="w-full text-sm">
-        <thead className="text-left text-text-secondary">
+        <thead className="bg-black text-left text-[#ffe100] dark:bg-transparent dark:text-text-secondary">
           <tr>
             <th className="px-3 py-2 w-10">#</th>
             <th className="px-3 py-2">Competitor</th>

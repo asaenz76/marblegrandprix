@@ -4,6 +4,7 @@ import { formatCents } from "@/lib/utils/money";
 import { humanizeEnum } from "@/lib/utils/humanize";
 import { walletTransactionLabel } from "@/lib/wallet/transaction-copy";
 import { Card, CardContent } from "@/components/ui/card";
+import { BoldFormSurface } from "@/components/ui/bold-form-surface";
 import {
   getHouseRevenue,
   getJobHealth,
@@ -30,7 +31,7 @@ export default async function AdminReportsPage() {
     houseRevenue.feeCreditTotal + houseRevenue.remainderCreditTotal - houseRevenue.reversalDebitTotal;
 
   return (
-    <div className="space-y-6">
+    <BoldFormSurface className="space-y-6">
       <h1 className="sr-only">Reports</h1>
       <div className="grid gap-4 sm:grid-cols-2">
         <Card>
@@ -129,9 +130,9 @@ export default async function AdminReportsPage() {
       <Card>
         <CardContent className="space-y-2 pt-6">
           <h2 className="text-sm font-semibold text-text-primary">Ledger transactions by type</h2>
-          <div className="overflow-x-auto rounded-xl border border-border-subtle">
+          <div className="dark overflow-x-auto rounded-xl border border-border-subtle bg-black">
             <table className="w-full text-sm">
-              <thead className="bg-surface-secondary text-left text-text-muted">
+              <thead className="bg-black text-left text-[#ffe100]">
                 <tr>
                   <th className="px-3 py-2 font-medium">Type</th>
                   <th className="px-3 py-2 font-medium">Credited</th>
@@ -158,6 +159,6 @@ export default async function AdminReportsPage() {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </BoldFormSurface>
   );
 }

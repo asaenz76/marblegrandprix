@@ -27,7 +27,7 @@ export function AnalyticsFilterBar({ activePreset }: { activePreset: DateRangePr
   }
 
   return (
-    <div className="flex flex-wrap gap-1 rounded-lg bg-surface-secondary p-1">
+    <div className="flex flex-wrap gap-1 rounded-lg border border-border-subtle bg-background p-1 dark:border-transparent dark:bg-surface-secondary">
       {PRESETS.map(({ value, label }) => (
         <button
           key={value}

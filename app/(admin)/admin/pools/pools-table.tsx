@@ -143,7 +143,7 @@ function PoolDetailPanel({ pool }: { pool: PoolRow }) {
           </p>
           <div className="overflow-x-auto rounded-xl border border-border-subtle">
             <table className="w-full text-sm">
-              <thead className="bg-surface-secondary text-left text-text-muted">
+              <thead className="bg-black text-left text-[#ffe100] dark:bg-surface-secondary dark:text-text-muted">
                 <tr>
                   <th className="px-3 py-2 font-medium">Version</th>
                   <th className="px-3 py-2 font-medium">Outcome</th>
@@ -178,7 +178,7 @@ function PoolDetailPanel({ pool }: { pool: PoolRow }) {
         </p>
         <div className="overflow-x-auto rounded-xl border border-border-subtle">
           <table className="w-full text-sm">
-            <thead className="bg-surface-secondary text-left text-text-muted">
+            <thead className="bg-black text-left text-[#ffe100] dark:bg-surface-secondary dark:text-text-muted">
               <tr>
                 <th className="px-3 py-2 font-medium">Player</th>
                 <th className="px-3 py-2 font-medium">Choice</th>
@@ -399,7 +399,7 @@ export function PoolsTable({ pools, isSuperAdmin }: { pools: PoolRow[]; isSuperA
       </div>
 
       {isSuperAdmin && deletableVisible.length > 0 && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border-subtle bg-surface-secondary px-4 py-2.5">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border-subtle bg-background dark:bg-surface-secondary px-4 py-2.5">
           <label className="flex items-center gap-2 text-sm text-text-secondary">
             <Checkbox checked={allDeletableSelected} onCheckedChange={toggleSelectAllDeletable} />
             Select all settled/voided/cancelled ({deletableVisible.length})
@@ -463,7 +463,7 @@ export function PoolsTable({ pools, isSuperAdmin }: { pools: PoolRow[]; isSuperA
 
       <div className="overflow-x-auto rounded-xl border border-border-subtle">
         <table className="w-full text-sm">
-          <thead className="bg-surface-secondary text-left text-text-muted">
+          <thead className="bg-black text-left text-[#ffe100] dark:bg-surface-secondary dark:text-text-muted">
             <tr>
               {isSuperAdmin && <th className="w-8 px-3 py-2"></th>}
               <th className="w-8 px-3 py-2"></th>

@@ -7,6 +7,7 @@ import { AnalyticsPageHeader } from "@/components/analytics/AnalyticsPageHeader"
 import { MetricCard } from "@/components/analytics/MetricCard";
 import { LineChartCard } from "@/components/analytics/LineChartCard";
 import { HorizontalBarChartCard, type HorizontalBarDatum } from "@/components/analytics/HorizontalBarChartCard";
+import { BoldFormSurface } from "@/components/ui/bold-form-surface";
 import { formatPercent, formatSignedCents } from "@/lib/analytics/format";
 import { formatCents } from "@/lib/utils/money";
 import type { DateRangePreset, MetricValue } from "@/lib/analytics/types";
@@ -80,7 +81,7 @@ export function AdminAnalyticsPageClient({ data, preset }: { data: AdminAnalytic
   );
 
   return (
-    <div className="space-y-6">
+    <BoldFormSurface className="space-y-6">
       <AnalyticsPageHeader
         title="Analytics"
         description="Platform-wide activity across every player. Deposits and withdrawals are excluded from pool results — see Reports for house revenue and operational status."
@@ -142,7 +143,7 @@ export function AdminAnalyticsPageClient({ data, preset }: { data: AdminAnalytic
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-2">
           <h2 className="text-sm font-semibold text-text-primary">Top users</h2>
-          <div className="flex gap-1 rounded-lg bg-surface-secondary p-1">
+          <div className="flex gap-1 rounded-lg border border-border-subtle bg-background p-1 dark:border-transparent dark:bg-surface-secondary">
             {(Object.keys(SORT_LABELS) as TopUsersSort[]).map((sort) => (
               <button
                 key={sort}
@@ -159,9 +160,9 @@ export function AdminAnalyticsPageClient({ data, preset }: { data: AdminAnalytic
             ))}
           </div>
         </div>
-        <div className="overflow-x-auto rounded-xl border border-border-subtle">
+        <div className="dark overflow-x-auto rounded-xl border border-border-subtle bg-black">
           <table className="w-full text-sm">
-            <thead className="bg-surface-secondary text-left text-text-muted">
+            <thead className="bg-black text-left text-[#ffe100]">
               <tr>
                 <th className="px-3 py-2 font-medium">Player</th>
                 <th className="px-3 py-2 font-medium">Entries</th>
@@ -202,6 +203,6 @@ export function AdminAnalyticsPageClient({ data, preset }: { data: AdminAnalytic
           </table>
         </div>
       </div>
-    </div>
+    </BoldFormSurface>
   );
 }

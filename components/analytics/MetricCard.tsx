@@ -20,7 +20,10 @@ const TONE_CLASSES = {
 
 export function MetricCard({ label, value, helpText, delta, emptyMessage }: MetricCardProps) {
   return (
-    <Card size="sm">
+    // Metric cards carry a green/red delta, so they get a local dark scope +
+    // black ground (rule: any section with green text/numbers goes black for
+    // contrast). bg-black! overrides the gold-wrap's transparent card fill.
+    <Card size="sm" className="dark border-black bg-black!">
       <CardContent className="space-y-1">
         <p className="text-xs font-medium tracking-wide text-text-muted uppercase">{label}</p>
         {emptyMessage ? (

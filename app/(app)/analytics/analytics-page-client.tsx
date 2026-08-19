@@ -8,6 +8,7 @@ import { LineChartCard } from "@/components/analytics/LineChartCard";
 import { HorizontalBarChartCard, type HorizontalBarDatum } from "@/components/analytics/HorizontalBarChartCard";
 import { StreakTimeline } from "@/components/analytics/StreakTimeline";
 import { EntryHighlightsTable } from "@/components/analytics/EntryHighlightsTable";
+import { BoldFormSurface } from "@/components/ui/bold-form-surface";
 import { formatChartDate, formatPercent, formatSignedCents } from "@/lib/analytics/format";
 import { formatCents } from "@/lib/utils/money";
 import type { DateRangePreset, MetricValue } from "@/lib/analytics/types";
@@ -116,7 +117,7 @@ export function AnalyticsPageClient({ data, preset }: { data: UserAnalyticsPageD
   const chartDateFormatter = (iso: string) => formatChartDate(iso, data.timeZone);
 
   return (
-    <div className="space-y-6">
+    <BoldFormSurface className="space-y-6">
       <AnalyticsPageHeader
         title="Analytics"
         description="Your personal pool performance. Deposits and withdrawals are excluded from pool results."
@@ -252,6 +253,6 @@ export function AnalyticsPageClient({ data, preset }: { data: UserAnalyticsPageD
           emptyMessage="No losses in this range yet."
         />
       </div>
-    </div>
+    </BoldFormSurface>
   );
 }

@@ -58,7 +58,10 @@ export function HorizontalBarChartCard({
   const axisValueFormatter = wrapAxisNumberFormatter(valueFormatter);
 
   return (
-    <Card>
+    // colorBySign means green/red bars — per the "green content goes black"
+    // rule, give the card a local dark scope + black ground so those bars pop
+    // (bg-black! overrides the gold-wrap's transparent card fill).
+    <Card className={colorBySign ? "dark border-black bg-black!" : undefined}>
       <CardHeader>
         <div className="flex items-start justify-between gap-2">
           <div>
