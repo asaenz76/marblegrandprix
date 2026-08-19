@@ -286,10 +286,13 @@
      TEXT (links, countdowns): #7c83ff measures 5.73:1 on surface-primary, so
      it is legible as normal-size text — unlike the button-fill primary below,
      which is intentionally deeper. */
-  --accent-primary: #ff5252;
-  --accent-primary-hover: #ff7070;
-  --accent-primary-subtle: #2a0d0d;
-  --accent-primary-label: #ff7070;
+  /* Dark mode leans into the "Gold" half: accent TEXT/links/selection are gold
+     (pops on near-black, ~15:1), while solid buttons stay red (--primary below).
+     Light mode keeps red accents — gold on white would be illegible. */
+  --accent-primary: #ffe100;
+  --accent-primary-hover: #fff04d;
+  --accent-primary-subtle: #2b2400;
+  --accent-primary-label: #ffe100;
   --warning-muted: #f59e0b;
   --danger: #ef4444;
   --credit: #22c55e;
