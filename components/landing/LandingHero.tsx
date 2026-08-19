@@ -24,7 +24,7 @@ export function LandingHero({ heroPool }: { heroPool: SocialPoolCardViewModel | 
           Call the race. <span className="text-accent-primary">Beat the grid.</span>
         </h1>
         <p className="max-w-md text-lg text-text-secondary">
-          Pick a competitor before the gate drops and enter community pools — then watch the race
+          Pick a competitor before the gate drops and enter race pools — then watch the race
           decide who called it.
         </p>
         <div className="flex flex-wrap items-center gap-3">
