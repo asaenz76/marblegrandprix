@@ -23,7 +23,7 @@ export function PoolPreviewCard({ viewModel }: { viewModel: SocialPoolCardViewMo
   const showDistribution = isPreVote || isPostVote;
 
   return (
-    <article className="space-y-3.5 rounded-2xl border border-border-subtle bg-surface-primary p-5">
+    <article className="dark space-y-3.5 rounded-2xl border border-border-subtle bg-black dark:bg-surface-primary p-5">
       <PoolLeagueHeader
         competitionName={viewModel.fixture.competitionName}
         competitionCountry={viewModel.fixture.competitionCountry}

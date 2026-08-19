@@ -35,7 +35,7 @@ export function CompetitionGroupCard({
       {group.winnerPool ? (
         <SocialPoolCard viewModel={group.winnerPool} {...shared} />
       ) : (
-        <div className="flex items-center gap-3 rounded-2xl border border-border-subtle bg-surface-primary p-5">
+        <div className="dark flex items-center gap-3 rounded-2xl border border-border-subtle bg-black dark:bg-surface-primary p-5">
           {group.competitionImageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={group.competitionImageUrl} alt="" className="size-8 shrink-0 rounded-full object-cover" />
@@ -57,7 +57,7 @@ export function CompetitionGroupCard({
             type="button"
             onClick={() => setOpen((o) => !o)}
             aria-expanded={open}
-            className="flex w-full items-center justify-between rounded-xl border border-border-subtle bg-surface-primary px-4 py-2.5 text-sm font-medium text-text-secondary hover:bg-surface-secondary"
+            className="dark flex w-full items-center justify-between rounded-xl border border-border-subtle bg-black dark:bg-surface-primary px-4 py-2.5 text-sm font-medium text-text-secondary hover:bg-surface-secondary"
           >
             <span>
               {open ? "Hide" : "Show"} {n} race{n === 1 ? "" : "s"}

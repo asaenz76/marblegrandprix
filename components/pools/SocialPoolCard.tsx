@@ -123,7 +123,12 @@ export function SocialPoolCard({
   return (
     <article
       className={cn(
-        "space-y-3.5 rounded-2xl border border-border-subtle bg-surface-primary p-5",
+        // Prediction cards carry a local dark scope so they sit on a black
+        // ground in light mode — the contrast the gold page can't give, and it
+        // lets competitor colors / win-green / selection accents pop. The
+        // `dark` class resolves inner tokens to their light-on-dark values;
+        // `dark:bg-surface-primary` leaves the real dark theme's card as-is.
+        "dark space-y-3.5 rounded-2xl border border-border-subtle bg-black dark:bg-surface-primary p-5",
         // A pool that's just locked (not yet live/settled/voided — those
         // have their own status notices) reads as "no longer available"
         // rather than looking identical to an actively OPEN pool.
