@@ -8,14 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RacingImageUploader } from "@/components/racing/RacingImageUploader";
 
-type Format = "SINGLE_RACE" | "CHAMPIONSHIP" | "LEAGUE" | "BRACKET" | "ELIMINATION";
+type Format = "SINGLE_RACE" | "CHAMPIONSHIP";
 
 const FORMAT_HELP: Record<Format, string> = {
   SINGLE_RACE: "One race that stands on its own.",
   CHAMPIONSHIP: "Points across several races; finalized from the standings.",
-  LEAGUE: "Points across several races; finalized from the standings.",
-  BRACKET: "Single elimination — winners advance round by round to a final.",
-  ELIMINATION: "Qualifying positions advance to the next round.",
 };
 
 /**
@@ -50,9 +47,6 @@ export function CompetitionCreateForm() {
         <Label htmlFor="format">Format</Label>
         <select id="format" className="w-full rounded-md border border-border-subtle bg-transparent px-3 py-2 text-sm" value={format} onChange={(e) => setFormat(e.target.value as Format)}>
           <option value="CHAMPIONSHIP">Championship</option>
-          <option value="LEAGUE">League</option>
-          <option value="BRACKET">Bracket</option>
-          <option value="ELIMINATION">Elimination</option>
           <option value="SINGLE_RACE">Single race</option>
         </select>
         <p className="text-xs text-text-secondary">{FORMAT_HELP[format]}</p>

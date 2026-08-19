@@ -54,7 +54,7 @@ export function RaceCreateForm({
   const [useNewCompetition, setUseNewCompetition] = useState(!lockedCompetition && canCreateCompetition && competitions.length === 0);
   const [competitionId, setCompetitionId] = useState(lockedCompetition?.id ?? competitions[0]?.id ?? "");
   const [newCompetitionName, setNewCompetitionName] = useState("");
-  const [newCompetitionFormat, setNewCompetitionFormat] = useState<"SINGLE_RACE" | "CHAMPIONSHIP" | "LEAGUE" | "BRACKET" | "ELIMINATION">("SINGLE_RACE");
+  const [newCompetitionFormat, setNewCompetitionFormat] = useState<"SINGLE_RACE" | "CHAMPIONSHIP">("SINGLE_RACE");
 
   // Source races available for a progression slot (only when adding to an
   // existing competition that already has races to advance from).
@@ -135,9 +135,6 @@ export function RaceCreateForm({
                 <select id="newFormat" className="w-full rounded-md border border-border-subtle bg-transparent px-3 py-2 text-sm" value={newCompetitionFormat} onChange={(e) => setNewCompetitionFormat(e.target.value as typeof newCompetitionFormat)}>
                   <option value="SINGLE_RACE">Single race</option>
                   <option value="CHAMPIONSHIP">Championship (points standings)</option>
-                  <option value="LEAGUE">League (points standings)</option>
-                  <option value="BRACKET">Bracket (single elimination)</option>
-                  <option value="ELIMINATION">Elimination (position-based)</option>
                 </select>
                 <p className="text-xs text-text-secondary">Championship/League finalize from standings; Bracket/Elimination advance winners (or qualifying positions) round-by-round to a final race.</p>
               </div>

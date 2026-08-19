@@ -11,10 +11,11 @@ import { isSuperAdmin } from "@/lib/auth/guards";
  * is a global act, so it stays Super-Admin-only (mirrors create-race.ts) — an
  * Organizer manages races within competitions a Super Admin assigned them to.
  *
- * CHAMPIONSHIP/LEAGUE/BRACKET/ELIMINATION start ACTIVE (they run immediately and
- * accept races/results); SINGLE_RACE keeps the DRAFT default. points_config is
- * left to the schema default (the approved 10/6/4/3/2/1 preset) — no config
- * editor in V1.
+ * Only two formats are offered: CHAMPIONSHIP (points standings across races,
+ * starts ACTIVE) and SINGLE_RACE (one race, keeps the DRAFT default). The
+ * older LEAGUE/BRACKET/ELIMINATION formats were retired from creation; the
+ * enum values remain in the DB so any existing rows keep working. points_config
+ * is left to the schema default (the approved 10/6/4/3/2/1 preset).
  */
 
 type Client = SupabaseClient;
@@ -22,7 +23,7 @@ type Client = SupabaseClient;
 export const createCompetitionSchema = z
   .object({
     name: z.string().trim().min(1, "A competition needs a name.").max(120),
-    format: z.enum(["SINGLE_RACE", "CHAMPIONSHIP", "LEAGUE", "BRACKET", "ELIMINATION"]),
+    format: z.enum(["SINGLE_RACE", "CHAMPIONSHIP"]),
     // Optional rounded icon (Phase 16). A public URL produced by the
     // /api/racing-image upload route; never a browser-supplied storage write.
     imageUrl: z.string().trim().url().max(2048).optional(),

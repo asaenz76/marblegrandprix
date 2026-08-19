@@ -1,8 +1,8 @@
-import { Flag, Trophy, ListOrdered, Network, Filter } from "lucide-react";
+import { Flag, Trophy } from "lucide-react";
 
 // Explains only the competition formats a new player needs to picture the
 // racing world — not every internal rule. Human-readable labels, never raw
-// enums (SINGLE_RACE/CHAMPIONSHIP/…).
+// enums (SINGLE_RACE/CHAMPIONSHIP).
 const FORMATS = [
   {
     icon: Flag,
@@ -13,21 +13,6 @@ const FORMATS = [
     icon: Trophy,
     name: "Championship",
     description: "Points across a series of races crown an overall champion.",
-  },
-  {
-    icon: ListOrdered,
-    name: "League",
-    description: "A points table that builds race by race across a season.",
-  },
-  {
-    icon: Network,
-    name: "Bracket",
-    description: "Winners advance round by round until one is left standing.",
-  },
-  {
-    icon: Filter,
-    name: "Elimination",
-    description: "Finishing position decides who moves on and who drops out.",
   },
 ];
 
