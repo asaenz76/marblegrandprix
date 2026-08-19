@@ -31,7 +31,7 @@ export function FeedFilters({
         aria-label="Sort by"
         value={activeSort}
         onChange={(e) => updateParam("sort", e.target.value === "newest" ? "" : e.target.value)}
-        className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm"
+        className="h-8 rounded-lg border border-black dark:border-input bg-transparent px-2.5 text-sm"
       >
         <option value="newest">Newest</option>
         <option value="locking_soon">Locking soon</option>
@@ -45,7 +45,7 @@ export function FeedFilters({
           aria-label="Filter by sport"
           value={searchParams.get("sport") ?? ""}
           onChange={(e) => updateParam("sport", e.target.value)}
-          className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm"
+          className="h-8 rounded-lg border border-black dark:border-input bg-transparent px-2.5 text-sm"
         >
           <option value="">All sports</option>
           {sportOptions.map((sport) => (
@@ -60,7 +60,7 @@ export function FeedFilters({
           aria-label="Filter by league"
           value={searchParams.get("league") ?? ""}
           onChange={(e) => updateParam("league", e.target.value)}
-          className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm"
+          className="h-8 rounded-lg border border-black dark:border-input bg-transparent px-2.5 text-sm"
         >
           <option value="">All leagues</option>
           {leagueOptions.map((league) => (

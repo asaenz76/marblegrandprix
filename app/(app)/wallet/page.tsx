@@ -10,6 +10,7 @@ import { getPaymentMethods } from "@/lib/payment-methods/fetch";
 import { TransactionList } from "@/components/activity/TransactionList";
 import { WalletRequestForm } from "./wallet-request-form";
 import { HouseRevenueView } from "./house-revenue-view";
+import { BoldFormSurface } from "@/components/ui/bold-form-surface";
 
 // Pending is the state a player is actively waiting and wondering about, so
 // it gets the loudest treatment — the same warning-muted "needs attention"
@@ -56,7 +57,9 @@ export default async function WalletPage() {
         <p className="text-4xl font-bold text-text-primary">{formatCents(balanceCents)}</p>
       </div>
 
-      <WalletRequestForm paymentMethods={enabledPaymentMethods} />
+      <BoldFormSurface>
+        <WalletRequestForm paymentMethods={enabledPaymentMethods} />
+      </BoldFormSurface>
 
       <div className="space-y-2">
         <h2 className="text-sm font-semibold text-text-primary">Your requests</h2>

@@ -2,6 +2,7 @@ import { requireOrganizerOrAbove } from "@/lib/auth/session";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isSuperAdmin } from "@/lib/auth/guards";
 import { RaceCreateForm } from "./race-create-form";
+import { BoldFormSurface } from "@/components/ui/bold-form-surface";
 
 // Single Race creation (Phase 4). First-class racing-native flow — no fixtures,
 // no provider, no home/away. Eligibility is the coarse organizer gate here; the
@@ -58,13 +59,15 @@ export default async function NewRacePage({ searchParams }: { searchParams: Prom
           {preselected ? <>Adding a race to <span className="font-medium text-text-primary">{preselected.name}</span>.</> : "Add a field of competitors and schedule the race."}
         </p>
       </div>
-      <RaceCreateForm
-        competitions={competitions}
-        canCreateCompetition={superAdmin}
-        library={lib ?? []}
-        racesByCompetition={racesByCompetition}
-        lockedCompetitionId={preselected?.id ?? null}
-      />
+      <BoldFormSurface>
+        <RaceCreateForm
+          competitions={competitions}
+          canCreateCompetition={superAdmin}
+          library={lib ?? []}
+          racesByCompetition={racesByCompetition}
+          lockedCompetitionId={preselected?.id ?? null}
+        />
+      </BoldFormSurface>
     </div>
   );
 }

@@ -25,6 +25,7 @@ import {
   GradeManuallyButton,
   UndoGradingButton,
 } from "./lifecycle-actions";
+import { BoldFormSurface } from "@/components/ui/bold-form-surface";
 
 const CANCELLABLE_STATUSES = ["DRAFT", "OPEN", "LOCKED", "AWAITING_RESULT", "MANUAL_REVIEW"];
 
@@ -151,7 +152,7 @@ export default async function AdminPoolDetailPage({
   const templateTotalEntries = (templateOptionCounts ?? []).reduce((sum, o) => sum + (o.entry_count ?? 0), 0);
 
   return (
-    <div className="space-y-6">
+    <BoldFormSurface className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
           {pool.title && <p className="text-sm text-text-secondary">{pool.title}</p>}
@@ -506,6 +507,6 @@ export default async function AdminPoolDetailPage({
           </tbody>
         </table>
       </div>
-    </div>
+    </BoldFormSurface>
   );
 }

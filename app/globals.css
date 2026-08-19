@@ -151,7 +151,12 @@
  * now use text-primary (a plain, high-contrast neutral) instead.
  */
 :root {
-  --background: #ffffff;
+  /* Bold racing ground: the light-mode page background is gold (FFC917), a
+     race-flag yellow. Cards/surfaces below stay white so every card, feed
+     item, and form panel floats and pops off the gold. Only the raw page
+     ground is gold — see the contrast notes on --text-secondary/-muted for
+     why grey text must stay on a white card, never directly on this ground. */
+  --background: #ffc917;
   --surface-primary: #ffffff;
   /* Nested panels sitting on top of a card (combo-leg lists, admin table
      rows) — spec's "surface-subtle". */
@@ -160,18 +165,24 @@
      "surface-hover", reused for both since neither needs to be visually
      distinct from the other at this near-white end of the scale. */
   --surface-elevated: #f7f7f7;
-  --border-subtle: #e8e8e8;
-  /* New: a stronger divider for cases that need more separation than
-     border-subtle without becoming a colored accent (e.g. the "remaining"
-     segment of a two-side percentage bar). */
+  /* Bold gold theme: borders are black in light mode. This token feeds card
+     outlines, input/field borders (--input), dividers, tab underlines, and
+     table gridlines, so making it black here turns every hairline crisp-black
+     on the gold ground in one place (dark mode keeps its own subtle value). */
+  --border-subtle: #000000;
+  /* Stronger divider for cases that need more separation than border-subtle
+     (e.g. the "remaining" segment of a two-side percentage bar). Kept a mid
+     grey so it still reads as a neutral track, not a black fill. */
   --border-strong: #d4d4d4;
   --text-primary: #0a0a0a;
-  --text-secondary: #737373;
-  /* #a3a3a3 measured 2.52:1 against surface-primary — well under WCAG AA's
-     4.5:1 floor for the text-xs sizes this token is actually used at
-     (timestamps, footer notes, muted labels throughout the app). #707070
-     measures 4.95:1 on surface-primary and 4.54:1 on surface-secondary. */
-  --text-muted: #707070;
+  /* Darkened for the bold gold (FFC917) ground: secondary/muted text is used
+     both on white cards AND directly on the page ground (profile stat labels,
+     bottom-nav labels, inactive tabs). The old #737373/#707070 cleared AA on
+     white cards but dropped to ~2.9:1 on gold. #3d3d3d and #4d4d4d clear AA on
+     BOTH grounds (gold ~6.5:1 / ~5.0:1; white ~9:1 / ~7.7:1) while staying
+     clearly lighter than the near-black primary, so the muted hierarchy holds. */
+  --text-secondary: #3d3d3d;
+  --text-muted: #4d4d4d;
   /* Fire & Gold: red is the interaction accent (replacing the old indigo). */
   --accent-primary: #f00000;
   --accent-primary-hover: #c40000;
@@ -345,6 +356,19 @@
   --sidebar-accent-foreground: var(--text-primary);
   --sidebar-border: var(--border-subtle);
   --sidebar-ring: var(--accent-primary);
+}
+
+/* Bold gold-ground form treatment (BoldFormSurface). On the light FFC917
+   ground, secondary/muted text inside a form surface collapses to the near-
+   black primary so labels and help text stay legible on gold; dark mode
+   restores the tuned muted tones (values mirror the .dark :root block above). */
+.bold-form-text {
+  --text-secondary: var(--text-primary);
+  --text-muted: var(--text-primary);
+}
+.dark .bold-form-text {
+  --text-secondary: #a8a8b0;
+  --text-muted: #8e8e98;
 }
 
 @layer base {

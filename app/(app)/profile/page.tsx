@@ -2,6 +2,7 @@ import { requireUser } from "@/lib/auth/session";
 import { isAdminOrAbove } from "@/lib/auth/guards";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent } from "@/components/ui/card";
+import { BoldFormSurface } from "@/components/ui/bold-form-surface";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { AvatarUploader } from "./avatar-uploader";
 import { ProfileForm } from "./profile-form";
@@ -60,33 +61,39 @@ export default async function ProfilePage() {
         following={<FollowedTeamsLeaguesTab />}
         edit={
           <div className="space-y-6">
-            <Card>
-              <CardContent className="pt-6">
-                <AvatarUploader displayName={user.display_name} avatarUrl={user.avatar_url} />
-              </CardContent>
-            </Card>
+            {/* Bold gold-ground form treatment (matches the auth screen): the
+                edit cards blend into the FFC917 ground with black card/field
+                outlines and black text. The Close-account danger card is
+                intentionally OUTSIDE this scope so it keeps its red edge. */}
+            <BoldFormSurface className="space-y-6">
+              <Card>
+                <CardContent className="pt-6">
+                  <AvatarUploader displayName={user.display_name} avatarUrl={user.avatar_url} />
+                </CardContent>
+              </Card>
 
-            <Card>
-              <CardContent className="pt-6">
-                <ProfileForm
-                  key={`${user.display_name}-${user.username}-${editableFields?.bio}`}
-                  displayName={user.display_name}
-                  username={user.username}
-                  pronouns={editableFields?.pronouns ?? null}
-                  gender={editableFields?.gender ?? null}
-                  bio={editableFields?.bio ?? null}
-                  showPronouns={editableFields?.show_pronouns ?? true}
-                  showGender={editableFields?.show_gender ?? true}
-                  showBio={editableFields?.show_bio ?? true}
-                />
-              </CardContent>
-            </Card>
+              <Card>
+                <CardContent className="pt-6">
+                  <ProfileForm
+                    key={`${user.display_name}-${user.username}-${editableFields?.bio}`}
+                    displayName={user.display_name}
+                    username={user.username}
+                    pronouns={editableFields?.pronouns ?? null}
+                    gender={editableFields?.gender ?? null}
+                    bio={editableFields?.bio ?? null}
+                    showPronouns={editableFields?.show_pronouns ?? true}
+                    showGender={editableFields?.show_gender ?? true}
+                    showBio={editableFields?.show_bio ?? true}
+                  />
+                </CardContent>
+              </Card>
 
-            <Card>
-              <CardContent className="pt-6">
-                <ChangePasswordForm />
-              </CardContent>
-            </Card>
+              <Card>
+                <CardContent className="pt-6">
+                  <ChangePasswordForm />
+                </CardContent>
+              </Card>
+            </BoldFormSurface>
 
             <CloseAccountForm />
           </div>

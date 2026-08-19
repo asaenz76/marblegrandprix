@@ -10,6 +10,7 @@ import { WalletAdjustmentForm } from "./wallet-adjustment-form";
 import { SetRoleForm } from "./set-role-form";
 import { UsersFilters } from "./users-filters";
 import { requireAdminOrAbove } from "@/lib/auth/session";
+import { BoldFormSurface } from "@/components/ui/bold-form-surface";
 
 const PAGE_SIZE = 50;
 
@@ -105,8 +106,10 @@ export default async function AdminUsersPage({
   return (
     <div className="space-y-6">
       <h1 className="sr-only">Users</h1>
-      <InviteForm />
-      <CreateUserForm />
+      <BoldFormSurface className="space-y-6">
+        <InviteForm />
+        <CreateUserForm />
+      </BoldFormSurface>
       <div className="flex items-center justify-between">
         <UsersFilters />
         <p className="text-xs text-text-muted">
@@ -116,7 +119,7 @@ export default async function AdminUsersPage({
 
       <div className="overflow-x-auto rounded-xl border border-border-subtle">
         <table className="w-full text-sm">
-          <thead className="bg-surface-secondary text-left text-text-muted">
+          <thead className="bg-black text-left text-[#ffe100] dark:bg-surface-secondary dark:text-text-muted">
             <tr>
               <th className="px-3 py-2 font-medium">User</th>
               <th className="px-3 py-2 font-medium">Role</th>

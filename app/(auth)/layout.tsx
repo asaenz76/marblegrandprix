@@ -1,8 +1,12 @@
 import { Wordmark } from "@/components/Wordmark";
+import { BoldFormSurface } from "@/components/ui/bold-form-surface";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-full flex-1 items-center justify-center bg-background px-4 py-12">
+    <BoldFormSurface
+      card="none"
+      className="flex min-h-full flex-1 items-center justify-center bg-background px-4 py-12"
+    >
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <h1>
@@ -14,6 +18,6 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </div>
         {children}
       </div>
-    </div>
+    </BoldFormSurface>
   );
 }

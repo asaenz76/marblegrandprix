@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { RegistrationToggle } from "./registration-toggle";
 import { PaymentMethodsSettings } from "./payment-methods-settings";
 import { PoolFeeDefaultsForm } from "./pool-fee-defaults-form";
+import { BoldFormSurface } from "@/components/ui/bold-form-surface";
 
 export default async function AdminSettingsPage() {
   await requireSuperAdmin();
@@ -17,7 +18,7 @@ export default async function AdminSettingsPage() {
   ]);
 
   return (
-    <div className="space-y-6">
+    <BoldFormSurface className="space-y-6">
       <h1 className="sr-only">Settings</h1>
       <Card>
         <CardContent className="pt-6">
@@ -37,6 +38,6 @@ export default async function AdminSettingsPage() {
           <PaymentMethodsSettings methods={paymentMethods} />
         </CardContent>
       </Card>
-    </div>
+    </BoldFormSurface>
   );
 }

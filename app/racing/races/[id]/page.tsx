@@ -15,6 +15,7 @@ import { DeleteRacingEntityButton } from "@/components/racing/DeleteRacingEntity
 import { LocalDateTime } from "@/components/LocalDateTime";
 import { ResultForm } from "./result-form";
 import { CorrectionForm } from "./correction-form";
+import { BoldFormSurface } from "@/components/ui/bold-form-surface";
 
 // Race detail + result entry (Phase 6). Access is re-checked server-side:
 // requireCompetitionAccess enforces the Phase 3 assignment boundary (super_admin
@@ -53,7 +54,7 @@ export default async function RaceDetailPage({ params }: { params: Promise<{ id:
     .order("created_at", { ascending: false });
 
   return (
-    <div className="mx-auto max-w-xl space-y-6">
+    <BoldFormSurface className="mx-auto max-w-xl space-y-6">
       <div className="flex items-center gap-3">
         {race.image_url && (
           // eslint-disable-next-line @next/next/no-img-element
@@ -145,6 +146,6 @@ export default async function RaceDetailPage({ params }: { params: Promise<{ id:
           <DeleteRacingEntityButton kind="race" id={race.id} name={race.title ?? "Race"} />
         </section>
       )}
-    </div>
+    </BoldFormSurface>
   );
 }

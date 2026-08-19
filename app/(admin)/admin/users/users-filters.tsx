@@ -31,7 +31,7 @@ export function UsersFilters() {
       aria-label="Filter by status"
       value={searchParams.get("status") ?? "active"}
       onChange={(e) => updateStatus(e.target.value)}
-      className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm"
+      className="h-8 rounded-lg border border-black dark:border-input bg-transparent px-2.5 text-sm"
     >
       {STATUS_OPTIONS.map((option) => (
         <option key={option.value} value={option.value}>

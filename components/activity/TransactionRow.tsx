@@ -48,7 +48,12 @@ export function TransactionRow({
     <li
       id={`tx-${id}`}
       className={cn(
-        "rounded-xl border border-border-subtle bg-surface-primary transition-shadow",
+        // Transaction rows carry a local dark scope so the black ground lets
+        // the credit-green / debit-red amounts pop (they'd wash out on the
+        // gold light ground). The `dark` class resolves text/border tokens to
+        // their light-on-dark values in light mode; `dark:bg-surface-primary`
+        // leaves the real dark theme's row color exactly as it was.
+        "dark rounded-xl border border-border-subtle bg-black dark:bg-surface-primary transition-shadow",
         highlighted && "ring-2 ring-accent-primary",
       )}
     >
