@@ -19,7 +19,7 @@ export async function HouseRevenueView() {
     <div className="space-y-6">
       <h1 className="sr-only">Ledger</h1>
 
-      <div className="dark rounded-2xl border border-border-subtle bg-black dark:bg-surface-primary p-4">
+      <div className="rounded-2xl border-2 border-border-subtle bg-surface-primary p-4 shadow-sticker">
         <p className="text-sm text-text-muted">Platform revenue</p>
         <p className="text-2xl font-bold text-text-primary">{formatCents(revenue.currentBalance)}</p>
         <p className="mt-1 text-xs text-text-muted">

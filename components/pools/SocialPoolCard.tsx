@@ -128,7 +128,7 @@ export function SocialPoolCard({
         // lets competitor colors / win-green / selection accents pop. The
         // `dark` class resolves inner tokens to their light-on-dark values;
         // `dark:bg-surface-primary` leaves the real dark theme's card as-is.
-        "dark space-y-3.5 rounded-2xl border border-border-subtle bg-black dark:bg-surface-primary p-5",
+        "space-y-3.5 rounded-2xl border-2 border-border-subtle bg-surface-primary p-5 shadow-sticker",
         // A pool that's just locked (not yet live/settled/voided — those
         // have their own status notices) reads as "no longer available"
         // rather than looking identical to an actively OPEN pool.

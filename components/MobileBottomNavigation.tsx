@@ -57,7 +57,7 @@ export function MobileBottomNavigation({
   return (
     <nav
       aria-label="Primary"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-black bg-background/95 backdrop-blur pb-[env(safe-area-inset-bottom)] dark:border-border-subtle"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-border-subtle bg-background/95 backdrop-blur pb-[env(safe-area-inset-bottom)]"
     >
       <ul className={cn("mx-auto flex w-full items-stretch justify-around", wide ? "max-w-[1200px]" : "max-w-[720px]")}>
         {LEFT_TABS.map(({ href, label, icon: Icon }) => (

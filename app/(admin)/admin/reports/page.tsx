@@ -130,9 +130,9 @@ export default async function AdminReportsPage() {
       <Card>
         <CardContent className="space-y-2 pt-6">
           <h2 className="text-sm font-semibold text-text-primary">Ledger transactions by type</h2>
-          <div className="dark overflow-x-auto rounded-xl border border-border-subtle bg-black">
+          <div className="overflow-x-auto rounded-xl border border-border-subtle">
             <table className="w-full text-sm">
-              <thead className="bg-black text-left text-[#ffe100]">
+              <thead className="bg-surface-secondary text-left text-text-muted">
                 <tr>
                   <th className="px-3 py-2 font-medium">Type</th>
                   <th className="px-3 py-2 font-medium">Credited</th>

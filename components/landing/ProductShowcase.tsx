@@ -25,7 +25,7 @@ function ShowcasePanel({
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2 text-sm font-semibold">
-        <span className="flex size-6 items-center justify-center rounded-full bg-[#ffc917]/20 text-[#ffc917]">
+        <span className="flex size-6 items-center justify-center rounded-full bg-[#ffc440]/20 text-[#ffc440]">
           {index}
         </span>
         {title}
@@ -54,8 +54,8 @@ export function ProductShowcase({
     <section className="border-y border-border-subtle bg-inverted-surface py-16 text-inverted-surface-foreground">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <h2 className="text-balance text-center font-display text-2xl font-extrabold sm:text-3xl">
-          Built for <span className="text-[#ffc917]">competition</span>. Made for{" "}
-          <span className="text-[#ffc917]">community</span>.
+          Built for <span className="text-[#ffc440]">competition</span>. Made for{" "}
+          <span className="text-[#ffc440]">community</span>.
         </h2>
 
         <div className="mx-auto mt-12 grid max-w-3xl gap-10 sm:grid-cols-2">

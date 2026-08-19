@@ -20,7 +20,7 @@ export default async function AdminInvitationsPage() {
       <h1 className="sr-only">Invitations</h1>
       <div className="overflow-x-auto rounded-xl border border-border-subtle">
         <table className="w-full text-sm">
-          <thead className="bg-black text-left text-[#ffe100] dark:bg-surface-secondary dark:text-text-muted">
+          <thead className="bg-surface-secondary text-left text-text-muted">
             <tr>
               <th className="px-3 py-2 font-medium">Email</th>
             <th className="px-3 py-2 font-medium">Status</th>

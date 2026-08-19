@@ -62,7 +62,7 @@ export function LineChartCard({
             {description && <CardDescription>{description}</CardDescription>}
           </div>
           {modes && modes.length > 1 && (
-            <div className="flex shrink-0 gap-1 rounded-lg border border-border-subtle bg-background p-1 dark:border-transparent dark:bg-surface-secondary">
+            <div className="flex shrink-0 gap-1 rounded-lg bg-surface-secondary p-1">
               {modes.map((mode) => (
                 <button
                   key={mode.key}

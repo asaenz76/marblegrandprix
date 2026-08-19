@@ -53,7 +53,7 @@ export function TransactionRow({
         // gold light ground). The `dark` class resolves text/border tokens to
         // their light-on-dark values in light mode; `dark:bg-surface-primary`
         // leaves the real dark theme's row color exactly as it was.
-        "dark rounded-xl border border-border-subtle bg-black dark:bg-surface-primary transition-shadow",
+        "rounded-xl border-2 border-border-subtle bg-surface-primary transition-shadow shadow-sticker-sm",
         highlighted && "ring-2 ring-accent-primary",
       )}
     >

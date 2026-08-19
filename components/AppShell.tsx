@@ -33,7 +33,7 @@ export function AppShell({
 
   return (
     <div className="flex min-h-full flex-col bg-background">
-      <header className="sticky top-0 z-30 border-b border-black bg-background/95 backdrop-blur dark:border-border-subtle">
+      <header className="sticky top-0 z-30 border-b border-border-subtle bg-background/95 backdrop-blur">
         <div
           className={cn(
             // flex-wrap + gap-y: at large accessibility text sizes the

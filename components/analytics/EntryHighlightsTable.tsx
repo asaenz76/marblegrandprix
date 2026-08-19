@@ -17,7 +17,7 @@ export function EntryHighlightsTable({ title, description, entries, emptyMessage
   return (
     // Net-result column is green/red, so the whole card goes black (rule: green
     // content on a black ground). bg-black! overrides the gold-wrap's fill.
-    <Card className="dark border-black bg-black!">
+    <Card>
       <CardHeader>
         <CardTitle>{title}</CardTitle>
         {description && <CardDescription>{description}</CardDescription>}
@@ -29,7 +29,7 @@ export function EntryHighlightsTable({ title, description, entries, emptyMessage
           <div className="-mx-(--card-spacing) overflow-x-auto">
             <table className="w-full min-w-[560px] text-sm">
               <thead>
-                <tr className="border-b border-border-subtle text-left text-xs bg-black text-[#ffe100]">
+                <tr className="border-b border-border-subtle text-left text-xs text-text-muted">
                   <th className="px-(--card-spacing) py-2 font-medium">Question</th>
                   <th className="px-(--card-spacing) py-2 font-medium">Selected</th>
                   <th className="px-(--card-spacing) py-2 text-right font-medium">Entry</th>

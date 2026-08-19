@@ -10,14 +10,12 @@ export function BalancePill({ balanceCents }: { balanceCents: number }) {
       href="/wallet"
       className={cn(
         badgeVariants({ variant: "primary", size: "lg" }),
-        // Bold gold theme: the wallet pill is a black chip with gold text/icon.
-        // In dark mode a pure-black pill would vanish on the near-black header,
-        // so it steps up to the elevated dark surface, keeping the gold text.
-        "border border-black bg-black text-[#ffe100] transition-colors hover:bg-[#1a1a1a]",
-        "dark:border-border-subtle dark:bg-surface-elevated dark:hover:bg-surface-secondary",
+        // Cream sticker chip: ink border + hard offset shadow, teal wallet icon.
+        "border-2 border-border-subtle bg-surface-primary shadow-sticker-sm transition-colors hover:bg-surface-secondary",
+        "dark:border-transparent dark:bg-surface-elevated dark:shadow-none dark:hover:bg-surface-secondary",
       )}
     >
-      <Wallet className="size-3.5 text-[#ffe100]" aria-hidden="true" />
+      <Wallet className="size-3.5 text-accent-primary" aria-hidden="true" />
       {formatCents(balanceCents)}
     </Link>
   );

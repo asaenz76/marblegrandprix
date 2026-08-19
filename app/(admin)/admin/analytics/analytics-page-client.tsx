@@ -143,7 +143,7 @@ export function AdminAnalyticsPageClient({ data, preset }: { data: AdminAnalytic
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-2">
           <h2 className="text-sm font-semibold text-text-primary">Top users</h2>
-          <div className="flex gap-1 rounded-lg border border-border-subtle bg-background p-1 dark:border-transparent dark:bg-surface-secondary">
+          <div className="flex gap-1 rounded-lg bg-surface-secondary p-1">
             {(Object.keys(SORT_LABELS) as TopUsersSort[]).map((sort) => (
               <button
                 key={sort}
@@ -160,9 +160,9 @@ export function AdminAnalyticsPageClient({ data, preset }: { data: AdminAnalytic
             ))}
           </div>
         </div>
-        <div className="dark overflow-x-auto rounded-xl border border-border-subtle bg-black">
+        <div className="overflow-x-auto rounded-xl border border-border-subtle">
           <table className="w-full text-sm">
-            <thead className="bg-black text-left text-[#ffe100]">
+            <thead className="bg-surface-secondary text-left text-text-muted">
               <tr>
                 <th className="px-3 py-2 font-medium">Player</th>
                 <th className="px-3 py-2 font-medium">Entries</th>

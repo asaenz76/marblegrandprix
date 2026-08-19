@@ -19,14 +19,14 @@ export function PhoneFrame({ children, onDark = false }: { children: React.React
     <div
       className={cn(
         "relative mx-auto w-full max-w-[300px] rounded-[2.5rem] border-[6px] border-inverted-surface bg-inverted-surface p-2 shadow-2xl",
-        onDark ? "ring-1 ring-[#ffc917]" : "dark:ring-1 dark:ring-[#ffc917]",
+        onDark ? "ring-1 ring-[#ffc440]" : "dark:ring-1 dark:ring-[#ffc440]",
       )}
     >
       <div className="absolute left-1/2 top-2 h-5 w-24 -translate-x-1/2 rounded-full bg-inverted-surface" aria-hidden="true" />
       {/* Screen is the near-black app surface (not bg-background, which is gold
           in light mode) so the mockup reads like a dark phone and the gold
           ground never shows through behind the app content. */}
-      <div className="h-[560px] overflow-hidden rounded-[2rem] bg-inverted-surface">
+      <div className="h-[560px] overflow-hidden rounded-[2rem] bg-background">
         <div className="h-[560px] overflow-y-auto p-3 pt-7">{children}</div>
       </div>
     </div>

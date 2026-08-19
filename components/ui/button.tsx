@@ -8,16 +8,17 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/80",
+        default:
+          "border-2 border-border-subtle bg-primary text-primary-foreground shadow-sticker-sm hover:bg-primary/85 dark:border-transparent dark:shadow-none",
         outline:
-          "border-black bg-black text-[#ffe100] hover:bg-[#1a1a1a] hover:text-[#ffe100] aria-expanded:bg-[#1a1a1a] aria-expanded:text-[#ffe100] dark:border-input dark:bg-input/30 dark:text-foreground dark:hover:bg-input/50 dark:hover:text-foreground",
+          "border-2 border-border-subtle bg-surface-primary text-text-primary shadow-sticker-sm hover:bg-surface-secondary aria-expanded:bg-surface-secondary dark:border-input dark:bg-input/30 dark:text-foreground dark:hover:bg-input/50 dark:shadow-none",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
+          "border-2 border-border-subtle bg-secondary text-secondary-foreground shadow-sticker-sm hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] dark:border-transparent dark:shadow-none",
         ghost:
           "hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50",
         destructive:
-          "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
-        link: "text-primary underline-offset-4 hover:underline",
+          "border-2 border-destructive bg-destructive/10 text-destructive shadow-sticker-sm hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:border-transparent dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40 dark:shadow-none",
+        link: "text-accent-primary underline-offset-4 hover:underline",
       },
       size: {
         default:

@@ -47,12 +47,12 @@ export function FormatsSection() {
             key={name}
             // Black card (local dark scope) with a yellow title and a solid
             // yellow icon badge — the bold black-and-yellow race-type look.
-            className="dark rounded-2xl border border-border-subtle bg-black p-5"
+            className="rounded-2xl border-2 border-border-subtle bg-surface-primary p-5 shadow-sticker"
           >
-            <div className="flex size-9 items-center justify-center rounded-full bg-[#ffe100] text-black">
+            <div className="flex size-9 items-center justify-center rounded-full bg-accent-primary text-white">
               <Icon className="size-5" aria-hidden="true" />
             </div>
-            <h3 className="mt-3 font-semibold text-[#ffe100]">{name}</h3>
+            <h3 className="mt-3 font-semibold text-text-primary">{name}</h3>
             <p className="mt-1 text-sm text-text-secondary">{description}</p>
           </div>
         ))}

@@ -78,7 +78,7 @@ export function LeaderboardFilters() {
         aria-label="Range"
         value={range}
         onChange={(e) => updateParam("range", e.target.value)}
-        className="h-8 rounded-lg border border-black dark:border-input bg-transparent px-2.5 text-sm"
+        className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm"
       >
         {RANGE_OPTIONS.map((option) => (
           <option key={option.value} value={option.value}>

@@ -156,48 +156,48 @@
      item, and form panel floats and pops off the gold. Only the raw page
      ground is gold — see the contrast notes on --text-secondary/-muted for
      why grey text must stay on a white card, never directly on this ground. */
-  --background: #ffc917;
-  --surface-primary: #ffffff;
+  --background: #f6f2df;
+  --surface-primary: #fffef4;
   /* Nested panels sitting on top of a card (combo-leg lists, admin table
      rows) — spec's "surface-subtle". */
-  --surface-secondary: #f5f5f5;
+  --surface-secondary: #efe8c7;
   /* Popovers/modals and hover tints on interactive surfaces — spec's
      "surface-hover", reused for both since neither needs to be visually
      distinct from the other at this near-white end of the scale. */
-  --surface-elevated: #f7f7f7;
+  --surface-elevated: #fff6dd;
   /* Bold gold theme: borders are black in light mode. This token feeds card
      outlines, input/field borders (--input), dividers, tab underlines, and
      table gridlines, so making it black here turns every hairline crisp-black
      on the gold ground in one place (dark mode keeps its own subtle value). */
-  --border-subtle: #000000;
+  --border-subtle: #102337;
   /* Stronger divider for cases that need more separation than border-subtle
      (e.g. the "remaining" segment of a two-side percentage bar). Kept a mid
      grey so it still reads as a neutral track, not a black fill. */
-  --border-strong: #d4d4d4;
-  --text-primary: #0a0a0a;
+  --border-strong: #102337;
+  --text-primary: #102337;
   /* Darkened for the bold gold (FFC917) ground: secondary/muted text is used
      both on white cards AND directly on the page ground (profile stat labels,
      bottom-nav labels, inactive tabs). The old #737373/#707070 cleared AA on
      white cards but dropped to ~2.9:1 on gold. #3d3d3d and #4d4d4d clear AA on
      BOTH grounds (gold ~6.5:1 / ~5.0:1; white ~9:1 / ~7.7:1) while staying
      clearly lighter than the near-black primary, so the muted hierarchy holds. */
-  --text-secondary: #3d3d3d;
-  --text-muted: #4d4d4d;
+  --text-secondary: #445867;
+  --text-muted: #445867;
   /* Fire & Gold: red is the interaction accent (replacing the old indigo). */
-  --accent-primary: #f00000;
-  --accent-primary-hover: #c40000;
-  --accent-primary-subtle: #ffecec;
-  --accent-primary-label: #cc0000; /* deeper red so small accent text clears AA on white */
+  --accent-primary: #00778f;
+  --accent-primary-hover: #005f73;
+  --accent-primary-subtle: #c8f1ea;
+  --accent-primary-label: #005f73; /* deeper red so small accent text clears AA on white */
   /* #f59e0b (amber-500) measured 2.15:1 against surface-primary — badly
      fails WCAG AA. Only overridden here in light mode: the same hex passes
      comfortably (8.1:1) against .dark's darker surfaces below, so it's
      left unchanged there. #a2620a measures 4.9:1 on surface-primary. */
-  --warning-muted: #a2620a;
-  --danger: #ef4444;
-  --credit: #22c55e;
-  --debit: #ef4444;
-  --pool-win: #22c55e;
-  --pool-loss: #ef4444;
+  --warning-muted: #b45309;
+  --danger: #b7353b;
+  --credit: #15803d;
+  --debit: #b7353b;
+  --pool-win: #15803d;
+  --pool-loss: #b7353b;
   /* Racing winner/champion marker — see --color-success. Green-700: legible
      as small badge text on light surfaces (5.0:1 on white). */
   --success: #15803d;
@@ -205,15 +205,15 @@
      "this match is live" gets the warning hue instead of its old orange.
      Same light-mode contrast fix as --warning-muted above (identical
      underlying failure: #f59e0b measured 2.15:1 on surface-primary). */
-  --pool-live: #a2620a;
+  --pool-live: #b45309;
   /* New: streaks only. Never reused as a general accent/warning color. */
-  --streak: #fb923c;
+  --streak: #f76568;
   /* New: leaderboard podium only (Podium.tsx) — theme-invariant medal
      colors, not redefined in .dark below, since a gold medal is gold
      regardless of theme. Foreground pairs are fixed dark text for contrast
      against these bright badge fills in both themes. */
-  --medal-gold: #ffc917;
-  --medal-gold-foreground: #78350f;
+  --medal-gold: #ffc440;
+  --medal-gold-foreground: #102337;
   --medal-silver: #d4d4d8;
   --medal-silver-foreground: #3f3f46;
   --medal-bronze: #cd7f32;
@@ -225,24 +225,24 @@
      mode by coincidence (text-primary is near-black there) but inverts to
      a near-white band/bezel in dark mode, since text-primary flips
      meaning between themes and these never should. */
-  --inverted-surface: #050505;
-  --inverted-surface-foreground: #f5f5f5;
+  --inverted-surface: #102337;
+  --inverted-surface-foreground: #fffef4;
   /* Deliberate deep navy — the "Formula blue-and-white" structural tone.
      Used sparingly (wordmark, section eyebrows, footer band), never as an
      interaction color, so it never competes with the indigo accent. */
-  --brand-navy: #b00000;
+  --brand-navy: #005f73;
   /* Dark hairline ring for competitor color swatches on the near-white
      surfaces — keeps white/yellow/orange marbles from vanishing (they
      measure 1.0–2.8:1 against a white card). */
-  --competitor-ring: rgba(17, 17, 17, 0.3);
+  --competitor-ring: rgba(16, 35, 55, 0.35);
 
   --foreground: var(--text-primary);
   --card: var(--surface-primary);
   --card-foreground: var(--text-primary);
   --popover: var(--surface-elevated);
   --popover-foreground: var(--text-primary);
-  --primary: var(--accent-primary);
-  --primary-foreground: #ffffff;
+  --primary: #ffc440;
+  --primary-foreground: #102337;
   --secondary: var(--surface-secondary);
   --secondary-foreground: var(--text-primary);
   --muted: var(--surface-secondary);
@@ -250,7 +250,7 @@
   --accent: var(--surface-secondary);
   --accent-foreground: var(--text-primary);
   --destructive: var(--danger);
-  --destructive-foreground: #ffffff;
+  --destructive-foreground: #fffef4;
   --border: var(--border-subtle);
   --input: var(--border-subtle);
   --ring: var(--accent-primary);
@@ -259,11 +259,11 @@
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
+  --radius: 0.5rem;
   --sidebar: var(--surface-primary);
   --sidebar-foreground: var(--text-primary);
   --sidebar-primary: var(--accent-primary);
-  --sidebar-primary-foreground: #ffffff;
+  --sidebar-primary-foreground: #102337;
   --sidebar-accent: var(--surface-secondary);
   --sidebar-accent-foreground: var(--text-primary);
   --sidebar-border: var(--border-subtle);
@@ -356,6 +356,18 @@
   --sidebar-accent-foreground: var(--text-primary);
   --sidebar-border: var(--border-subtle);
   --sidebar-ring: var(--accent-primary);
+}
+
+/* Neo-brutalist hard offset shadow ("Reclaim the Web" theme): a solid ink
+   block offset down-right with no blur — the "sticker" lift on cards, buttons,
+   and pills. Pairs with a 2px ink border. Light mode only; dark keeps flat. */
+@layer utilities {
+  .shadow-sticker { box-shadow: 0.25rem 0.25rem 0 rgba(16, 35, 55, 0.28); }
+  .shadow-sticker-sm { box-shadow: 0.15rem 0.15rem 0 rgba(16, 35, 55, 0.28); }
+  :root[data-theme="dark"] .shadow-sticker,
+  :root[data-theme="dark"] .shadow-sticker-sm,
+  .dark .shadow-sticker,
+  .dark .shadow-sticker-sm { box-shadow: none; }
 }
 
 /* Bold gold-ground form treatment (BoldFormSurface). On the light FFC917

@@ -387,7 +387,7 @@ export default async function AdminPoolDetailPage({
             </p>
             <div className="overflow-x-auto rounded-xl border border-border-subtle">
               <table className="w-full text-sm">
-                <thead className="bg-black text-left text-[#ffe100] dark:bg-surface-secondary dark:text-text-muted">
+                <thead className="bg-surface-secondary text-left text-text-muted">
                   <tr>
                     <th className="px-3 py-2 font-medium">Player</th>
                     <th className="px-3 py-2 font-medium">Credited amount</th>
@@ -439,7 +439,7 @@ export default async function AdminPoolDetailPage({
       {(settlements ?? []).length > 0 && (
         <div className="overflow-x-auto rounded-xl border border-border-subtle">
           <table className="w-full text-sm">
-            <thead className="bg-black text-left text-[#ffe100] dark:bg-surface-secondary dark:text-text-muted">
+            <thead className="bg-surface-secondary text-left text-text-muted">
               <tr>
                 <th className="px-3 py-2 font-medium">Version</th>
                 <th className="px-3 py-2 font-medium">Outcome</th>
@@ -473,7 +473,7 @@ export default async function AdminPoolDetailPage({
 
       <div className="overflow-x-auto rounded-xl border border-border-subtle">
         <table className="w-full text-sm">
-          <thead className="bg-black text-left text-[#ffe100] dark:bg-surface-secondary dark:text-text-muted">
+          <thead className="bg-surface-secondary text-left text-text-muted">
             <tr>
               <th className="px-3 py-2 font-medium">Player</th>
               <th className="px-3 py-2 font-medium">Choice</th>
