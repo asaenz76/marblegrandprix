@@ -395,6 +395,16 @@
   }
   html {
     @apply font-sans;
+    /* Offset in-page anchor jumps for the sticky header so targets land just
+       below it, not behind it. The landing header wraps to two rows below lg
+       (~109px) and collapses to one row at lg+ (~57px), so the offset tightens
+       on wide screens. */
+    scroll-padding-top: 7.5rem;
+  }
+  @media (min-width: 1024px) {
+    html {
+      scroll-padding-top: 5rem;
+    }
   }
 }
 
