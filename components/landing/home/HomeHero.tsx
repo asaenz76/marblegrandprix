@@ -46,7 +46,7 @@ export function HomeHero({
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-      <div className="rounded-2xl border-2 border-border-subtle bg-surface-primary p-6 shadow-sticker sm:p-10">
+      <div className="rounded-2xl border-2 border-border-subtle bg-surface-primary p-6 shadow-sticker-colored sm:p-10">
         <div className="flex flex-wrap items-center gap-2 text-sm font-semibold uppercase tracking-wide">
           <span className="inline-flex items-center gap-1.5 rounded-md bg-accent-primary px-2.5 py-1 text-white">
             <Flag className="size-3.5" aria-hidden="true" /> Round {String(nextGrandPrix.roundNumber ?? 1).padStart(2, "0")}
@@ -56,7 +56,7 @@ export function HomeHero({
 
         <h1 className="mt-4 text-balance font-display text-4xl font-extrabold sm:text-6xl">
           {nextGrandPrix.title}
-          <span className="text-accent-primary"> Grand Prix</span>
+          <span className="text-sticker text-accent-primary"> Grand Prix</span>
         </h1>
 
         {start && (

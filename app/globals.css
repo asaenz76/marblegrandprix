@@ -371,6 +371,25 @@
   .dark .shadow-sticker { box-shadow: 0.25rem 0.25rem 0 rgba(0, 0, 0, 0.55); }
   :root[data-theme="dark"] .shadow-sticker-sm,
   .dark .shadow-sticker-sm { box-shadow: 0.15rem 0.15rem 0 rgba(0, 0, 0, 0.55); }
+
+  /* Layered "sticker" text shadow — the Reclaim-the-web colored offset stack,
+     for a big accent heading (e.g. the hero "Grand Prix"). Offsets are in em so
+     they scale with the font size. Colors are the brand amber + coral (fixed in
+     both themes, like the logo mark) over a thin cream edge for separation. */
+  .text-sticker {
+    text-shadow:
+      0.016em 0.016em 0 #fff7e6,
+      0.05em 0.05em 0 #ffc440,
+      0.09em 0.09em 0 #f76568;
+  }
+
+  /* Stacked colored hard shadow for a marquee card — amber over coral peeking
+     to the bottom-right, matching the theme's layered-card treatment. */
+  .shadow-sticker-colored {
+    box-shadow:
+      0.3rem 0.3rem 0 #ffc440,
+      0.6rem 0.6rem 0 #f76568;
+  }
 }
 
 /* Bold gold-ground form treatment (BoldFormSurface). On the light FFC917
