@@ -74,11 +74,9 @@
   --color-accent-primary: var(--accent-primary);
   --color-accent-primary-hover: var(--accent-primary-hover);
   --color-accent-primary-subtle: var(--accent-primary-subtle);
-  /* For small accent-colored text labels (not buttons/backgrounds) where
-     the base accent-primary blue reads fine on a light card but is low-
-     contrast as small text against a dark one — e.g. the pool lock
-     countdown. Identical to accent-primary in light mode; only dark mode
-     substitutes a legible tint. */
+  /* For small accent-colored text labels (not buttons/backgrounds): a deeper
+     accent tint so small accent text stays legible on a light card — e.g. the
+     pool lock countdown. */
   --color-accent-primary-label: var(--accent-primary-label);
   --color-warning-muted: var(--warning-muted);
   --color-danger: var(--danger);
@@ -97,8 +95,8 @@
      FINANCIAL result. A pool's winning option can be marked even for a viewer
      who didn't back it, so "this competitor won" and "you profited" are
      separate concepts and must not share a token. Tuned to be legible as small
-     badge/label TEXT in both themes (green-700 on light, green-400 on dark),
-     unlike pool-win's brighter #22c55e which only reads on a fill. */
+     badge/label TEXT (green-700 on light surfaces), unlike pool-win's brighter
+     #22c55e which only reads on a fill. */
   --color-success: var(--success);
   /* Social-first palette additions (2026 refactor) — see the "Social-first
      palette" comment block below :root for the full rationale. Only
@@ -116,15 +114,13 @@
   --color-inverted-surface-foreground: var(--inverted-surface-foreground);
   /* Marble Grand Prix brand additions (Phase 12):
      brand-navy  -> deliberate deep-navy structural tone (wordmark, section
-                    eyebrows, footer) that gives the light UI its "blue-and-
-                    white Formula" gravitas WITHOUT touching the indigo
-                    interaction accent. In dark mode it flips to a light cool
-                    tint so the same structural elements stay legible.
-     competitor-ring -> a theme-contrasting hairline stroke placed around every
-                    competitor color swatch so a swatch whose fill matches the
-                    theme (white on light, black/navy on dark) never visually
-                    disappears. Competitor colors are product data and are
-                    never altered; the ring is what guarantees separation. */
+                    eyebrows, footer) that gives the UI its "blue-and-white
+                    Formula" gravitas WITHOUT touching the interaction accent.
+     competitor-ring -> a hairline stroke placed around every competitor color
+                    swatch so a swatch whose fill matches the near-white ground
+                    (e.g. a white or yellow marble) never visually disappears.
+                    Competitor colors are product data and are never altered;
+                    the ring is what guarantees separation. */
   --color-brand-navy: var(--brand-navy);
   --color-competitor-ring: var(--competitor-ring);
 }
@@ -149,7 +145,7 @@
  * now use text-primary (a plain, high-contrast neutral) instead.
  */
 :root {
-  /* Bold racing ground: the light-mode page background is gold (FFC917), a
+  /* Bold racing ground: the page background is gold (FFC917), a
      race-flag yellow. Cards/surfaces below stay white so every card, feed
      item, and form panel floats and pops off the gold. Only the raw page
      ground is gold — see the contrast notes on --text-secondary/-muted for
@@ -163,10 +159,10 @@
      "surface-hover", reused for both since neither needs to be visually
      distinct from the other at this near-white end of the scale. */
   --surface-elevated: #fff6dd;
-  /* Bold gold theme: borders are black in light mode. This token feeds card
-     outlines, input/field borders (--input), dividers, tab underlines, and
-     table gridlines, so making it black here turns every hairline crisp-black
-     on the gold ground in one place (dark mode keeps its own subtle value). */
+  /* Bold gold theme: borders are black. This token feeds card outlines,
+     input/field borders (--input), dividers, tab underlines, and table
+     gridlines, so making it black here turns every hairline crisp-black on the
+     gold ground in one place. */
   --border-subtle: #102337;
   /* Stronger divider for cases that need more separation than border-subtle
      (e.g. the "remaining" segment of a two-side percentage bar). Kept a mid
@@ -186,10 +182,9 @@
   --accent-primary-hover: #005f73;
   --accent-primary-subtle: #c8f1ea;
   --accent-primary-label: #005f73; /* deeper red so small accent text clears AA on white */
-  /* #f59e0b (amber-500) measured 2.15:1 against surface-primary — badly
-     fails WCAG AA. Only overridden here in light mode: the same hex passes
-     comfortably (8.1:1) against .dark's darker surfaces below, so it's
-     left unchanged there. #a2620a measures 4.9:1 on surface-primary. */
+  /* #f59e0b (amber-500) measured only 2.15:1 against surface-primary — badly
+     fails WCAG AA — so warning text uses this deeper amber instead (#a2620a
+     already measures 4.9:1 on surface-primary; #b45309 is deeper still). */
   --warning-muted: #b45309;
   --danger: #b7353b;
   --credit: #15803d;
@@ -201,28 +196,24 @@
   --success: #15803d;
   /* Amber, not orange — orange is reserved exclusively for streaks now, so
      "this match is live" gets the warning hue instead of its old orange.
-     Same light-mode contrast fix as --warning-muted above (identical
-     underlying failure: #f59e0b measured 2.15:1 on surface-primary). */
+     Same contrast fix as --warning-muted above (identical underlying failure:
+     #f59e0b measured 2.15:1 on surface-primary). */
   --pool-live: #b45309;
   /* New: streaks only. Never reused as a general accent/warning color. */
   --streak: #f76568;
-  /* New: leaderboard podium only (Podium.tsx) — theme-invariant medal
-     colors, not redefined in .dark below, since a gold medal is gold
-     regardless of theme. Foreground pairs are fixed dark text for contrast
-     against these bright badge fills in both themes. */
+  /* New: leaderboard podium only (Podium.tsx) — a gold medal is gold; the
+     foreground pairs are fixed dark text for contrast against these bright
+     badge fills. */
   --medal-gold: #ffc440;
   --medal-gold-foreground: #102337;
   --medal-silver: #d4d4d8;
   --medal-silver-foreground: #3f3f46;
   --medal-bronze: #cd7f32;
   --medal-bronze-foreground: #451a03;
-  /* New: landing-page-only "always dark, regardless of theme" surface —
-     the ProductShowcase.tsx band and PhoneFrame.tsx's device bezel, same
-     theme-invariant pattern as the medal colors above. Using
-     bg-text-primary/text-background directly would have worked in light
-     mode by coincidence (text-primary is near-black there) but inverts to
-     a near-white band/bezel in dark mode, since text-primary flips
-     meaning between themes and these never should. */
+  /* New: landing-page-only fixed dark surface — the ProductShowcase.tsx band
+     and PhoneFrame.tsx's device bezel. Its own token (rather than reusing
+     text-primary/background) so the band/bezel stays a deliberate dark ink
+     independent of what any other token does. */
   --inverted-surface: #102337;
   --inverted-surface-foreground: #fffef4;
   /* Deliberate deep navy — the "Formula blue-and-white" structural tone.
@@ -273,7 +264,7 @@
 
 /* Neo-brutalist hard offset shadow ("Reclaim the Web" theme): a solid ink
    block offset down-right with no blur — the "sticker" lift on cards, buttons,
-   and pills. Pairs with a 2px ink border. Light mode only; dark keeps flat. */
+   and pills. Pairs with a 2px ink border. */
 @layer utilities {
   /* Hard, solid offset shadow (Reclaim-the-web neo-brutalism) — an opaque ink
      shade so containers read as crisp stickers rather than softly
@@ -283,8 +274,8 @@
 
   /* Layered "sticker" text shadow — the Reclaim-the-web colored offset stack,
      for a big accent heading (e.g. the hero "Grand Prix"). Offsets are in em so
-     they scale with the font size. Colors are the brand amber + coral (fixed in
-     both themes, like the logo mark) over a thin cream edge for separation. */
+     they scale with the font size. Colors are the brand amber + coral (like the
+     logo mark) over a thin cream edge for separation. */
   .text-sticker {
     text-shadow:
       0.016em 0.016em 0 #fff7e6,
