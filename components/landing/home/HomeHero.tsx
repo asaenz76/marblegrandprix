@@ -77,7 +77,7 @@ export function HomeHero({
           )}
           <div className="flex flex-wrap gap-3">
             <Link href="/register" className="inline-flex h-11 items-center rounded-lg border-2 border-border-subtle bg-primary px-5 font-semibold uppercase tracking-wide text-primary-foreground shadow-sticker-sm">
-              Enter Grand Prix
+              Enter Grand Prix Pool
             </Link>
             <Link href="#standings" className="inline-flex h-11 items-center rounded-lg border-2 border-border-subtle bg-surface-primary px-5 font-semibold uppercase tracking-wide text-text-primary shadow-sticker-sm">
               View standings
