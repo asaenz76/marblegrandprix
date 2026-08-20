@@ -26,6 +26,11 @@ export const raceCompetitorInputSchema = z
     // Reuse path: pick an existing persistent competitor from the library.
     existingCompetitorId: z.string().uuid().optional(),
 
+    // Team path: pick a team from the library; it expands to one entrant per
+    // member marble (each tagged with the team for grouping). The winner is
+    // still a single marble.
+    teamId: z.string().uuid().optional(),
+
     // Inline-create path fields (all optional individually; >=1 required):
     name: z.string().trim().min(1).max(80).optional(),
     number: z.string().trim().min(1).max(20).optional(),
@@ -43,8 +48,15 @@ export const raceCompetitorInputSchema = z
   .superRefine((c, ctx) => {
     // Placeholder slot: identity is deferred to the progression engine.
     if (c.advancesFrom) {
-      if (c.existingCompetitorId || c.name || c.number || c.colors || c.imageUrl) {
+      if (c.existingCompetitorId || c.teamId || c.name || c.number || c.colors || c.imageUrl) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: "A progression slot cannot also name a competitor." });
+      }
+      return;
+    }
+    // Team slot: identity is the team's members; no other fields apply.
+    if (c.teamId) {
+      if (c.existingCompetitorId || c.name || c.number || c.colors || c.imageUrl) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "A team entrant cannot also name a competitor." });
       }
       return;
     }
@@ -86,7 +98,9 @@ export const createRaceSchema = z
     // /api/racing-image upload route; never a browser-supplied storage write.
     imageUrl: z.string().trim().url().max(2048).optional(),
 
-    competitors: z.array(raceCompetitorInputSchema).min(2, "A race needs at least 2 competitors."),
+    // At least one entrant row; a single team row expands to its members, so the
+    // real ">= 2 marbles" minimum is enforced after expansion in create-race.ts.
+    competitors: z.array(raceCompetitorInputSchema).min(1, "A race needs at least one entrant."),
   })
   .strict()
   .superRefine((v, ctx) => {
@@ -107,6 +121,12 @@ export const createRaceSchema = z
     const existingIds = v.competitors.map((c) => c.existingCompetitorId).filter(Boolean) as string[];
     if (new Set(existingIds).size !== existingIds.length) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: "The same competitor cannot be added twice to a race.", path: ["competitors"] });
+    }
+    // No duplicate team within one race (cross-team member overlap is deduped in
+    // create-race.ts, since teams aren't expanded here).
+    const teamIds = v.competitors.map((c) => c.teamId).filter(Boolean) as string[];
+    if (new Set(teamIds).size !== teamIds.length) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "The same team cannot be added twice to a race.", path: ["competitors"] });
     }
   });
 

@@ -98,29 +98,71 @@ export async function createRaceForActor(
     const rid: string = race.id;
     raceId = rid;
 
-    for (let i = 0; i < data.competitors.length; i++) {
-      const c = data.competitors[i];
-      // Phase 8: a progression placeholder slot — occupant deferred to the engine.
+    // Resolve every entrant row into ordered planned race_competitors rows. A
+    // team entrant expands to one row per member marble (team affiliation is
+    // global via racing_team_members, so no per-race team column is stored — the
+    // winner and points stay per-marble). Progression slots keep a null occupant.
+    type Planned =
+      | { kind: "placeholder"; sourceRaceId: string; sourceRule: string; sourcePosition: number | null }
+      | { kind: "competitor"; competitorId: string };
+    const planned: Planned[] = [];
+
+    for (const c of data.competitors) {
       if (c.advancesFrom) {
         const { data: src } = await client.from("races").select("competition_id").eq("id", c.advancesFrom.sourceRaceId).maybeSingle();
         if (!src || src.competition_id !== competitionId) throw new Error("slot-source"); // source must be in this competition
-        const { error: slotErr } = await client.from("race_competitors").insert({
-          race_id: raceId,
-          competitor_id: null,
-          is_placeholder: true,
-          sort_order: i,
-          source_race_id: c.advancesFrom.sourceRaceId,
-          source_rule: c.advancesFrom.sourceRule,
-          source_position: c.advancesFrom.sourcePosition ?? null,
-        });
-        if (slotErr) throw new Error("slot");
+        planned.push({ kind: "placeholder", sourceRaceId: c.advancesFrom.sourceRaceId, sourceRule: c.advancesFrom.sourceRule, sourcePosition: c.advancesFrom.sourcePosition ?? null });
+        continue;
+      }
+      if (c.teamId) {
+        const { data: team } = await client.from("racing_teams").select("id, is_active").eq("id", c.teamId).maybeSingle();
+        if (!team || !(team as { is_active: boolean }).is_active) throw new Error("team");
+        const { data: members } = await client
+          .from("racing_team_members")
+          .select("competitor_id, competitors ( is_persistent, is_active )")
+          .eq("team_id", c.teamId)
+          .order("sort_order", { ascending: true });
+        const list = (members ?? []) as unknown as Array<{ competitor_id: string; competitors: { is_persistent: boolean; is_active: boolean } | null }>;
+        if (list.length === 0) throw new Error("team-empty");
+        for (const m of list) {
+          if (!m.competitors?.is_persistent || !m.competitors?.is_active) throw new Error("team-member");
+          planned.push({ kind: "competitor", competitorId: m.competitor_id });
+        }
         continue;
       }
       const competitorId = await resolveCompetitor(client, c, rid, actor.id, raceOnlyCompetitorIds);
       if (!competitorId) throw new Error("competitor");
-      const { error: attachErr } = await client
-        .from("race_competitors")
-        .insert({ race_id: raceId, competitor_id: competitorId, sort_order: i });
+      planned.push({ kind: "competitor", competitorId });
+    }
+
+    // Dedup marbles by competitor id (a marble added via two teams, or via a
+    // team and individually, enters once — first occurrence wins). Placeholders
+    // are distinct slots and never deduped.
+    const seen = new Set<string>();
+    const deduped = planned.filter((p) => {
+      if (p.kind !== "competitor") return true;
+      if (seen.has(p.competitorId)) return false;
+      seen.add(p.competitorId);
+      return true;
+    });
+
+    // The real race minimum applies AFTER team expansion.
+    if (deduped.length < 2) throw new Error("min-entrants");
+
+    for (let i = 0; i < deduped.length; i++) {
+      const p = deduped[i];
+      const { error: attachErr } =
+        p.kind === "placeholder"
+          ? await client.from("race_competitors").insert({
+              race_id: rid,
+              competitor_id: null,
+              is_placeholder: true,
+              sort_order: i,
+              source_race_id: p.sourceRaceId,
+              source_rule: p.sourceRule,
+              source_position: p.sourcePosition,
+            })
+          : await client.from("race_competitors").insert({ race_id: rid, competitor_id: p.competitorId, sort_order: i });
       if (attachErr) throw new Error("attach"); // duplicate / race-only-scope violations land here
     }
   } catch {

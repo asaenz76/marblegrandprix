@@ -3,7 +3,8 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createRaceAction } from "@/lib/actions/races";
-import { CompetitorIdentity } from "@/components/racing/CompetitorIdentity";
+import { CompetitorIdentity, type CompetitorIdentityData } from "@/components/racing/CompetitorIdentity";
+import { TeamCluster } from "@/components/racing/TeamCluster";
 import { RacingImageUploader } from "@/components/racing/RacingImageUploader";
 import { ColorChips } from "@/components/racing/ColorChips";
 import { Button } from "@/components/ui/button";
@@ -14,10 +15,12 @@ import { Card, CardContent } from "@/components/ui/card";
 type CompetitionOption = { id: string; name: string; format: string };
 type LibraryCompetitor = { id: string; name: string | null; number: string | null; colors: string[] | null };
 type SourceRace = { id: string; title: string | null };
+type TeamOption = { id: string; name: string; color: string | null; imageUrl: string | null; members: CompetitorIdentityData[] };
 
 type Row = {
-  mode: "new" | "existing" | "slot"; // "slot" = Phase 8 progression placeholder
+  mode: "new" | "existing" | "slot" | "team"; // "slot" = Phase 8 progression placeholder; "team" = expand a team's members
   existingCompetitorId: string;
+  teamId: string;
   name: string;
   number: string;
   colorsText: string; // comma-separated, up to 4
@@ -29,18 +32,20 @@ type Row = {
   sourcePosition: string;
 };
 
-const emptyRow = (): Row => ({ mode: "new", existingCompetitorId: "", name: "", number: "", colorsText: "", imageUrl: "", persistent: false, sourceRaceId: "", sourceRule: "WINNER", sourcePosition: "" });
+const emptyRow = (): Row => ({ mode: "new", existingCompetitorId: "", teamId: "", name: "", number: "", colorsText: "", imageUrl: "", persistent: false, sourceRaceId: "", sourceRule: "WINNER", sourcePosition: "" });
 
 export function RaceCreateForm({
   competitions,
   canCreateCompetition,
   library,
+  teams = [],
   racesByCompetition = {},
   lockedCompetitionId = null,
 }: {
   competitions: CompetitionOption[];
   canCreateCompetition: boolean;
   library: LibraryCompetitor[];
+  teams?: TeamOption[];
   racesByCompetition?: Record<string, SourceRace[]>;
   // Phase 10: when adding a race from a competition page, the competition is
   // fixed — lock it and hide the competition picker / "new competition" toggle.
@@ -82,6 +87,7 @@ export function RaceCreateForm({
         };
       }
       if (r.mode === "existing") return { existingCompetitorId: r.existingCompetitorId };
+      if (r.mode === "team") return { teamId: r.teamId };
       const colors = r.colorsText.split(",").map((c) => c.trim()).filter(Boolean).slice(0, 4);
       return {
         name: r.name.trim() || undefined,
@@ -195,6 +201,9 @@ export function RaceCreateForm({
                   {library.length > 0 && (
                     <label className="flex items-center gap-1"><input type="radio" checked={r.mode === "existing"} onChange={() => update(i, { mode: "existing", existingCompetitorId: library[0].id })} /> From library</label>
                   )}
+                  {teams.length > 0 && (
+                    <label className="flex items-center gap-1"><input type="radio" checked={r.mode === "team"} onChange={() => update(i, { mode: "team", teamId: teams[0].id })} /> From team</label>
+                  )}
                   {sourceRaces.length > 0 && (
                     <label className="flex items-center gap-1"><input type="radio" checked={r.mode === "slot"} onChange={() => update(i, { mode: "slot", sourceRaceId: sourceRaces[0].id })} /> Advances from a race</label>
                   )}
@@ -223,6 +232,24 @@ export function RaceCreateForm({
                     <option key={c.id} value={c.id}>{[c.number, c.name, (c.colors ?? []).join("/")].filter(Boolean).join(" · ") || "Competitor"}</option>
                   ))}
                 </select>
+              ) : r.mode === "team" ? (
+                <div className="space-y-2">
+                  <select className="w-full rounded-md border border-border-subtle bg-transparent px-3 py-2 text-sm" value={r.teamId} onChange={(e) => update(i, { teamId: e.target.value })}>
+                    {teams.map((t) => (
+                      <option key={t.id} value={t.id}>{t.name} ({t.members.length})</option>
+                    ))}
+                  </select>
+                  {(() => {
+                    const t = teams.find((x) => x.id === r.teamId);
+                    if (!t) return null;
+                    return (
+                      <p className="text-xs text-text-secondary">
+                        <TeamCluster team={{ name: t.name, color: t.color, imageUrl: t.imageUrl, members: t.members }} size="sm" />
+                        <span className="ml-1 text-text-muted">— all {t.members.length} marble{t.members.length === 1 ? "" : "s"} enter this race</span>
+                      </p>
+                    );
+                  })()}
+                </div>
               ) : (
                 <>
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">

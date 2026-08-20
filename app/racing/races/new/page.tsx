@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { isSuperAdmin } from "@/lib/auth/guards";
 import { RaceCreateForm } from "./race-create-form";
 import { BoldFormSurface } from "@/components/ui/bold-form-surface";
+import type { CompetitorIdentityData } from "@/components/racing/CompetitorIdentity";
 
 // Single Race creation (Phase 4). First-class racing-native flow — no fixtures,
 // no provider, no home/away. Eligibility is the coarse organizer gate here; the
@@ -45,6 +46,38 @@ export default async function NewRacePage({ searchParams }: { searchParams: Prom
     .order("created_at", { ascending: false })
     .limit(100);
 
+  // Teams (constructors) available to add as an entrant — expands to its members.
+  const { data: teamRows } = await client
+    .from("racing_teams")
+    .select("id, name, color, image_url")
+    .eq("is_active", true)
+    .order("created_at", { ascending: false })
+    .limit(200);
+  const teamIds = (teamRows ?? []).map((t) => t.id as string);
+  const membersByTeam: Record<string, CompetitorIdentityData[]> = {};
+  if (teamIds.length) {
+    const { data: mem } = await client
+      .from("racing_team_members")
+      .select("team_id, sort_order, competitors ( name, number, colors, image_url )")
+      .in("team_id", teamIds)
+      .order("sort_order", { ascending: true });
+    for (const m of (mem ?? []) as unknown as Array<{ team_id: string; competitors: { name: string | null; number: string | null; colors: string[] | null; image_url: string | null } | null }>) {
+      (membersByTeam[m.team_id] ??= []).push({
+        name: m.competitors?.name ?? null,
+        number: m.competitors?.number ?? null,
+        colors: m.competitors?.colors ?? null,
+        imageUrl: m.competitors?.image_url ?? null,
+      });
+    }
+  }
+  const teams = (teamRows ?? []).map((t) => ({
+    id: t.id as string,
+    name: t.name as string,
+    color: (t.color as string | null) ?? null,
+    imageUrl: (t.image_url as string | null) ?? null,
+    members: membersByTeam[t.id as string] ?? [],
+  }));
+
   // Preselect + lock the competition when arriving from a competition page
   // ("Add race"), so the operator isn't asked to re-pick the same competition.
   const preselected = preselectedCompetitionId && competitions.some((c) => c.id === preselectedCompetitionId)
@@ -64,6 +97,7 @@ export default async function NewRacePage({ searchParams }: { searchParams: Prom
           competitions={competitions}
           canCreateCompetition={superAdmin}
           library={lib ?? []}
+          teams={teams}
           racesByCompetition={racesByCompetition}
           lockedCompetitionId={preselected?.id ?? null}
         />
