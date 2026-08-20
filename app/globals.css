@@ -365,12 +365,15 @@
    block offset down-right with no blur — the "sticker" lift on cards, buttons,
    and pills. Pairs with a 2px ink border. Light mode only; dark keeps flat. */
 @layer utilities {
-  .shadow-sticker { box-shadow: 0.25rem 0.25rem 0 rgba(16, 35, 55, 0.28); }
-  .shadow-sticker-sm { box-shadow: 0.15rem 0.15rem 0 rgba(16, 35, 55, 0.28); }
+  /* Hard, solid offset shadow (Reclaim-the-web neo-brutalism) — an opaque ink
+     shade in light, opaque black in dark, so containers read as crisp stickers
+     rather than softly drop-shadowed. */
+  .shadow-sticker { box-shadow: 0.25rem 0.25rem 0 #102337; }
+  .shadow-sticker-sm { box-shadow: 0.15rem 0.15rem 0 #102337; }
   :root[data-theme="dark"] .shadow-sticker,
-  .dark .shadow-sticker { box-shadow: 0.25rem 0.25rem 0 rgba(0, 0, 0, 0.55); }
+  .dark .shadow-sticker { box-shadow: 0.25rem 0.25rem 0 #000000; }
   :root[data-theme="dark"] .shadow-sticker-sm,
-  .dark .shadow-sticker-sm { box-shadow: 0.15rem 0.15rem 0 rgba(0, 0, 0, 0.55); }
+  .dark .shadow-sticker-sm { box-shadow: 0.15rem 0.15rem 0 #000000; }
 
   /* Layered "sticker" text shadow — the Reclaim-the-web colored offset stack,
      for a big accent heading (e.g. the hero "Grand Prix"). Offsets are in em so
