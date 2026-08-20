@@ -10,6 +10,7 @@ import { CompetitorIdentity } from "@/components/racing/CompetitorIdentity";
 import { PoolOptionButton } from "@/components/pools/PoolOptionButton";
 import { PoolDistributionBar } from "@/components/pools/PoolDistributionBar";
 import { AvatarStack } from "@/components/pools/AvatarStack";
+import { ExpandableList } from "./home/ExpandableList";
 
 // A read-only preview of the real SocialPoolCard, built from the exact same
 // view-model + presentational sub-components the logged-in Feed renders —
@@ -83,27 +84,37 @@ export function PoolPreviewCard({
         <h3 className="text-lg font-bold text-text-primary">{viewModel.question}</h3>
       </div>
 
-      <div className="space-y-2">
-        {viewModel.options.map((option) => {
-          const competitor = viewModel.racing?.optionCompetitors[option.optionId];
-          return (
-            <PoolOptionButton
-              key={option.optionId}
-              label={option.label}
-              logoUrl={option.teamLogoUrl}
-              // Racing options render the full competitor identity
-              // (colors/number/name/image), N-agnostically — same as the feed.
-              leading={competitor ? <CompetitorIdentity competitor={competitor} /> : undefined}
-              isWinner={viewModel.racing?.winnerOptionId === option.optionId}
-              percentage={option.percentage}
-              estimatedPayout={option.estimatedPayout}
-              isCurrentUserChoice={false}
-              disabled
-              onSelect={() => {}}
-            />
-          );
-        })}
-      </div>
+      {/* Bound the option list so a race with a large field scrolls inside the
+          card instead of stretching the page; expands on demand. */}
+      <ExpandableList
+        framed={false}
+        count={viewModel.options.length}
+        threshold={8}
+        collapsedMaxHeight="24rem"
+        itemNoun="marbles"
+      >
+        <div className="space-y-2">
+          {viewModel.options.map((option) => {
+            const competitor = viewModel.racing?.optionCompetitors[option.optionId];
+            return (
+              <PoolOptionButton
+                key={option.optionId}
+                label={option.label}
+                logoUrl={option.teamLogoUrl}
+                // Racing options render the full competitor identity
+                // (colors/number/name/image), N-agnostically — same as the feed.
+                leading={competitor ? <CompetitorIdentity competitor={competitor} /> : undefined}
+                isWinner={viewModel.racing?.winnerOptionId === option.optionId}
+                percentage={option.percentage}
+                estimatedPayout={option.estimatedPayout}
+                isCurrentUserChoice={false}
+                disabled
+                onSelect={() => {}}
+              />
+            );
+          })}
+        </div>
+      </ExpandableList>
 
       {(!hideEconomics || showDistribution) && (
         <p className="text-xs text-text-muted">

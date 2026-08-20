@@ -23,7 +23,14 @@ function activeStageForDay(day: number): number {
 
 export function RaceWeekTracker() {
   const [active, setActive] = useState<number | null>(null);
-  useEffect(() => setActive(activeStageForDay(new Date().getDay())), []);
+  // Mount-gate: the active stage depends on the visitor's local day, which is
+  // only known client-side. Setting it once on mount is the intended pattern
+  // here (server renders no active stage), so the set-state-in-effect lint is
+  // deliberately suppressed rather than worked around.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setActive(activeStageForDay(new Date().getDay()));
+  }, []);
 
   return (
     <section className="mx-auto max-w-6xl px-4 sm:px-6">

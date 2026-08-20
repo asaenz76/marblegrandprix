@@ -10,6 +10,10 @@ import { useEffect, useState } from "react";
 export function Countdown({ targetIso }: { targetIso: string }) {
   const [now, setNow] = useState<number | null>(null);
   useEffect(() => {
+    // Mount-gate: rendering the ticking value only after mount avoids a
+    // hydration mismatch against the server's static markup. The immediate set
+    // is intentional (not a worked-around effect), so the lint is suppressed.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setNow(Date.now());
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);

@@ -1,5 +1,6 @@
 import type { LandingLeaderboardEntry } from "@/lib/landing/fetch";
 import { Avatar } from "@/components/Avatar";
+import { ExpandableList } from "./ExpandableList";
 
 /**
  * Player leaderboard — the humans calling races best. Kept visually and
@@ -15,21 +16,28 @@ export function PlayerLeaderboard({ entries }: { entries: LandingLeaderboardEntr
       <p className="mb-4 mt-1 text-sm text-text-secondary">
         The people calling races best — separate from the marble championship.
       </p>
-      <ol className="max-w-xl space-y-2">
-        {entries.map((e) => (
-          <li
-            key={e.userId}
-            className="flex items-center gap-3 rounded-xl border-2 border-border-subtle bg-surface-primary p-3 shadow-sticker-sm"
-          >
-            <span className="w-6 text-center font-bold tabular-nums text-text-muted">{e.rank}</span>
-            <Avatar displayName={e.displayName} avatarUrl={e.avatarUrl} size="sm" />
-            <span className="min-w-0 flex-1 truncate font-medium">{e.displayName}</span>
-            <span className="shrink-0 text-sm tabular-nums text-text-secondary">
-              {e.correctCount}/{e.totalCount}
-            </span>
-          </li>
-        ))}
-      </ol>
+      <ExpandableList
+        className="max-w-xl"
+        count={entries.length}
+        threshold={6}
+        itemNoun="players"
+      >
+        <ol className="space-y-2">
+          {entries.map((e) => (
+            <li
+              key={e.userId}
+              className="flex items-center gap-3 rounded-xl border-2 border-border-subtle bg-surface-primary p-3 shadow-sticker-sm"
+            >
+              <span className="w-6 text-center font-bold tabular-nums text-text-muted">{e.rank}</span>
+              <Avatar displayName={e.displayName} avatarUrl={e.avatarUrl} size="sm" />
+              <span className="min-w-0 flex-1 truncate font-medium">{e.displayName}</span>
+              <span className="shrink-0 text-sm tabular-nums text-text-secondary">
+                {e.correctCount}/{e.totalCount}
+              </span>
+            </li>
+          ))}
+        </ol>
+      </ExpandableList>
     </section>
   );
 }

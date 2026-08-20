@@ -319,8 +319,11 @@ export interface HomepageData {
   stats: LandingStats;
 }
 
+// Homepage shows a fuller leaderboard now that it lives in a height-bounded,
+// expandable panel — no longer just a top-5 teaser. Cap kept sane to bound the
+// public payload.
 function mapLeaderboard(rows: unknown): LandingLeaderboardEntry[] {
-  return ((rows as Array<Record<string, unknown>>) ?? []).slice(0, 5).map((row) => ({
+  return ((rows as Array<Record<string, unknown>>) ?? []).slice(0, 50).map((row) => ({
     userId: row.user_id as string,
     displayName: row.display_name as string,
     username: (row.username as string | null) ?? null,
