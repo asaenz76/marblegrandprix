@@ -2,7 +2,6 @@ import Link from "next/link";
 import { Bell } from "lucide-react";
 import { Wordmark } from "@/components/Wordmark";
 import { BalancePill } from "@/components/BalancePill";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { LogoutButton } from "@/components/LogoutButton";
 import { MobileBottomNavigation } from "@/components/MobileBottomNavigation";
 import { NotificationToast } from "@/components/NotificationToast";
@@ -89,7 +88,6 @@ export function AppShell({
                 </span>
               )}
             </Link>
-            <ThemeToggle />
             <LogoutButton />
           </div>
         </div>
