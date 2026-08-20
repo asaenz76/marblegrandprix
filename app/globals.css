@@ -2,8 +2,6 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
-
 /*
  * Design tokens. Every component must consume these semantic tokens, never
  * raw hex/rgb/Tailwind-shade values directly — see the "Social-first
@@ -273,107 +271,15 @@
   --sidebar-ring: var(--accent-primary);
 }
 
-/*
- * Dark mode — "Neutral Night" (Phase 12 redesign). The previous dark ground
- * (#0f1115) was a blue-gray whose surfaces stepped up in the same blue-gray
- * family, so the indigo brand and competitor colors lost separation against
- * it (accent/card measured only ~3.9:1). Neutral Night drops to a near-black
- * NEUTRAL foundation: the blue family becomes the only chromatic identity and
- * every competitor color pops off the neutral ground. Racing energy comes from
- * composition and typography, not a tinted background. Every value below is
- * measured against WCAG AA (see the Phase 12 Stage A study).
- */
-.dark {
-  --background: #1b120d;
-  --surface-primary: #2a1a13;
-  --surface-secondary: #3c2619;
-  --surface-elevated: #4b2b18;
-  --border-subtle: #fff0cf;
-  --border-strong: #e4c6a4;
-  --text-primary: #fff0cf;
-  --text-secondary: #e4c6a4;
-  /* #8e8e98 measures 5.67:1 on surface-primary and 5.23:1 on
-     surface-secondary — clears the 4.5:1 normal-text floor at the text-xs
-     sizes this token is used at (timestamps, muted labels). */
-  --text-muted: #c9ad86;
-  /* Interaction accent used for borders, selection rings, and small accent
-     TEXT (links, countdowns): #7c83ff measures 5.73:1 on surface-primary, so
-     it is legible as normal-size text — unlike the button-fill primary below,
-     which is intentionally deeper. */
-  /* Dark mode leans into the "Gold" half: accent TEXT/links/selection are gold
-     (pops on near-black, ~15:1), while solid buttons stay red (--primary below).
-     Light mode keeps red accents — gold on white would be illegible. */
-  --accent-primary: #ff9f43;
-  --accent-primary-hover: #ffd166;
-  --accent-primary-subtle: #4b2b18;
-  --accent-primary-label: #ffd166;
-  --warning-muted: #ffb45a;
-  --danger: #ff7a5c;
-  --credit: #4ade80;
-  --debit: #ff7a5c;
-  --pool-win: #4ade80;
-  --pool-loss: #ff7a5c;
-  --pool-live: #ffb45a;
-  --streak: #ff7a5c;
-  /* Racing winner/champion marker — green-400: legible as small badge text on
-     the near-black surfaces (10.6:1 on the card). */
-  --success: #4ade80;
-  /* Structural navy flips to a light cool tint in dark mode (10.3:1 on the
-     ground) so wordmark/eyebrow elements stay legible. */
-  --brand-navy: #ffd166;
-  /* Light hairline ring so black/navy competitor swatches (which measure
-     ~1.1–1.8:1 against the near-black card) never disappear. */
-  --competitor-ring: rgba(255, 240, 207, 0.55);
-
-  --foreground: var(--text-primary);
-  --card: var(--surface-primary);
-  --card-foreground: var(--text-primary);
-  --popover: var(--surface-elevated);
-  --popover-foreground: var(--text-primary);
-  /* Solid button fill = the brand red. --accent-primary stays a lighter red
-     (#ff5252) so accent-colored TEXT and borders read against the dark ground,
-     while the fill below carries white button labels. */
-  --primary: #ffc440;
-  --primary-foreground: #102337;
-  --secondary: var(--surface-secondary);
-  --secondary-foreground: var(--text-primary);
-  --muted: var(--surface-secondary);
-  --muted-foreground: var(--text-muted);
-  --accent: var(--surface-elevated);
-  --accent-foreground: var(--text-primary);
-  --destructive: var(--danger);
-  --destructive-foreground: #1b120d;
-  --border: var(--border-subtle);
-  --input: var(--border-subtle);
-  --ring: var(--accent-primary);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: var(--surface-primary);
-  --sidebar-foreground: var(--text-primary);
-  --sidebar-primary: var(--accent-primary);
-  --sidebar-primary-foreground: #102337;
-  --sidebar-accent: var(--surface-elevated);
-  --sidebar-accent-foreground: var(--text-primary);
-  --sidebar-border: var(--border-subtle);
-  --sidebar-ring: var(--accent-primary);
-}
-
 /* Neo-brutalist hard offset shadow ("Reclaim the Web" theme): a solid ink
    block offset down-right with no blur — the "sticker" lift on cards, buttons,
    and pills. Pairs with a 2px ink border. Light mode only; dark keeps flat. */
 @layer utilities {
   /* Hard, solid offset shadow (Reclaim-the-web neo-brutalism) — an opaque ink
-     shade in light, opaque black in dark, so containers read as crisp stickers
-     rather than softly drop-shadowed. */
+     shade so containers read as crisp stickers rather than softly
+     drop-shadowed. */
   .shadow-sticker { box-shadow: 0.25rem 0.25rem 0 #102337; }
   .shadow-sticker-sm { box-shadow: 0.15rem 0.15rem 0 #102337; }
-  :root[data-theme="dark"] .shadow-sticker,
-  .dark .shadow-sticker { box-shadow: 0.25rem 0.25rem 0 #000000; }
-  :root[data-theme="dark"] .shadow-sticker-sm,
-  .dark .shadow-sticker-sm { box-shadow: 0.15rem 0.15rem 0 #000000; }
 
   /* Layered "sticker" text shadow — the Reclaim-the-web colored offset stack,
      for a big accent heading (e.g. the hero "Grand Prix"). Offsets are in em so
@@ -397,15 +303,10 @@
 
 /* Bold gold-ground form treatment (BoldFormSurface). On the light FFC917
    ground, secondary/muted text inside a form surface collapses to the near-
-   black primary so labels and help text stay legible on gold; dark mode
-   restores the tuned muted tones (values mirror the .dark :root block above). */
+   black primary so labels and help text stay legible on gold. */
 .bold-form-text {
   --text-secondary: var(--text-primary);
   --text-muted: var(--text-primary);
-}
-.dark .bold-form-text {
-  --text-secondary: #e4c6a4;
-  --text-muted: #c9ad86;
 }
 
 @layer base {

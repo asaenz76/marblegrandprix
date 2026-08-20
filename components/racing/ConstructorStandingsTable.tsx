@@ -18,7 +18,7 @@ export function ConstructorStandingsTable({ standings }: { standings: Constructo
   return (
     <div className="overflow-x-auto rounded-md border border-border-subtle">
       <table className="w-full text-sm">
-        <thead className="bg-surface-secondary text-left text-text-muted dark:bg-transparent dark:text-text-secondary">
+        <thead className="bg-surface-secondary text-left text-text-muted">
           <tr>
             <th className="w-10 px-3 py-2">#</th>
             <th className="px-3 py-2">Team</th>

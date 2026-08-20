@@ -17,7 +17,7 @@ function Card({
         // --card-spacing values are ~15% more generous than the previous
         // 12px/16px (design-system refactor: more generous card/feed
         // spacing), still compact enough not to inflate mobile height.
-        "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl border-2 border-border-subtle bg-card py-(--card-spacing) text-sm text-card-foreground shadow-sticker [--card-spacing:1.125rem] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:0.875rem] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl dark:shadow-none",
+        "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl border-2 border-border-subtle bg-card py-(--card-spacing) text-sm text-card-foreground shadow-sticker [--card-spacing:1.125rem] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:0.875rem] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
         className
       )}
       {...props}

@@ -51,7 +51,7 @@ export function TransactionRow({
         // Transaction rows carry a local dark scope so the black ground lets
         // the credit-green / debit-red amounts pop (they'd wash out on the
         // gold light ground). The `dark` class resolves text/border tokens to
-        // their light-on-dark values in light mode; `dark:bg-surface-primary`
+        // their light-on-dark values in light mode; `
         // leaves the real dark theme's row color exactly as it was.
         "rounded-xl border-2 border-border-subtle bg-surface-primary transition-shadow shadow-sticker-sm",
         highlighted && "ring-2 ring-accent-primary",

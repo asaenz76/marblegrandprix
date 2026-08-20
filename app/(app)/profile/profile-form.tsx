@@ -15,7 +15,7 @@ const initialState: UpdateProfileState = { error: null, success: false };
 const BIO_MAX_LENGTH = 150;
 
 const SELECT_CLASS =
-  "h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm dark:bg-input/30";
+  "h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm";
 
 // A single text input (the field actually submitted) paired with a preset
 // dropdown as a fill-in shortcut — picking a preset just writes its value

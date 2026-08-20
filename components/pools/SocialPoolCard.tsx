@@ -127,7 +127,7 @@ export function SocialPoolCard({
         // ground in light mode — the contrast the gold page can't give, and it
         // lets competitor colors / win-green / selection accents pop. The
         // `dark` class resolves inner tokens to their light-on-dark values;
-        // `dark:bg-surface-primary` leaves the real dark theme's card as-is.
+        // ` leaves the real dark theme's card as-is.
         "space-y-3.5 rounded-2xl border-2 border-border-subtle bg-surface-primary p-5 shadow-sticker",
         // A pool that's just locked (not yet live/settled/voided — those
         // have their own status notices) reads as "no longer available"
