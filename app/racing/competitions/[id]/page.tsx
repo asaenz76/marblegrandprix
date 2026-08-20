@@ -4,9 +4,11 @@ import { requireCompetitionAccess } from "@/lib/auth/session";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isOrganizerOrAbove, isSuperAdmin } from "@/lib/auth/guards";
 import { computeStandings, type StandingsResult } from "@/lib/racing/standings";
+import { computeConstructorStandings, type ConstructorStandingsResult } from "@/lib/racing/constructor-standings";
 import { humanizeEnum } from "@/lib/utils/humanize";
 import type { CompetitorIdentityData } from "@/components/racing/CompetitorIdentity";
 import { StandingsTable } from "@/components/racing/StandingsTable";
+import { ConstructorStandingsTable } from "@/components/racing/ConstructorStandingsTable";
 import { FinalizeForm } from "./finalize-form";
 import { BracketView } from "@/components/racing/BracketView";
 import { CreateRacingPoolForm } from "@/components/racing/CreateRacingPoolForm";
@@ -47,6 +49,21 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
 
   // Standings are only meaningful for CHAMPIONSHIP/LEAGUE.
   const standings: StandingsResult | null = isStandings ? await computeStandings(admin, id) : null;
+  // Constructors' championship = teams ranked by the sum of their members' points.
+  const constructorStandings: ConstructorStandingsResult | null = isStandings
+    ? await computeConstructorStandings(admin, id)
+    : null;
+  // Team badge per scoring driver (grouping display on the drivers' table).
+  const teamByCompetitor = new Map<string, { name: string; color: string | null; imageUrl: string | null }>();
+  if (constructorStandings) {
+    const { data: memberRows } = await admin
+      .from("racing_team_members")
+      .select("competitor_id, racing_teams ( name, color, image_url )")
+      .in("competitor_id", standings?.rows.map((r) => r.competitorId) ?? ["00000000-0000-0000-0000-000000000000"]);
+    for (const m of (memberRows ?? []) as unknown as Array<{ competitor_id: string; racing_teams: { name: string; color: string | null; image_url: string | null } | null }>) {
+      if (m.racing_teams) teamByCompetitor.set(m.competitor_id, { name: m.racing_teams.name, color: m.racing_teams.color, imageUrl: m.racing_teams.image_url });
+    }
+  }
 
   // Resolve confirmed-result state per race (for the "needs result" hint).
   const raceIds = (races ?? []).map((r) => r.id);
@@ -126,14 +143,22 @@ export default async function CompetitionDetailPage({ params }: { params: Promis
       )}
 
       {isStandings && standings ? (
-        <section className="space-y-2">
-          <h2 className="text-sm font-semibold">Standings</h2>
-          <StandingsTable standings={standings} competitors={competitors} winnerCompetitorId={comp.winner_competitor_id} />
-          {standings.ambiguous && (
-            <p className="text-sm text-danger">A race has a tied finish that can&apos;t be scored automatically. It must be resolved before the competition can be finalized.</p>
-          )}
-          {!standings.ambiguous && standings.topTie && (
-            <p className="text-sm text-text-secondary">The top of the standings is tied — there is no automatic champion.</p>
+        <section className="space-y-4">
+          <div className="space-y-2">
+            <h2 className="text-sm font-semibold">Drivers&apos; Championship</h2>
+            <StandingsTable standings={standings} competitors={competitors} winnerCompetitorId={comp.winner_competitor_id} teamLabels={teamByCompetitor} />
+            {standings.ambiguous && (
+              <p className="text-sm text-danger">A race has a tied finish that can&apos;t be scored automatically. It must be resolved before the competition can be finalized.</p>
+            )}
+            {!standings.ambiguous && standings.topTie && (
+              <p className="text-sm text-text-secondary">The top of the standings is tied — there is no automatic champion.</p>
+            )}
+          </div>
+          {constructorStandings && constructorStandings.rows.length > 0 && (
+            <div className="space-y-2">
+              <h2 className="text-sm font-semibold">Constructors&apos; Championship</h2>
+              <ConstructorStandingsTable standings={constructorStandings} />
+            </div>
           )}
         </section>
       ) : isBracket ? (

@@ -14,6 +14,7 @@ const TABS = [
   { href: "/racing/competitions", label: "Competitions" },
   { href: "/racing/races", label: "Races" },
   { href: "/racing/competitors", label: "Competitors" },
+  { href: "/racing/teams", label: "Teams" },
 ];
 
 export function RacingNav() {

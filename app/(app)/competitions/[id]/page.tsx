@@ -3,9 +3,11 @@ import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { computeStandings } from "@/lib/racing/standings";
+import { computeConstructorStandings } from "@/lib/racing/constructor-standings";
 import { humanizeEnum } from "@/lib/utils/humanize";
-import type { CompetitorIdentityData } from "@/components/racing/CompetitorIdentity";
+import type { CompetitorIdentityData, TeamLabelData } from "@/components/racing/CompetitorIdentity";
 import { StandingsTable } from "@/components/racing/StandingsTable";
+import { ConstructorStandingsTable } from "@/components/racing/ConstructorStandingsTable";
 import { BracketView } from "@/components/racing/BracketView";
 
 /**
@@ -38,6 +40,7 @@ export default async function PlayerCompetitionPage({ params }: { params: Promis
     .order("created_at", { ascending: true });
 
   const standings = isStandings ? await computeStandings(supabase, id) : null;
+  const constructorStandings = isStandings ? await computeConstructorStandings(supabase, id) : null;
 
   // Identities for the standings rows (and the champion).
   const competitors = new Map<string, CompetitorIdentityData>();
@@ -48,6 +51,18 @@ export default async function PlayerCompetitionPage({ params }: { params: Promis
     for (const c of rows ?? []) competitors.set(c.id, { name: c.name, number: c.number, colors: c.colors, imageUrl: c.image_url });
   }
 
+  // Team badge per scoring driver (drivers' table grouping display).
+  const teamByCompetitor = new Map<string, TeamLabelData>();
+  if (isStandings && competitorIds.size) {
+    const { data: memberRows } = await supabase
+      .from("racing_team_members")
+      .select("competitor_id, racing_teams ( name, color, image_url )")
+      .in("competitor_id", [...competitorIds]);
+    for (const m of (memberRows ?? []) as unknown as Array<{ competitor_id: string; racing_teams: { name: string; color: string | null; image_url: string | null } | null }>) {
+      if (m.racing_teams) teamByCompetitor.set(m.competitor_id, { name: m.racing_teams.name, color: m.racing_teams.color, imageUrl: m.racing_teams.image_url });
+    }
+  }
+
   return (
     <div className="mx-auto max-w-xl space-y-6">
       <div>
@@ -56,10 +71,18 @@ export default async function PlayerCompetitionPage({ params }: { params: Promis
       </div>
 
       {isStandings && standings ? (
-        <section className="space-y-2">
-          <h2 className="text-sm font-semibold">Standings</h2>
-          <StandingsTable standings={standings} competitors={competitors} winnerCompetitorId={comp.winner_competitor_id} />
-          {standings.rows.length === 0 && <p className="text-sm text-text-secondary">No points yet — results will populate the standings.</p>}
+        <section className="space-y-4">
+          <div className="space-y-2">
+            <h2 className="text-sm font-semibold">Drivers&apos; Championship</h2>
+            <StandingsTable standings={standings} competitors={competitors} winnerCompetitorId={comp.winner_competitor_id} teamLabels={teamByCompetitor} />
+            {standings.rows.length === 0 && <p className="text-sm text-text-secondary">No points yet — results will populate the standings.</p>}
+          </div>
+          {constructorStandings && constructorStandings.rows.length > 0 && (
+            <div className="space-y-2">
+              <h2 className="text-sm font-semibold">Constructors&apos; Championship</h2>
+              <ConstructorStandingsTable standings={constructorStandings} />
+            </div>
+          )}
         </section>
       ) : isBracket ? (
         <section className="space-y-2">

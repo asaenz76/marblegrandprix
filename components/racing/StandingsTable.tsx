@@ -1,4 +1,4 @@
-import { CompetitorIdentity, type CompetitorIdentityData } from "@/components/racing/CompetitorIdentity";
+import { CompetitorIdentity, type CompetitorIdentityData, type TeamLabelData } from "@/components/racing/CompetitorIdentity";
 import type { StandingsResult } from "@/lib/racing/standings";
 
 /**
@@ -11,10 +11,13 @@ export function StandingsTable({
   standings,
   competitors,
   winnerCompetitorId,
+  teamLabels,
 }: {
   standings: StandingsResult;
   competitors: Map<string, CompetitorIdentityData>;
   winnerCompetitorId: string | null;
+  /** Optional constructor chip per competitor (drivers' team grouping). */
+  teamLabels?: Map<string, TeamLabelData>;
 }) {
   if (standings.rows.length === 0) {
     return <p className="text-sm text-text-secondary">No points yet — confirm a race result to start the standings.</p>;
@@ -40,7 +43,7 @@ export function StandingsTable({
                 <td className="px-3 py-2 tabular-nums text-text-secondary">{row.rank ?? "—"}</td>
                 <td className="px-3 py-2">
                   <span className="inline-flex items-center gap-2">
-                    <CompetitorIdentity competitor={competitors.get(row.competitorId) ?? {}} />
+                    <CompetitorIdentity competitor={competitors.get(row.competitorId) ?? {}} teamLabel={teamLabels?.get(row.competitorId) ?? null} />
                     {isChampion && <span className="rounded-full bg-success/15 px-2 py-0.5 text-xs text-success">Champion</span>}
                   </span>
                 </td>

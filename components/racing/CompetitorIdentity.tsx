@@ -7,6 +7,13 @@ export type CompetitorIdentityData = {
   imageUrl?: string | null;
 };
 
+// A team ("constructor") a marble races for — rendered as a small trailing chip.
+export type TeamLabelData = {
+  name: string;
+  color?: string | null;
+  imageUrl?: string | null;
+};
+
 /**
  * Reusable visual identity for a racing competitor (Phase 4, §8).
  *
@@ -23,10 +30,13 @@ export function CompetitorIdentity({
   competitor,
   size = "md",
   className,
+  teamLabel,
 }: {
   competitor: CompetitorIdentityData;
   size?: "sm" | "md";
   className?: string;
+  /** Optional constructor chip, rendered after the marble identity. */
+  teamLabel?: TeamLabelData | null;
 }) {
   const colors = (competitor.colors ?? []).slice(0, 4);
   const label = competitor.name?.trim() || null;
@@ -73,6 +83,24 @@ export function CompetitorIdentity({
       {!label && !number && !competitor.imageUrl && colors.length > 0 && (
         <span className={cn("text-text-secondary", size === "sm" ? "text-xs" : "text-sm")}>{colors.join(" / ")}</span>
       )}
+
+      {teamLabel && (
+        <span
+          className={cn(
+            "inline-flex items-center gap-1 rounded-full bg-surface-secondary px-1.5 py-0.5 text-text-secondary",
+            size === "sm" ? "text-[10px]" : "text-xs",
+          )}
+          title={`Team ${teamLabel.name}`}
+        >
+          {teamLabel.imageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={teamLabel.imageUrl} alt="" className="h-3 w-3 rounded-full object-cover" />
+          ) : teamLabel.color ? (
+            <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: cssColor(teamLabel.color) }} />
+          ) : null}
+          {teamLabel.name}
+        </span>
+      )}
     </span>
   );
 }
@@ -80,7 +108,7 @@ export function CompetitorIdentity({
 // Map a user-entered color to a CSS value. Named CSS colors ("Red", "Gold")
 // render directly; a hex value ("#7A1B2C") passes through; anything else falls
 // back to a neutral swatch so the UI never breaks on free-text input.
-function cssColor(input: string): string {
+export function cssColor(input: string): string {
   const v = input.trim();
   if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v)) return v;
   if (/^[a-z]+$/i.test(v)) return v.toLowerCase();
