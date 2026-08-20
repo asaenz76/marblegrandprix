@@ -1,10 +1,11 @@
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
 
 // Shared chrome for standalone legal documents (Terms, Privacy) — these are
 // public routes reachable without auth (outside the (app)/(auth)/(admin)
 // route groups), so they get their own minimal header instead of AppShell's
 // nav or the auth screens' centered-card layout.
-export function LegalPage({
+export async function LegalPage({
   title,
   effectiveDate,
   children,
@@ -13,10 +14,18 @@ export function LegalPage({
   effectiveDate: string;
   children: React.ReactNode;
 }) {
+  // Send the reader back where "home" means for them: the feed when logged in,
+  // the public homepage when logged out.
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const backHref = user ? "/feed" : "/";
+
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 sm:py-16">
       <Link
-        href="/login"
+        href={backHref}
         className="text-sm text-text-secondary underline underline-offset-4 hover:text-text-primary"
       >
         ← Back to Marble Grand Prix
