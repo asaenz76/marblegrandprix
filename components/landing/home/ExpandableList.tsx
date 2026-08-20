@@ -54,7 +54,7 @@ export function ExpandableList({
           className="mt-2 inline-flex items-center gap-1.5 rounded-lg border-2 border-border-subtle bg-surface-primary px-3 py-1.5 text-sm font-semibold text-text-primary shadow-sticker-sm"
         >
           <ChevronDown className={cn("size-4 transition-transform", expanded && "rotate-180")} aria-hidden="true" />
-          {expanded ? "Show less" : `Show all ${count} ${itemNoun}`}
+          {expanded ? "Show Less" : `Show All ${count} ${itemNoun}`}
         </button>
       )}
     </div>

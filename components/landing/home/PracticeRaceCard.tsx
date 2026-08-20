@@ -19,7 +19,7 @@ export function PracticeRaceCard({ pool }: { pool: SocialPoolCardViewModel | nul
         <div className="max-w-xl space-y-3">
           <PoolPreviewCard viewModel={pool} hideEconomics />
           <Link href="/register" className="inline-flex h-11 items-center rounded-lg border-2 border-border-subtle bg-primary px-5 font-semibold text-primary-foreground shadow-sticker-sm">
-            Make your pick
+            Make Your Pick
           </Link>
         </div>
       ) : (

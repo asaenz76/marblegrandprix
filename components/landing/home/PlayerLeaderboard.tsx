@@ -20,7 +20,7 @@ export function PlayerLeaderboard({ entries }: { entries: LandingLeaderboardEntr
         className="max-w-xl"
         count={entries.length}
         threshold={6}
-        itemNoun="players"
+        itemNoun="Players"
       >
         <ol className="space-y-2">
           {entries.map((e) => (

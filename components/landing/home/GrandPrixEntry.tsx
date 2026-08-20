@@ -28,7 +28,7 @@ export function GrandPrixEntry({
     ? "Call the marble that wins the whole season — points from every Grand Prix decide the champion. This pool runs the length of the championship, not a single race."
     : "The official Sunday race. Its finishing order awards the season points that count toward the championship.";
   const label = isSeason ? "Season-long" : "Official round";
-  const cta = isSeason ? "Enter championship pool" : "Enter Grand Prix";
+  const cta = isSeason ? "Enter Championship Pool" : "Enter Grand Prix Pool";
 
   return (
     <section id="enter" className="mx-auto max-w-6xl px-4 sm:px-6">

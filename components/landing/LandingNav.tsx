@@ -23,10 +23,10 @@ export function LandingNav() {
           <InstallAppButton />
           <ThemeToggle />
           <Link href="/login" className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}>
-            Sign in
+            Sign In
           </Link>
           <Link href="/register" className={cn(buttonVariants({ size: "sm" }))}>
-            Join the beta
+            Join the Beta
           </Link>
         </div>
       </div>

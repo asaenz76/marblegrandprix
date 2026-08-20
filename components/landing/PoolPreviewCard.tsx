@@ -91,7 +91,7 @@ export function PoolPreviewCard({
         count={viewModel.options.length}
         threshold={8}
         collapsedMaxHeight="24rem"
-        itemNoun="marbles"
+        itemNoun="Marbles"
       >
         <div className="space-y-2">
           {viewModel.options.map((option) => {
