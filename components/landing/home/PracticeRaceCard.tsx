@@ -9,10 +9,11 @@ import { PoolPreviewCard } from "../PoolPreviewCard";
 export function PracticeRaceCard({ pool }: { pool: SocialPoolCardViewModel | null }) {
   return (
     <section className="mx-auto max-w-6xl px-4 sm:px-6">
-      <h2 className="mb-3 font-display text-2xl font-extrabold">Today&apos;s Practice Race</h2>
+      <h2 className="mb-1 font-display text-2xl font-extrabold uppercase tracking-wide">Today&apos;s Practice</h2>
+      <p className="mb-3 max-w-2xl text-sm font-semibold text-text-primary">Study the grid. Make your pick. Build your streak.</p>
       <p className="mb-4 max-w-2xl text-sm text-text-secondary">
-        A weekday race to learn the field and build your streak — practice results don&apos;t affect the
-        official championship standings.
+        Practice races run Monday through Thursday. Results do not count toward the official championship
+        standings.
       </p>
 
       {pool ? (
@@ -24,8 +25,8 @@ export function PracticeRaceCard({ pool }: { pool: SocialPoolCardViewModel | nul
         </div>
       ) : (
         <div className="max-w-xl rounded-2xl border-2 border-dashed border-border-subtle p-8 text-center">
-          <p className="font-semibold text-text-primary">No practice race open right now</p>
-          <p className="mt-1 text-sm text-text-muted">New practice races open Monday through Thursday. Check back soon.</p>
+          <p className="font-semibold uppercase tracking-wide text-text-primary">Practice closed</p>
+          <p className="mt-1 text-sm text-text-muted">The next practice session will appear here when it opens.</p>
         </div>
       )}
     </section>

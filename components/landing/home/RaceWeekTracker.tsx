@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils";
 const STAGES = [
   { key: "practice", label: "Practice", sub: "Mon–Thu", Icon: ClipboardCheck },
   { key: "qualifying", label: "Qualifying", sub: "Fri–Sat", Icon: Timer },
-  { key: "grandprix", label: "Grand Prix", sub: "Sunday", Icon: Flag },
-  { key: "result", label: "Result", sub: "Standings update", Icon: Trophy },
+  { key: "raceday", label: "Race Day", sub: "Sunday", Icon: Flag },
+  { key: "classification", label: "Classification", sub: "After the race", Icon: Trophy },
 ] as const;
 
 // Which stage the week is in, by day (client-side so it uses the visitor's
@@ -34,7 +34,7 @@ export function RaceWeekTracker() {
 
   return (
     <section className="mx-auto max-w-6xl px-4 sm:px-6">
-      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-text-muted">This week</h2>
+      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-text-muted">Race Week</h2>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
         {STAGES.map((stage, i) => {
           const isActive = active === i;
@@ -53,8 +53,8 @@ export function RaceWeekTracker() {
               >
                 <stage.Icon className="size-5 shrink-0" aria-hidden="true" />
                 <div className="min-w-0">
-                  <p className="font-semibold leading-tight">{stage.label}</p>
-                  <p className={cn("text-xs", isActive ? "text-white/80" : "text-text-muted")}>{stage.sub}</p>
+                  <p className="font-semibold uppercase tracking-wide leading-tight">{stage.label}</p>
+                  <p className={cn("text-xs uppercase tracking-wide", isActive ? "text-white/80" : "text-text-muted")}>{stage.sub}</p>
                 </div>
               </div>
               {i < STAGES.length - 1 && (

@@ -12,7 +12,7 @@ export function UpcomingGrandPrix({ rounds }: { rounds: HomeRound[] }) {
   return (
     <section id="schedule" className="mx-auto max-w-6xl px-4 sm:px-6">
       <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="font-display text-2xl font-extrabold">Upcoming Grand Prix</h2>
+        <h2 className="font-display text-2xl font-extrabold uppercase tracking-wide">Upcoming Grand Prix</h2>
         <Link href="/register" className="text-sm font-semibold text-accent-primary hover:underline">
           Full schedule →
         </Link>

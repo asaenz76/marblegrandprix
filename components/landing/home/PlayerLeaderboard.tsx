@@ -12,7 +12,7 @@ export function PlayerLeaderboard({ entries }: { entries: LandingLeaderboardEntr
   if (entries.length === 0) return null;
   return (
     <section id="community" className="mx-auto max-w-6xl px-4 sm:px-6">
-      <h2 className="font-display text-2xl font-extrabold">Player leaderboard</h2>
+      <h2 className="font-display text-2xl font-extrabold uppercase tracking-wide">Player Leaderboard</h2>
       <p className="mb-4 mt-1 text-sm text-text-secondary">
         The people calling races best — separate from the marble championship.
       </p>

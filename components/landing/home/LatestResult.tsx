@@ -1,7 +1,7 @@
 import type { HomepageData } from "@/lib/landing/fetch";
 import { CompetitorIdentity } from "@/components/racing/CompetitorIdentity";
 
-const PODIUM_LABEL = ["1st", "2nd", "3rd"];
+const PODIUM_LABEL = ["P1", "P2", "P3"];
 
 /**
  * Latest Grand Prix result — winner + podium. Only official Grand Prix results
@@ -14,7 +14,7 @@ export function LatestResult({ result }: { result: HomepageData["latestResult"] 
 
   return (
     <section className="mx-auto max-w-6xl px-4 sm:px-6">
-      <h2 className="mb-4 font-display text-2xl font-extrabold">Latest Grand Prix result</h2>
+      <h2 className="mb-4 font-display text-2xl font-extrabold uppercase tracking-wide">Classification</h2>
       <div className="rounded-2xl border-2 border-border-subtle bg-surface-primary p-6 shadow-sticker">
         <p className="text-sm text-text-muted">
           {result.round.title} Grand Prix
@@ -23,7 +23,7 @@ export function LatestResult({ result }: { result: HomepageData["latestResult"] 
         <ol className="mt-4 space-y-2">
           {podium.map((marble, i) => (
             <li key={i} className="flex items-center gap-3">
-              <span className="w-8 shrink-0 text-sm font-bold text-text-muted">{PODIUM_LABEL[i] ?? `${i + 1}th`}</span>
+              <span className="w-8 shrink-0 text-sm font-bold text-text-muted">{PODIUM_LABEL[i] ?? `P${i + 1}`}</span>
               <CompetitorIdentity competitor={marble} />
             </li>
           ))}

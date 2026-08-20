@@ -27,10 +27,10 @@ export function LandingPage({ data }: { data: HomepageData }) {
         <HomeHero championship={data.championship} nextGrandPrix={data.nextGrandPrix} />
         <RaceWeekTracker />
         <PracticeRaceCard pool={data.practiceRace} />
-        <ChampionshipStandings rows={data.standings} />
-        <UpcomingGrandPrix rounds={data.upcomingRounds} />
-        <MeetTheGrid grid={data.grid} />
         <GrandPrixEntry pool={data.grandPrixPool} grandPrix={data.nextGrandPrix} />
+        <ChampionshipStandings rows={data.standings} />
+        <MeetTheGrid grid={data.grid} />
+        <UpcomingGrandPrix rounds={data.upcomingRounds} />
         <HowRaceWeekWorks />
         <LatestResult result={data.latestResult} />
         <PlayerLeaderboard entries={data.leaderboard} />

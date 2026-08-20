@@ -10,7 +10,7 @@ export function MeetTheGrid({ grid }: { grid: HomeStandingRow[] }) {
   if (grid.length === 0) return null;
   return (
     <section id="grid" className="mx-auto max-w-6xl px-4 sm:px-6">
-      <h2 className="mb-4 font-display text-2xl font-extrabold">Meet the grid</h2>
+      <h2 className="mb-4 font-display text-2xl font-extrabold uppercase tracking-wide">The Grid</h2>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {grid.map((row, i) => (
           <div
@@ -28,6 +28,9 @@ export function MeetTheGrid({ grid }: { grid: HomeStandingRow[] }) {
                 <span className="font-bold">{row.points}</span>
                 <span className="text-text-muted"> pts</span>
               </span>
+              {row.wins > 0 && (
+                <span className="tabular-nums text-xs text-text-muted">{row.wins}W</span>
+              )}
             </div>
           </div>
         ))}

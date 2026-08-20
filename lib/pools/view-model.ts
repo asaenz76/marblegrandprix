@@ -205,7 +205,7 @@ export function deriveRacingQuestion(
   scope: "RACE" | "COMPETITION",
   competitionFormat: string | null,
 ): string {
-  if (scope === "RACE") return "Who wins this race?";
+  if (scope === "RACE") return "Who takes the chequered flag?";
   switch (competitionFormat) {
     case "CHAMPIONSHIP":
       return "Who wins the championship?";
