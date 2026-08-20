@@ -43,7 +43,7 @@ export function UpcomingGrandPrix({ rounds }: { rounds: HomeRound[] }) {
                   <CompetitorIdentity competitor={r.winner} size="sm" />
                 </span>
               ) : i === 0 ? (
-                <span className="inline-flex items-center rounded-md border-2 border-border-subtle bg-accent-primary px-2.5 py-0.5 text-xs font-semibold text-white">
+                <span className="inline-flex items-center rounded-full bg-accent-primary px-2.5 py-1 text-xs font-semibold text-white">
                   This weekend
                 </span>
               ) : (
