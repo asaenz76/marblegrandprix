@@ -13,6 +13,7 @@ const TABS = [
   { href: "/racing", label: "Home", exact: true },
   { href: "/racing/competitions", label: "Competitions" },
   { href: "/racing/races", label: "Races" },
+  { href: "/racing/competitors", label: "Competitors" },
 ];
 
 export function RacingNav() {
